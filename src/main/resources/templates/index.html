@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="layout :: none">
+<body>
+<div th:with="pageTitle='Home', content=~{::content}">
+  <div th:fragment="content">
+    <div class="p-4 p-md-5 rounded-3 bg-light border">
+      <h1 class="display-6 fw-semibold">Train smarter. Track everything.</h1>
+      <p class="lead mb-4">Plan sessions, log workouts, and stay consistent with your goals.</p>
+      <div class="d-flex gap-2">
+        <a class="btn btn-dark" th:href="@{/login}">Log in</a>
+        <a class="btn btn-outline-dark" th:href="@{/dashboard}">View dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

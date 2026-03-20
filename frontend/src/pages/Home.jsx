@@ -1,4 +1,4 @@
-import Navigation from "../components/Navigation";
+/*import Navigation from "../components/Navigation";
 import Statistics from "../components/Statistics";
 
 function Home() {
@@ -15,4 +15,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Home; */

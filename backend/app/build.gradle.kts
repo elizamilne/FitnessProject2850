@@ -22,10 +22,26 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Ktor 
+    implementation("io.ktor:ktor-server-core:2.3.7")
+    implementation("io.ktor:ktor-server-netty:2.3.7")
+
+    implementation("io.ktor:ktor-server-content-negotiation:2.3.7")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.46.0")
+
+    // Exposed
+    implementation("org.jetbrains.exposed:exposed-core:0.46.0")
+    implementation("org.jetbrains.exposed:exposed-dao:0.46.0")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.46.0")
+
+    // SQLite driver 
+    implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -37,7 +53,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.AppKt"
+    mainClass = "org.example.ApplicationKt"
 }
 
 tasks.named<Test>("test") {

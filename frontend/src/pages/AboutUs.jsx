@@ -1,4 +1,4 @@
-import Navigation from "../components/Navigation";
+/*import Navigation from "../components/Navigation";
 import Statistics from "../components/Statistics";
 
 function AboutUs() {
@@ -15,4 +15,4 @@ function AboutUs() {
   );
 }
 
-export default AboutUs;
+export default AboutUs;*/

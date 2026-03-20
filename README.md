@@ -2,8 +2,21 @@
 
 ## 1. Start the Application
 
+Ensure you have Java installed before running the backend.
+Before executing any commands, ensure you are in the project’s root directory.
+
 ### 1.1. Setup the Backend Application
-// TODO
+From the root folder of the project, navigate to the backend directory:
+```bash
+cd backend
+```
+
+Build and start the backend server using the Gradle wrapper:
+```bash
+./gradlew run
+```
+
+The server will start on your local machine at `http://localhost:8080/`
 
 ---
 

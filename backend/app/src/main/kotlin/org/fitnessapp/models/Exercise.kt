@@ -1,6 +1,7 @@
 package org.fitnessapp.models
 
 import org.jetbrains.exposed.sql.*
+import kotlinx.serialization.Serializable
 
 object Exercise : Table("exercise") {
     val id = long("id").autoIncrement()
@@ -8,3 +9,10 @@ object Exercise : Table("exercise") {
     val image = text("image").nullable()
     override val primaryKey = PrimaryKey(id)
 }
+
+@Serializable
+data class ExerciseDTO(
+    val id: Long? = null,
+    val name: String?,
+    val image: String?
+)

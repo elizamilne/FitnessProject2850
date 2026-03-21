@@ -19,6 +19,7 @@ import org.fitnessapp.initDatabase
 import org.fitnessapp.routes.userRoutes
 import org.fitnessapp.routes.profileRoutes
 import org.fitnessapp.routes.activityRoutes
+import org.fitnessapp.routes.exericseRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 

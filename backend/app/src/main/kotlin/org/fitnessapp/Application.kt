@@ -17,6 +17,7 @@ import io.ktor.server.response.*
 
 import org.fitnessapp.initDatabase
 import org.fitnessapp.routes.userRoutes
+import org.fitnessapp.routes.profileRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -59,6 +60,7 @@ fun Application.module() {
         userRoutes()
         raceRoutes()
         programScheduleRoutes()
+        profileRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

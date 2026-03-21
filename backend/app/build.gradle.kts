@@ -9,6 +9,8 @@ plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
 
+    kotlin("plugin.serialization") version "2.2.20"
+
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
@@ -22,23 +24,28 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation(libs.junit.jupiter)
 
-    // Ktor 
-    implementation("io.ktor:ktor-server-core:2.3.7")
-    implementation("io.ktor:ktor-server-netty:2.3.7")
+    val ktor_version = "2.3.7"
 
-    implementation("io.ktor:ktor-server-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-    implementation("org.jetbrains.exposed:exposed-java-time:0.46.0")
+    // Ktor
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-server-status-pages:$ktor_version")
 
     // Exposed
     implementation("org.jetbrains.exposed:exposed-core:0.46.0")
     implementation("org.jetbrains.exposed:exposed-dao:0.46.0")
     implementation("org.jetbrains.exposed:exposed-jdbc:0.46.0")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.46.0")
 
-    // SQLite driver 
+    // SQLite
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
-    // This dependency is used by the application.
+    // Hashing
+    implementation("org.mindrot:jbcrypt:0.4")
+
     implementation(libs.guava)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -53,7 +60,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.ApplicationKt"
+    mainClass = "org.fitnessapp.ApplicationKt"
 }
 
 tasks.named<Test>("test") {

@@ -27,7 +27,7 @@ private fun findUserById(id: Long): UserResponse? = transaction {
 
 
 fun Route.userRoutes() {
-    route("/User") {
+    route("/user") {
         post("/register") {
             val request = call.receive<RegisterRequest>()
             
@@ -65,5 +65,43 @@ fun Route.userRoutes() {
             )
         }
 
+        post("/login") {
+            val request = call.receive<LoginRequest>()
+
+            val userRow = transaction {
+                User.selectAll()
+                    .where{ User.email eq request.email }
+                    .singleOrNull()
+            }
+
+            if (userRow == null) {
+                call.respond(HttpStatusCode.Unauthorized, "Invalid credentials")
+                return@post
+            }
+
+            val storedHash = userRow[User.hashPass]
+
+            if (!BCrypt.checkpw(request.password, storedHash)) { 
+                call.respond(HttpStatusCode.Unauthorized, "Invalid credentials")
+                return@post
+            }
+
+            val user = UserResponse(
+                id = userRow[User.id],
+                firstName = userRow[User.firstName],
+                lastName = userRow[User.lastName],
+                email = userRow[User.email],
+                createdAt = userRow[User.createdAt].toString()
+            )
+
+            call.respond(
+                HttpStatusCode.OK,
+                user
+            )
+        }
+
+        post("/logout") {
+            call.respond(HttpStatusCode.OK, mapOf("message" to "Logged out successfully"))
+        }
     }
 }

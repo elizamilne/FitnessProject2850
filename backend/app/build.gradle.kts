@@ -38,6 +38,9 @@ dependencies {
     // SQLite driver 
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
+    // 🔐 for hashing
+    implementation("org.mindrot:jbcrypt:0.4")
+    
     // This dependency is used by the application.
     implementation(libs.guava)
 

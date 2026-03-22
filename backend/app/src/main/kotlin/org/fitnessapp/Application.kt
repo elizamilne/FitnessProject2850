@@ -23,6 +23,7 @@ import org.fitnessapp.routes.exericseRoutes
 import org.fitnessapp.routes.muscleGroupRoutes
 import org.fitnessapp.routes.categoryRoutes
 import org.fitnessapp.routes.programScheduleRoutes
+import org.fitnessapp.routes.activityMetricRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -70,6 +71,7 @@ fun Application.module() {
         muscleGroupRoutes()
         categoryRoutes()
         programScheduleRoutes()
+        activityMetricRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

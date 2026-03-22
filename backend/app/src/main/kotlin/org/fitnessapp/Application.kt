@@ -57,6 +57,8 @@ fun Application.module() {
 
     routing { 
         userRoutes()
+        raceRoutes()
+        programScheduleRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

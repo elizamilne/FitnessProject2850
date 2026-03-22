@@ -20,6 +20,12 @@ data class ProgramExerciseMetricDTO(
 )
 
 @Serializable
+data class ProgramExerciseMetricRequest(
+    val metricTypeId: Long,
+    val value: Double
+)
+
+@Serializable
 data class ProgramExerciseMetricUpdate(
     val value: Double
 )

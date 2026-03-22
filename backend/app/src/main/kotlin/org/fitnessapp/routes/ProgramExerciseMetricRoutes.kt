@@ -15,9 +15,8 @@ import org.fitnessapp.models.ProgramExerciseMetricDTO
 
 import java.math.BigDecimal
 
-fun Route.programExerciseMetric() { 
+fun Route.programExerciseMetricRoutes() { 
     route("/program-exercise-metrics") {
-
         get {
             val programExerciseMetrics = transaction { 
                 ProgramExerciseMetric.selectAll().map {

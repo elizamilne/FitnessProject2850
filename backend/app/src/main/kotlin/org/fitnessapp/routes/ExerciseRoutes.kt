@@ -88,8 +88,8 @@ fun Route.exerciseRoutes() {
 
                 ExerciseDetailDTO(
                     id = baseInfo[Exercise.id],
-                    name = baseInfo[Exercise.name],
-                    image = baseInfo[Exercise.image],
+                    name = baseInfo[Exercise.name] ?: "",
+                    image = baseInfo[Exercise.image] ?: "",
                     categoryIds = categories,
                     muscleGroupIds = muscles
                 )

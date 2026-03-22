@@ -29,7 +29,7 @@ import org.fitnessapp.routes.activityRoutes
 import org.fitnessapp.routes.activityMetricRoutes
 import org.fitnessapp.routes.metricTypeRoutes
 
-import org.fitnessapp.routes.exericseRoutes
+import org.fitnessapp.routes.exerciseRoutes
 import org.fitnessapp.routes.muscleGroupRoutes
 import org.fitnessapp.routes.categoryRoutes
 
@@ -83,6 +83,7 @@ fun Application.module() {
         programExerciseRoutes()
         metricTypeRoutes()
         programExerciseMetric()
+        exerciseRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

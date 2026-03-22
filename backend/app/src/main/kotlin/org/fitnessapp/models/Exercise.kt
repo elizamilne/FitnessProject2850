@@ -16,3 +16,12 @@ data class ExerciseDTO(
     val name: String?,
     val image: String?
 )
+
+@kotlinx.serialization.Serializable
+data class ExerciseDetailDTO(
+    val id: Long,
+    val name: String,
+    val image: String,
+    val categoryIds: List<Long>,
+    val muscleGroupIds: List<Long>
+)

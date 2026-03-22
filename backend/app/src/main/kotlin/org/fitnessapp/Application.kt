@@ -16,16 +16,22 @@ import kotlinx.serialization.json.Json
 import io.ktor.server.response.*
 
 import org.fitnessapp.initDatabase
+
+// Route imports
 import org.fitnessapp.routes.userRoutes
 import org.fitnessapp.routes.profileRoutes
+
+import org.fitnessapp.routes.programExerciseRoutes
+import org.fitnessapp.routes.programExerciseMetric
+import org.fitnessapp.routes.programScheduleRoutes
+
 import org.fitnessapp.routes.activityRoutes
+import org.fitnessapp.routes.activityMetricRoutes
+import org.fitnessapp.routes.metricTypeRoutes
+
 import org.fitnessapp.routes.exericseRoutes
 import org.fitnessapp.routes.muscleGroupRoutes
 import org.fitnessapp.routes.categoryRoutes
-import org.fitnessapp.routes.programScheduleRoutes
-import org.fitnessapp.routes.activityMetricRoutes
-import org.fitnessapp.routes.programExerciseRoutes
-import org.fitnessapp.routes.metricTypeRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -76,6 +82,7 @@ fun Application.module() {
         activityMetricRoutes()
         programExerciseRoutes()
         metricTypeRoutes()
+        programExerciseMetric()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

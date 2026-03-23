@@ -11,18 +11,16 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
 import org.fitnessapp.services.UserService
+import org.fitnessapp.services.toCreateUserRequest
+import org.fitnessapp.services.toUserResponse
 
 fun Route.userRoutes() {
     route("/user") {
         post("/register") {
             val request = call.receive<RegisterRequest>()
+        
+            val existingUser = UserService.findUserByEmail(request.email)
             
-            val existingUser = transaction {
-                User.selectAll().where {
-                    (User.email eq request.email)
-                }.singleOrNull()
-            }
-
             if (existingUser != null) { 
                 call.respond(HttpStatusCode.Conflict, "User already exists")
                 return@post
@@ -33,15 +31,10 @@ fun Route.userRoutes() {
                 BCrypt.gensalt()
             )
 
-            val userId = transaction { 
-                User.insert {
-                    it[firstName] = request.firstName
-                    it[lastName] = request.lastName
-                    it[email] = request.email
-                    it[hashPass] = hashedPassword
-                } get User.id
-            }
+            val createRequest = request.toCreateUserRequest(hashedPassword)
 
+            val userId = UserService.createActivityAndReturnId(createRequest)
+            
             val createdUser = UserService.findUserById(userId)
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
             
@@ -54,31 +47,21 @@ fun Route.userRoutes() {
         post("/login") {
             val request = call.receive<LoginRequest>()
 
-            val userRow = transaction {
-                User.selectAll()
-                    .where{ User.email eq request.email }
-                    .singleOrNull()
-            }
+            val existingUser = UserService.findUserByEmail(request.email)
 
-            if (userRow == null) {
+            if (existingUser == null) {
                 call.respond(HttpStatusCode.Unauthorized, "Invalid credentials")
                 return@post
             }
 
-            val storedHash = userRow[User.hashPass]
+            val storedHash = existingUser[User.hashPass]
 
             if (!BCrypt.checkpw(request.password, storedHash)) { 
                 call.respond(HttpStatusCode.Unauthorized, "Invalid credentials")
                 return@post
             }
 
-            val user = UserResponse(
-                id = userRow[User.id],
-                firstName = userRow[User.firstName],
-                lastName = userRow[User.lastName],
-                email = userRow[User.email],
-                createdAt = userRow[User.createdAt].toString()
-            )
+            val user = existingUser.toUserResponse()
 
             call.respond(
                 HttpStatusCode.OK,

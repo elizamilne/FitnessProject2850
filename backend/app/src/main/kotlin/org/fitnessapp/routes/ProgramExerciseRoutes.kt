@@ -21,6 +21,8 @@ import org.fitnessapp.models.ProgramExerciseMetricRequest
 import org.fitnessapp.models.MetricType
 import org.fitnessapp.models.Program
 
+import org.fitnessapp.services.ExerciseService
+
 import java.math.BigDecimal
 
 private fun ResultRow.toProgramExerciseDTO() = ProgramExerciseDTO(
@@ -143,7 +145,7 @@ fun Route.programExerciseRoutes() {
                 return@post call.respond(HttpStatusCode.BadRequest, "Program not found")
             }
 
-            val exercise = findExerciseById(request.exerciseId)
+            val exercise = ExerciseService.findExerciseById(request.exerciseId)
             if (exercise == null) {
                 return@post call.respond(HttpStatusCode.BadRequest, "Exercise not found")
             }

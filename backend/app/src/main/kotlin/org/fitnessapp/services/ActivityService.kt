@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.fitnessapp.models.*
 import java.time.LocalDate
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 fun ResultRow.toActivityDTO() = ActivityDTO(
     id = this[Activity.id],
@@ -43,6 +44,16 @@ object ActivityService {
         }.map {
             it.toActivityDTO()
         }
+    }
+
+    fun createActivityAndReturnId(request: CreateActivityRequest): Long = transaction {
+        Activity.insert { builder ->
+            createActivity(builder, request)
+        } get Activity.id
+    }
+
+    fun deleteActivityById(id: Long): Int = transaction {
+        Activity.deleteWhere { Activity.id eq id }
     }
 }
 

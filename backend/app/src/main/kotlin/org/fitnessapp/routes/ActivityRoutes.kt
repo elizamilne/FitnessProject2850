@@ -11,7 +11,6 @@ import io.ktor.http.*
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 import org.fitnessapp.models.Activity
 import org.fitnessapp.models.CreateActivityRequest
@@ -38,11 +37,7 @@ fun Route.activityRoutes() {
         post {
             val activity = call.receive<CreateActivityRequest>()
 
-            val createdActivityId = transaction { 
-                Activity.insert { builder ->
-                    ActivityService.createActivity(builder, activity)
-                } get Activity.id
-            }
+            val createdActivityId = ActivityService.createActivityAndReturnId(activity)
 
             call.respond(
                 HttpStatusCode.Created,
@@ -54,9 +49,7 @@ fun Route.activityRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = transaction { 
-                Activity.deleteWhere { Activity.id eq id }
-            }
+            val rowsDeleted = ActivityService.deleteActivityById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Activity not found")

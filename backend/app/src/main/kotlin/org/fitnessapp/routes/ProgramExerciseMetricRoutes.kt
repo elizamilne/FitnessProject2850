@@ -9,7 +9,6 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.statements.UpdateBuilder
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.fitnessapp.models.ProgramExerciseMetric
@@ -19,83 +18,13 @@ import org.fitnessapp.models.UpdateProgramExerciseMetricRequest
 
 import java.math.BigDecimal
 
-private fun ResultRow.toProgramExerciseMetricDTO() = ProgramExerciseMetricDTO(
-    id = this[ProgramExerciseMetric.id],
-    metricTypeId = this[ProgramExerciseMetric.metricTypeId],
-    programExerciseId = this[ProgramExerciseMetric.programExerciseId],
-    value = this[ProgramExerciseMetric.value].toDouble()
-)
-
-private fun CreateProgramExerciseMetricRequest.toProgramExerciseMetricDTO(
-    id: Long
-) = ProgramExerciseMetricDTO(
-    id = id,
-    metricTypeId = metricTypeId,
-    programExerciseId = programExerciseId,
-    value = value
-)
-
-private fun createProgramExerciseMetric(
-    builder: InsertStatement<*>,
-    request: CreateProgramExerciseMetricRequest
-) {
-    builder[ProgramExerciseMetric.metricTypeId] = request.metricTypeId
-    builder[ProgramExerciseMetric.programExerciseId] = request.programExerciseId
-    builder[ProgramExerciseMetric.value] = request.value.toBigDecimal()
-}
-
-private fun updateProgramExerciseMetric(
-    builder: UpdateBuilder<*>,
-    request: UpdateProgramExerciseMetricRequest
-) {
-    builder[ProgramExerciseMetric.metricTypeId] = request.metricTypeId
-    builder[ProgramExerciseMetric.programExerciseId] = request.programExerciseId
-    builder[ProgramExerciseMetric.value] = request.value.toBigDecimal()
-}
-
-private fun findAllProgramExerciseMetrics(): List<ProgramExerciseMetricDTO> = transaction {
-    ProgramExerciseMetric
-        .selectAll()
-        .map { it.toProgramExerciseMetricDTO() }
-}
-
-private fun findProgramExerciseMetricById(id: Long): ProgramExerciseMetricDTO? = transaction {
-    ProgramExerciseMetric
-        .selectAll()
-        .where { ProgramExerciseMetric.id eq id }
-        .map { it.toProgramExerciseMetricDTO() }
-        .singleOrNull()
-}
-
-private fun createProgramExerciseMetricAndReturnId(
-    request: CreateProgramExerciseMetricRequest
-): Long = transaction {
-    ProgramExerciseMetric.insert { builder ->
-        createProgramExerciseMetric(builder, request)
-    } get ProgramExerciseMetric.id
-}
-
-private fun updateProgramExerciseMetricById(
-    id: Long,
-    request: UpdateProgramExerciseMetricRequest
-): Int = transaction {
-    ProgramExerciseMetric.update(
-        { ProgramExerciseMetric.id eq id }
-    ) { builder ->
-        updateProgramExerciseMetric(builder, request)
-    }
-}
-
-private fun deleteProgramExerciseMetricById(id: Long): Int = transaction {
-    ProgramExerciseMetric.deleteWhere {
-        ProgramExerciseMetric.id eq id
-    }
-}
+import org.fitnessapp.services.ProgramExerciseMetricService
+import org.fitnessapp.services.toProgramExerciseMetricDTO
 
 fun Route.programExerciseMetricRoutes() { 
     route("/program-exercise-metrics") {
         get {
-            val programExerciseMetrics = findAllProgramExerciseMetrics()
+            val programExerciseMetrics = ProgramExerciseMetricService.findAllProgramExerciseMetrics()
 
             call.respond(HttpStatusCode.OK, programExerciseMetrics)
         }
@@ -104,7 +33,7 @@ fun Route.programExerciseMetricRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val programExerciseMetric = findProgramExerciseMetricById(id)
+            val programExerciseMetric = ProgramExerciseMetricService.findProgramExerciseMetricById(id)
 
             if (programExerciseMetric == null){ 
                 call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")
@@ -116,7 +45,7 @@ fun Route.programExerciseMetricRoutes() {
         post {
             val request = call.receive<CreateProgramExerciseMetricRequest>()
 
-            val createdProgramExerciseMetricId = createProgramExerciseMetricAndReturnId(request)
+            val createdProgramExerciseMetricId = ProgramExerciseMetricService.createProgramExerciseMetricAndReturnId(request)
 
             call.respond(
                 HttpStatusCode.Created,
@@ -137,7 +66,7 @@ fun Route.programExerciseMetricRoutes() {
                 )
             }
 
-            val rowsUpdated = updateProgramExerciseMetricById(id, request)
+            val rowsUpdated = ProgramExerciseMetricService.updateProgramExerciseMetricById(id, request)
 
             if (rowsUpdated == 0) {
                 call.respond(
@@ -156,7 +85,7 @@ fun Route.programExerciseMetricRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = deleteProgramExerciseMetricById(id)
+            val rowsDeleted = ProgramExerciseMetricService.deleteProgramExerciseMetricById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")

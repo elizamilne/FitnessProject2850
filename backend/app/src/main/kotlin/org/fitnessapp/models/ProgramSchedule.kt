@@ -16,3 +16,9 @@ data class ProgramScheduleDTO(
     val day: String,
     val programId: Long
 )
+
+@Serializable
+data class CreateProgramScheduleRequest(
+    val day: String,
+    val programId: Long 
+)

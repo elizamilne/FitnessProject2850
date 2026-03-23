@@ -12,6 +12,11 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
+import java.time.LocalDate
+import java.time.format.DateTimeParseException
+import java.time.format.TextStyle
+import java.util.Locale
+
 import org.fitnessapp.models.Program
 import org.fitnessapp.models.ProgramDTO
 import org.fitnessapp.models.ProgramSchedule
@@ -21,6 +26,7 @@ import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProgramExercise
 import org.fitnessapp.models.ProgramExerciseMetric
 
+
 private fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
     id = this[Program.id],
     profileId = this[Program.profileId],
@@ -28,6 +34,15 @@ private fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
     bannerUrl = this[Program.bannerUrl],
     weeklyFrequency = days
 )
+
+private fun createProgram(
+    builder: InsertStatement<*>,
+    request: CreateProgramRequest
+) {
+    builder[Program.title] = request.title
+    builder[Program.bannerUrl] = request.bannerUrl
+    builder[Program.profileId] = request.profileId
+}
 
 private fun findProgramsByProfileId(profileId: Long): List<ProgramDTO> = transaction {
     Program.selectAll()
@@ -43,13 +58,33 @@ private fun findProgramsByProfileId(profileId: Long): List<ProgramDTO> = transac
         }
 }
 
-private fun createProgram(
-    builder: InsertStatement<*>,
-    request: CreateProgramRequest
-) {
-    builder[Program.title] = request.title
-    builder[Program.bannerUrl] = request.bannerUrl
-    builder[Program.profileId] = request.profileId
+private fun findProgramsByProfileIdAndDay(
+    profileId: Long, 
+    day: String
+): List<ProgramDTO> = transaction {
+
+    Program.selectAll()
+        .where { Program.profileId eq profileId }
+        .mapNotNull { row ->
+            val programId = row[Program.id]
+
+            val days = ProgramSchedule.selectAll()
+                .where { ProgramSchedule.programId eq programId }
+                .map { it[ProgramSchedule.day] }
+
+            if (day in days) {
+                row.toProgramDTO(days)
+            } else {
+                null
+            }
+        }
+}
+
+private fun getDayOfWeek(dateParam: String?): String? {
+    return dateParam?.let {
+        val date = LocalDate.parse(it) 
+        date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+    }
 }
 
 fun Route.programRoutes() { 
@@ -62,7 +97,20 @@ fun Route.programRoutes() {
                 return@get
             }
 
-            val programs = findProgramsByProfileId(profileId)
+            val dateParam = call.request.queryParameters["date"]
+
+            val dayOfWeek = try {
+                getDayOfWeek(dateParam)
+            } catch (e: DateTimeParseException) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid date format. Use YYYY-MM-DD")
+                return@get
+            }
+
+            val programs = if (dayOfWeek != null) {
+                findProgramsByProfileIdAndDay(profileId, dayOfWeek)
+            } else {
+                findProgramsByProfileId(profileId)
+            }
 
             call.respond(HttpStatusCode.OK, programs)
         }

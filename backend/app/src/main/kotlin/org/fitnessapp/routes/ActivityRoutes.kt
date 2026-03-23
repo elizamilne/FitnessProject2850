@@ -1,5 +1,8 @@
 package org.fitnessapp.routes
 
+import org.fitnessapp.services.ActivityService
+import org.fitnessapp.services.toActivityDTO
+
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -9,51 +12,9 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.fitnessapp.models.Activity
-import org.fitnessapp.models.ActivityDTO
 import org.fitnessapp.models.CreateActivityRequest
-
-import java.time.LocalDate
-
-private fun ResultRow.toActivityDTO() = ActivityDTO(
-    id = this[Activity.id],
-    date = this[Activity.date].toString(),
-    profileId = this[Activity.profileId],
-    exerciseId = this[Activity.exerciseId]
-)
-
-private fun CreateActivityRequest.toActivityDTO(id: Long) = ActivityDTO(
-    id = id,
-    date = date,
-    profileId = profileId,
-    exerciseId = exerciseId
-)
-
-private fun createActivity(
-    builder: InsertStatement<*>,
-    request: CreateActivityRequest
-) {
-    builder[Activity.date] = LocalDate.parse(request.date)
-    builder[Activity.profileId] = request.profileId
-    builder[Activity.exerciseId] = request.exerciseId
-}
-
-private fun findActivitiesByProfile(
-    profileId: Long,
-    date: java.time.LocalDate?
-): List<ActivityDTO> = transaction {
-    Activity.selectAll().where {
-        if (date != null) {
-            (Activity.profileId eq profileId) and (Activity.date eq date)
-        } else {
-            Activity.profileId eq profileId
-        }
-    }.map {
-        it.toActivityDTO()
-    }
-}
 
 fun Route.activityRoutes() { 
     route("/activities") {
@@ -69,7 +30,7 @@ fun Route.activityRoutes() {
                 }
             }
 
-            val activities = findActivitiesByProfile(profileId, date)
+            val activities = ActivityService.findActivitiesByProfile(profileId, date)
 
             call.respond(HttpStatusCode.OK, activities)
         }
@@ -79,7 +40,7 @@ fun Route.activityRoutes() {
 
             val createdActivityId = transaction { 
                 Activity.insert { builder ->
-                    createActivity(builder, activity)
+                    ActivityService.createActivity(builder, activity)
                 } get Activity.id
             }
 

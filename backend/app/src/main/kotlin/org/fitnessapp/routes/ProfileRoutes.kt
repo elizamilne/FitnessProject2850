@@ -29,9 +29,21 @@ private fun ResultRow.toProfileDTO() = ProfileDTO(
     workoutFrequency = this[Profile.workoutFrequency]
 )
 
+private fun CreateProfileRequest.toProfileDTO(id: Long) = ProfileDTO(
+    id = id,
+    userId = userId,
+    goal = goal,
+    gender = gender,
+    age = age,
+    level = level,
+    weight = weight,
+    height = height,
+    workoutFrequency = workoutFrequency
+)
+
 private fun createProfile(
     builder: InsertStatement<*>,
-    profile: ProfileDTO
+    profile: CreateProfileRequest
 ) {
     builder[Profile.userId] = profile.userId
     builder[Profile.goal] = profile.goal
@@ -41,6 +53,10 @@ private fun createProfile(
     builder[Profile.weight] = BigDecimal.valueOf(profile.weight)
     builder[Profile.height] = BigDecimal.valueOf(profile.height)
     builder[Profile.workoutFrequency] = profile.workoutFrequency
+}
+
+private fun findAllProfiles(): List<ProfileDTO> = transaction {
+    Profile.selectAll().map { it.toProfileDTO() }
 }
 
 private fun getProfileById(id: Long): ProfileDTO? = transaction {
@@ -57,12 +73,20 @@ private fun findProfileByUserId(userId: Long): ProfileDTO? = transaction {
         .singleOrNull()
 }
 
+private fun createProfileAndReturnId(profile: CreateProfileRequest): Long = transaction {
+    Profile.insert { builder ->
+        createProfile(builder, profile)
+    } get Profile.id
+}
+
+private fun deleteProfileById(id: Long): Int = transaction {
+    Profile.deleteWhere { Profile.id eq id }
+}
+
 fun Route.profileRoutes() { 
     route("/profiles") { 
         get { 
-            val profiles = transaction { 
-                Profile.selectAll().map { it.toProfileDTO() }
-            }
+            val profiles = findAllProfiles()
 
             call.respond(HttpStatusCode.OK, profiles)
         }
@@ -94,24 +118,21 @@ fun Route.profileRoutes() {
         }
 
         post { 
-            val profile = call.receive<ProfileDTO>().copy(id = null)
+            val profile = call.receive<CreateProfileRequest>()
 
-            val createdProfileId = transaction {
-                Profile.insert { builder ->
-                    createProfile(builder, profile)
-                } get Profile.id
-            }
+            val createdProfileId = createProfileAndReturnId(profile)
 
-            call.respond(HttpStatusCode.Created, profile.copy(id=createdProfileId))
+            call.respond(
+                HttpStatusCode.Created, 
+                profile.toProfileDTO(createdProfileId)
+            )
         }
 
         delete("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = transaction {
-                Profile.deleteWhere { Profile.id eq id }
-            }
+            val rowsDeleted = deleteProfileById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")

@@ -89,7 +89,7 @@ private fun getDayOfWeek(dateParam: String?): String? {
 
 fun findProgramById(programId: Long): ResultRow? = transaction {
     Program
-        .select { Program.id eq programId }
+        .selectAll().where { Program.id eq programId }
         .singleOrNull()
 }
 

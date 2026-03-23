@@ -9,6 +9,7 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 import org.fitnessapp.models.Exercise
 import org.fitnessapp.models.ExerciseDTO
@@ -23,6 +24,84 @@ private fun ResultRow.toExerciseDTO() = ExerciseDTO(
     image = this[Exercise.image]
 )
 
+// Filtering helpers
+
+private fun nameContains(search: String): Op<Boolean> =
+    Exercise.name.lowerCase() like "%${search.lowercase()}%"
+
+// Relation helpers
+
+private fun findExerciseIdsByCategoryId(categoryId: Long): List<Long> = 
+    ExerciseCategory
+        .slice(ExerciseCategory.exerciseId)
+        .select { ExerciseCategory.categoryId eq categoryId }
+        .map { it[ExerciseCategory.exerciseId] }
+
+private fun findExerciseIdsByMuscleGroupId(muscleGroupId: Long): List<Long> =
+    ExerciseMuscleGroup
+        .slice(ExerciseMuscleGroup.exerciseId)
+        .select { ExerciseMuscleGroup.muscleGroupId eq muscleGroupId }
+        .map { it[ExerciseMuscleGroup.exerciseId] }
+
+private fun findCategoryIdsByExerciseId(exerciseId: Long): List<Long> =
+    ExerciseCategory
+        .slice(ExerciseCategory.categoryId)
+        .select { ExerciseCategory.exerciseId eq exerciseId }
+        .map { it[ExerciseCategory.categoryId] }
+
+private fun findMuscleGroupIdsByExerciseId(exerciseId: Long): List<Long> =
+    ExerciseMuscleGroup
+        .slice(ExerciseMuscleGroup.muscleGroupId)
+        .select { ExerciseMuscleGroup.exerciseId eq exerciseId }
+        .map { it[ExerciseMuscleGroup.muscleGroupId] }
+
+// Query helpers
+
+private fun findExercises(
+    search: String?, 
+    categoryId: Long?, 
+    muscleGroupId: Long?
+): List<ExerciseDTO> = transaction {
+
+    var query = Exercise.selectAll()
+
+    if (!search.isNullOrBlank()) {
+        query = query.andWhere { nameContains(search) }
+    }
+
+    if (categoryId != null) {
+        val ids = findExerciseIdsByCategoryId(categoryId)
+        if (ids.isEmpty()) return@transaction emptyList()
+        query = query.andWhere { Exercise.id inList ids }
+    }
+
+    if (muscleGroupId != null) {
+        val ids = findExerciseIdsByMuscleGroupId(muscleGroupId)
+        if (ids.isEmpty()) return@transaction emptyList()
+        query = query.andWhere { Exercise.id inList ids }
+    }
+
+    query.map { it.toExerciseDTO() }
+}
+
+private fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {
+    val baseInfo = Exercise.selectAll()
+        .where { Exercise.id eq id }
+        .singleOrNull()
+        ?: return@transaction null
+
+    val categories = findCategoryIdsByExerciseId(id) 
+    val muscles = findMuscleGroupIdsByExerciseId(id) 
+
+    ExerciseDetailDTO(
+        id = baseInfo[Exercise.id],
+        name = baseInfo[Exercise.name] ?: "",
+        image = baseInfo[Exercise.image] ?: "",
+        categoryIds = categories,
+        muscleGroupIds = muscles
+    )
+}
+
 fun Route.exerciseRoutes() { 
     route("/exercises") {
         get {
@@ -30,38 +109,7 @@ fun Route.exerciseRoutes() {
             val categoryId = call.request.queryParameters["categoryId"]?.toLongOrNull()
             val muscleGroupId = call.request.queryParameters["muscleGroupId"]?.toLongOrNull()
 
-            val exercises = transaction {
-                var query = Exercise.selectAll()
-
-                // search (optional)
-                if (!search.isNullOrBlank()) {
-                    query = query.andWhere {
-                        Exercise.name.lowerCase() like "%${search.lowercase()}%"
-                    }
-                }
-
-                // category filter (optional)
-                if (categoryId != null) {
-                    val ids = ExerciseCategory
-                        .slice(ExerciseCategory.exerciseId)
-                        .select { ExerciseCategory.categoryId eq categoryId }
-                        .map { it[ExerciseCategory.exerciseId] }
-
-                    query = query.andWhere { Exercise.id inList ids }
-                }
-
-                // muscle filter (optional)
-                if (muscleGroupId != null) {
-                    val ids = ExerciseMuscleGroup
-                        .slice(ExerciseMuscleGroup.exerciseId)
-                        .select { ExerciseMuscleGroup.muscleGroupId eq muscleGroupId }
-                        .map { it[ExerciseMuscleGroup.exerciseId] }
-
-                    query = query.andWhere { Exercise.id inList ids }
-                }
-
-                query.map { it.toExerciseDTO() } 
-            }
+            val exercises = findExercises(search, categoryId, muscleGroupId)
 
             call.respond(HttpStatusCode.OK, exercises)
         }
@@ -70,30 +118,7 @@ fun Route.exerciseRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
-            val result = transaction {
-                val baseInfo = Exercise.selectAll()
-                    .where { Exercise.id eq id }
-                    .singleOrNull()
-                    ?: return@transaction null
-
-                val categories = ExerciseCategory
-                    .slice(ExerciseCategory.categoryId)
-                    .select { ExerciseCategory.exerciseId eq id }
-                    .map { it[ExerciseCategory.categoryId] }
-
-                val muscles = ExerciseMuscleGroup
-                    .slice(ExerciseMuscleGroup.muscleGroupId)
-                    .select { ExerciseMuscleGroup.exerciseId eq id }
-                    .map { it[ExerciseMuscleGroup.muscleGroupId] }
-
-                ExerciseDetailDTO(
-                    id = baseInfo[Exercise.id],
-                    name = baseInfo[Exercise.name] ?: "",
-                    image = baseInfo[Exercise.image] ?: "",
-                    categoryIds = categories,
-                    muscleGroupIds = muscles
-                )
-            }
+            val result = findExerciseDetailById(id)
 
             if (result == null) {
                 call.respond(HttpStatusCode.NotFound, "Exercise not found")

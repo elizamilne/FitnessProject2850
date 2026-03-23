@@ -1,5 +1,8 @@
 package org.fitnessapp.routes
 
+import org.fitnessapp.services.CategoryService
+import org.fitnessapp.services.toCategoryDTO
+
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -13,29 +16,10 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.fitnessapp.models.Category
 import org.fitnessapp.models.CategoryDTO
 
-private fun ResultRow.toCategoryDTO() = CategoryDTO(
-    id = this[Category.id],
-    name = this[Category.name],
-    image = this[Category.image]
-)
-
-private fun findAllCategories(): List<CategoryDTO> = transaction {
-    Category.selectAll().map {
-        it.toCategoryDTO()
-    }
-}
-
-private fun findCategoryById(id: Long): CategoryDTO? = transaction {
-    Category.selectAll()
-        .where { Category.id eq id }
-        .map { it.toCategoryDTO() }
-        .singleOrNull()
-}
-
 fun Route.categoryRoutes() {
     route("/categories") {
         get {
-            val categories = findAllCategories()
+            val categories = CategoryService.findAllCategories()
             
             call.respond(HttpStatusCode.OK, categories)
         }
@@ -44,7 +28,7 @@ fun Route.categoryRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val category = findCategoryById(id)
+            val category = CategoryService.findCategoryById(id)
 
             if (category == null) {
                 call.respond(HttpStatusCode.NotFound, "Category not found")

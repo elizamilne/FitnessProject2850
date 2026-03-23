@@ -18,3 +18,10 @@ data class ActivityMetricDTO(
     val metricTypeId: Long?,   
     val value: Double?        
 )
+
+@Serializable
+data class CreateActivityMetricRequest(
+    val activityId: Long?,     
+    val metricTypeId: Long?,   
+    val value: Double?        
+)

@@ -9,6 +9,7 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.jetbrains.exposed.dao.id.EntityID
 import java.math.BigDecimal
@@ -17,6 +18,30 @@ import org.fitnessapp.models.Activity
 import org.fitnessapp.models.MetricType
 import org.fitnessapp.models.ActivityMetric
 import org.fitnessapp.models.ActivityMetricDTO
+import org.fitnessapp.models.CreateActivityMetricRequest
+
+private fun ResultRow.toActivityMetricDTO() = ActivityMetricDTO(
+    id = this[ActivityMetric.id],
+    activityId = this[ActivityMetric.activityId],
+    metricTypeId = this[ActivityMetric.metricTypeId],
+    value = this[ActivityMetric.value]?.toDouble()
+)
+
+private fun CreateActivityMetricRequest.toActivityMetricDTO(id: Long) = ActivityMetricDTO(
+    id = id,
+    activityId = activityId,
+    metricTypeId = metricTypeId,
+    value = value
+)
+
+private fun createActivityMetric(
+    builder: InsertStatement<*>,
+    request: CreateActivityMetricRequest
+) {
+    builder[ActivityMetric.activityId] = request.activityId
+    builder[ActivityMetric.metricTypeId] = request.metricTypeId
+    builder[ActivityMetric.value] = request.value?.toBigDecimal()
+}
 
 fun Route.activityMetricRoutes() {
     route("/activity-metrics") {
@@ -26,15 +51,9 @@ fun Route.activityMetricRoutes() {
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
             val activityMetrics = transaction { 
-                ActivityMetric.selectAll().where { ActivityMetric.activityId eq activityId }
-                    .map {
-                        ActivityMetricDTO(
-                            id = it[ActivityMetric.id],
-                            activityId = it[ActivityMetric.activityId],
-                            metricTypeId = it[ActivityMetric.metricTypeId],
-                            value = it[ActivityMetric.value]?.toDouble()
-                        )
-                    }
+                ActivityMetric.selectAll()
+                    .where { ActivityMetric.activityId eq activityId }
+                    .map { it.toActivityMetricDTO() }
             }
                 
             if (activityMetrics.isEmpty()) {
@@ -45,17 +64,18 @@ fun Route.activityMetricRoutes() {
         }
 
         post {
-            val activityMetric = call.receive<ActivityMetricDTO>()
+            val activityMetric = call.receive<CreateActivityMetricRequest>()
 
             val activityMetricId = transaction { 
-                ActivityMetric.insert {
-                    it[ActivityMetric.activityId] = activityMetric.activityId
-                    it[ActivityMetric.metricTypeId] = activityMetric.metricTypeId
-                    it[ActivityMetric.value] = activityMetric.value?.let { BigDecimal.valueOf(it) }
+                ActivityMetric.insert { builder ->
+                    createActivityMetric(builder, activityMetric)
                 } get ActivityMetric.id
             }
             
-            call.respond(HttpStatusCode.Created, activityMetric.copy(id = activityMetricId))
+            call.respond(
+                HttpStatusCode.Created, 
+                activityMetric.toActivityMetricDTO(activityMetricId)
+            )
         }
     }
 }

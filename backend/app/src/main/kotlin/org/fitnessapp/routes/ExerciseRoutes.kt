@@ -102,6 +102,12 @@ private fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {
     )
 }
 
+fun findExerciseById(exerciseId: Long): ResultRow? = transaction {
+    Exercise
+        .selectAll().where { Exercise.id eq exerciseId }
+        .singleOrNull()
+}
+
 fun Route.exerciseRoutes() { 
     route("/exercises") {
         get {

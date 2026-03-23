@@ -31,6 +31,13 @@ private fun findMetricTypeById(id: Long): MetricTypeDTO? = transaction {
         .singleOrNull()
 }
 
+fun metricTypeExists(metricTypeId: Long): Boolean {
+    return MetricType
+        .selectAll()
+        .where { MetricType.id eq metricTypeId }
+        .any()
+}
+
 fun Route.metricTypeRoutes() { 
     route("/metrics") {
         get {

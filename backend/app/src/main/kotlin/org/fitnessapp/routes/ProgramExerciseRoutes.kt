@@ -29,16 +29,6 @@ private fun ResultRow.toProgramExerciseDTO() = ProgramExerciseDTO(
     exerciseId = this[ProgramExercise.exerciseId]
 )
 
-private fun getMetricsForProgramExercise(programExerciseId: Long): List<Map<String, Any>> =
-    (ProgramExerciseMetric innerJoin MetricType)
-        .selectAll().where { ProgramExerciseMetric.programExerciseId eq programExerciseId }
-        .map { mRow ->
-            mapOf(
-                "metricName" to mRow[MetricType.name],
-                "value" to mRow[ProgramExerciseMetric.value].toDouble()
-            )
-        }
-
 private fun ResultRow.toProgramExerciseWithMetrics(): Map<String, Any?> {
     val peId = this[ProgramExercise.id]
 
@@ -70,12 +60,64 @@ private fun createProgramExerciseMetric(
     builder[ProgramExerciseMetric.value] = BigDecimal.valueOf(metric.value)
 }
 
+private fun getMetricsForProgramExercise(programExerciseId: Long): List<Map<String, Any>> =
+    (ProgramExerciseMetric innerJoin MetricType)
+        .selectAll().where { ProgramExerciseMetric.programExerciseId eq programExerciseId }
+        .map { mRow ->
+            mapOf(
+                "metricName" to mRow[MetricType.name],
+                "value" to mRow[ProgramExerciseMetric.value].toDouble()
+            )
+        }
+
+private fun findAllProgramExercises(): List<ProgramExerciseDTO> = transaction {
+    ProgramExercise
+        .selectAll()
+        .map { it.toProgramExerciseDTO() }
+}
+
+private fun createProgramExerciseAndReturnId(
+    request: CreateProgramExerciseRequest
+): Long =
+    ProgramExercise.insert { builder ->
+        createProgramExercise(builder, request)
+    } get ProgramExercise.id
+
+
+private fun insertMetricIfTypeExists(
+    programExerciseId: Long,
+    metric: ProgramExerciseMetricRequest
+) {
+    if (metricTypeExists(metric.metricTypeId)) {
+        ProgramExerciseMetric.insert { builder ->
+            createProgramExerciseMetric(builder, programExerciseId, metric)
+        }
+    }
+}
+
+private fun insertMetricsForProgramExercise(
+    programExerciseId: Long,
+    metrics: List<ProgramExerciseMetricRequest>
+) {
+    metrics.forEach { metric ->
+        insertMetricIfTypeExists(programExerciseId, metric)
+    }
+}
+
+private fun deleteProgramExerciseAndMetrics(programExerciseId: Long): Int = transaction {
+    ProgramExerciseMetric.deleteWhere {
+        ProgramExerciseMetric.programExerciseId eq programExerciseId
+    }
+
+    ProgramExercise.deleteWhere {
+        ProgramExercise.id eq programExerciseId
+    }
+}
+
 fun Route.programExerciseRoutes() { 
     route("/program-exercises") {
         get {
-            val programExercises = transaction {
-                ProgramExercise.selectAll().map { it.toProgramExerciseDTO() }
-            }
+            val programExercises = findAllProgramExercises()
 
             call.respond(HttpStatusCode.OK, programExercises)
         }
@@ -96,43 +138,19 @@ fun Route.programExerciseRoutes() {
         post {
             val request = call.receive<CreateProgramExerciseRequest>()
 
-            val programExists = transaction {
-                Program.selectAll()
-                    .where { Program.id eq request.programId }
-                    .singleOrNull()
-            }
-
-            if (programExists == null) {
+            val program = findProgramById(request.programId)
+            if (program == null) {
                 return@post call.respond(HttpStatusCode.BadRequest, "Program not found")
             }
 
-            val exerciseExists = transaction {
-                Exercise.selectAll()
-                    .where { Exercise.id eq request.exerciseId }
-                    .singleOrNull()
-            }
-
-            if (exerciseExists == null) {
+            val exercise = findExerciseById(request.exerciseId)
+            if (exercise == null) {
                 return@post call.respond(HttpStatusCode.BadRequest, "Exercise not found")
             }
 
             val programExerciseId = transaction {
-                val currentProgramExerciseId = ProgramExercise.insert { builder ->
-                    createProgramExercise(builder, request)
-                } get ProgramExercise.id
-
-                request.metrics.forEach { metric ->
-                    val metricTypeExists = MetricType.selectAll()
-                        .where { MetricType.id eq metric.metricTypeId }
-                        .singleOrNull()
-
-                    if (metricTypeExists != null) {
-                        ProgramExerciseMetric.insert { builder ->
-                            createProgramExerciseMetric(builder, currentProgramExerciseId, metric)
-                        }
-                    }
-                }
-
+                val currentProgramExerciseId = createProgramExerciseAndReturnId(request)
+                insertMetricsForProgramExercise(currentProgramExerciseId, request.metrics)
                 currentProgramExerciseId
             }
 
@@ -143,18 +161,13 @@ fun Route.programExerciseRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val deleted = transaction {
-                ProgramExerciseMetric.deleteWhere { programExerciseId eq id }
-                val count = ProgramExercise.deleteWhere { ProgramExercise.id eq id }
-                count
-            }
-
+            val deleted = deleteProgramExerciseAndMetrics(id)
+        
             if (deleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Program Exercise not found")
             } else {
                 call.respond(HttpStatusCode.NoContent)
             }
         }
-
     }
 }

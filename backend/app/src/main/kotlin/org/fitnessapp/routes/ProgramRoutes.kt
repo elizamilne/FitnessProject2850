@@ -87,6 +87,12 @@ private fun getDayOfWeek(dateParam: String?): String? {
     }
 }
 
+fun findProgramById(programId: Long): ResultRow? = transaction {
+    Program
+        .select { Program.id eq programId }
+        .singleOrNull()
+}
+
 fun Route.programRoutes() { 
     route("/programs") {
         get("/profile/{profileId}") {

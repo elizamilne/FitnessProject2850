@@ -15,17 +15,7 @@ import org.fitnessapp.models.ProgramScheduleDTO
 
 import java.time.LocalDate
 
-private fun ResultRow.toProgramScheduleDTO() = ProgramScheduleDTO(
-    id = this[ProgramSchedule.id],
-    day = this[ProgramSchedule.day],
-    programId = this[ProgramSchedule.programId]
-)
-
-private fun findSchedulesByProgramId(programId: Long) = transaction {
-    ProgramSchedule.selectAll()
-        .where { ProgramSchedule.programId eq programId }
-        .map { it.toProgramScheduleDTO() }
-}
+import org.fitnessapp.services.ProgramScheduleService
 
 fun Route.programScheduleRoutes() {
     route("/program-schedules") {
@@ -34,7 +24,7 @@ fun Route.programScheduleRoutes() {
             val programId = call.parameters["programId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Program ID")
 
-            val schedules = findSchedulesByProgramId(programId)
+            val schedules = ProgramScheduleService.findSchedulesByProgramId(programId)
 
             if (schedules.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "No schedules found")

@@ -55,7 +55,7 @@ fun Route.programExerciseRoutes() {
         post {
             val request = call.receive<CreateProgramExerciseRequest>()
 
-            val program = ProgramService.findProgramById(request.programId)
+            val program = ProgramService.findProgramRowById(request.programId)
             if (program == null) {
                 return@post call.respond(HttpStatusCode.BadRequest, "Program not found")
             }

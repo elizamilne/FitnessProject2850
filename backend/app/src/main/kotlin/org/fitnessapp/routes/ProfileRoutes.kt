@@ -23,7 +23,7 @@ import java.math.BigDecimal
 fun Route.profileRoutes() { 
     route("/profiles") { 
         get { 
-            val profiles = ProfileService.findAllProfiles()
+            val profiles = ProfileService.getAllProfiles()
 
             call.respond(HttpStatusCode.OK, profiles)
         }
@@ -45,7 +45,7 @@ fun Route.profileRoutes() {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid User ID")
 
-            val profile = ProfileService.findProfileByUserId(userId)
+            val profile = ProfileService.getProfileByUserId(userId)
 
             if (profile == null) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")

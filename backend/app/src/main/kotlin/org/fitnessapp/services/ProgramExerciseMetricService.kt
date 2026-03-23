@@ -4,11 +4,12 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 
 import java.math.BigDecimal
 
@@ -88,6 +89,16 @@ object ProgramExerciseMetricService {
     fun deleteProgramExerciseMetricById(id: Long): Int = transaction {
         ProgramExerciseMetric.deleteWhere {
             ProgramExerciseMetric.id eq id
+        }
+    }
+
+    fun deleteProgramExerciseMetrics(ids: List<Long>) {
+        if (ids.isEmpty()) return
+
+        ids.forEach { id ->
+            ProgramExerciseMetric.deleteWhere {
+                ProgramExerciseMetric.programExerciseId eq id
+            }
         }
     }
 }

@@ -34,7 +34,16 @@ object ProgramService {
         builder[Program.profileId] = request.profileId
     }
 
-    fun findProgramsByProfileId(profileId: Long): List<ProgramDTO> = transaction {
+    fun getDayOfWeek(dateParam: String?): String? {
+        return dateParam?.let {
+            val date = LocalDate.parse(it) 
+            date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
+        }
+    }
+    
+    // DTO functions
+
+    fun getProgramsByProfileId(profileId: Long): List<ProgramDTO> = transaction {
         Program.selectAll()
             .where { Program.profileId eq profileId }
             .map { row ->
@@ -48,7 +57,7 @@ object ProgramService {
             }
     }
 
-    fun findProgramsByProfileIdAndDay(
+    fun getProgramsByProfileIdAndDay(
         profileId: Long, 
         day: String
     ): List<ProgramDTO> = transaction {
@@ -70,17 +79,26 @@ object ProgramService {
             }
     }
 
-    fun getDayOfWeek(dateParam: String?): String? {
-        return dateParam?.let {
-            val date = LocalDate.parse(it) 
-            date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-        }
-    }
+    // DB-functions
 
-    fun findProgramById(programId: Long): ResultRow? = transaction {
+    fun findProgramRowById(programId: Long): ResultRow? = transaction {
         Program
-            .selectAll().where { Program.id eq programId }
+            .selectAll()
+            .where { Program.id eq programId }
             .singleOrNull()
     }
 
+    fun createProgramAndReturnId(request: CreateProgramRequest): Long = transaction {
+        Program.insert { builder ->
+            createProgram(builder, request)
+        } get Program.id
+    }
+
+    fun deleteProgramDependencies(programId: Long) = transaction {
+        val programExerciseIds = ProgramExerciseService.getProgramExerciseIds(programId)
+
+        ProgramExerciseMetricService.deleteProgramExerciseMetrics(programExerciseIds)
+        ProgramExerciseService.deleteProgramExercises(programId)
+        ProgramScheduleService.deleteProgramSchedules(programId)
+    }
 }

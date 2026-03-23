@@ -70,6 +70,12 @@ object ProgramExerciseService {
                     "value" to mRow[ProgramExerciseMetric.value].toDouble()
                 )
             }
+    
+    fun getProgramExerciseIds(programId: Long): List<Long> {
+        return ProgramExercise
+            .selectAll().where { ProgramExercise.programId eq programId }
+            .map { it[ProgramExercise.id] }
+    }
 
     fun findAllProgramExercises(): List<ProgramExerciseDTO> = transaction {
         ProgramExercise
@@ -112,6 +118,12 @@ object ProgramExerciseService {
 
         ProgramExercise.deleteWhere {
             ProgramExercise.id eq programExerciseId
+        }
+    }
+
+    fun deleteProgramExercises(programId: Long) {
+        ProgramExercise.deleteWhere { 
+            ProgramExercise.programId eq programId 
         }
     }
 }

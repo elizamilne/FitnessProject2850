@@ -50,4 +50,8 @@ object ProgramScheduleService {
     fun deleteProgramScheduleById(id: Long): Int = transaction {
         ProgramSchedule.deleteWhere { ProgramSchedule.id eq id }
     }
+
+    fun deleteProgramSchedules(programId: Long) {
+        ProgramSchedule.deleteWhere { ProgramSchedule.programId eq programId }
+    }
 }

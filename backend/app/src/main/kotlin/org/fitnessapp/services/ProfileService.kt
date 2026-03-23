@@ -53,7 +53,9 @@ object ProfileService {
         builder[Profile.workoutFrequency] = profile.workoutFrequency
     }
 
-    fun findAllProfiles(): List<ProfileDTO> = transaction {
+    // DTO functions 
+
+    fun getAllProfiles(): List<ProfileDTO> = transaction {
         Profile.selectAll().map { it.toProfileDTO() }
     }
 
@@ -64,10 +66,18 @@ object ProfileService {
             .singleOrNull()
     }
 
-    fun findProfileByUserId(userId: Long): ProfileDTO? = transaction {
+    fun getProfileByUserId(userId: Long): ProfileDTO? = transaction {
         Profile.selectAll()
             .where { Profile.userId eq userId }
             .map { it.toProfileDTO() }
+            .singleOrNull()
+    }
+
+    // DB-level functions
+
+    fun findProfileRowById(id: Long): ResultRow? = transaction {
+        Profile.selectAll()
+            .where { Profile.id eq id }
             .singleOrNull()
     }
 

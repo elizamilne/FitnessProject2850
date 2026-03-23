@@ -12,36 +12,12 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 import org.fitnessapp.models.MetricType
 import org.fitnessapp.models.MetricTypeDTO
-
-private fun ResultRow.toMetricTypeDTO() = MetricTypeDTO(
-    id = this[MetricType.id],
-    name = this[MetricType.name]
-)
-
-private fun findAllMetricTypes(): List<MetricTypeDTO> = transaction {
-    MetricType.selectAll().map {
-        it.toMetricTypeDTO()
-    }
-}
-
-private fun findMetricTypeById(id: Long): MetricTypeDTO? = transaction {
-    MetricType.selectAll()
-        .where { MetricType.id eq id }
-        .map { it.toMetricTypeDTO() }
-        .singleOrNull()
-}
-
-fun metricTypeExists(metricTypeId: Long): Boolean {
-    return MetricType
-        .selectAll()
-        .where { MetricType.id eq metricTypeId }
-        .any()
-}
+import org.fitnessapp.services.MetricTypeService
 
 fun Route.metricTypeRoutes() { 
     route("/metrics") {
         get {
-            val metricTypes = findAllMetricTypes()
+            val metricTypes = MetricTypeService.findAllMetricTypes()
 
             if (metricTypes.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "Metric Types not found")
@@ -54,7 +30,7 @@ fun Route.metricTypeRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
-            val metricType = findMetricTypeById(id)
+            val metricType = MetricTypeService.findMetricTypeById(id)
 
             if (metricType == null) {
                 call.respond(HttpStatusCode.NotFound, "Metric Type not found")

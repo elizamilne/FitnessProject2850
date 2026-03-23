@@ -19,9 +19,10 @@ import org.fitnessapp.models.Exercise
 import org.fitnessapp.models.ProgramExerciseMetric
 import org.fitnessapp.models.ProgramExerciseMetricRequest
 import org.fitnessapp.models.MetricType
-import org.fitnessapp.models.Program
+import org.fitnessapp.models.Program 
 
 import org.fitnessapp.services.ExerciseService
+import org.fitnessapp.services.MetricTypeService
 
 import java.math.BigDecimal
 
@@ -90,7 +91,7 @@ private fun insertMetricIfTypeExists(
     programExerciseId: Long,
     metric: ProgramExerciseMetricRequest
 ) {
-    if (metricTypeExists(metric.metricTypeId)) {
+    if (MetricTypeService.metricTypeExists(metric.metricTypeId)) {
         ProgramExerciseMetric.insert { builder ->
             createProgramExerciseMetric(builder, programExerciseId, metric)
         }

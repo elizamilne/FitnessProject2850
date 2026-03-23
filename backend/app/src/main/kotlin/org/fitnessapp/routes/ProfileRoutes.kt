@@ -9,29 +9,59 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProfileDTO
+import org.fitnessapp.models.CreateProfileRequest
 
 import java.math.BigDecimal
+
+private fun ResultRow.toProfileDTO() = ProfileDTO(
+    id = this[Profile.id],
+    userId = this[Profile.userId],
+    goal = this[Profile.goal],
+    gender = this[Profile.gender],
+    age = this[Profile.age],
+    level = this[Profile.level],
+    weight = this[Profile.weight].toDouble(),
+    height = this[Profile.height].toDouble(),
+    workoutFrequency = this[Profile.workoutFrequency]
+)
+
+private fun createProfile(
+    builder: InsertStatement<*>,
+    profile: ProfileDTO
+) {
+    builder[Profile.userId] = profile.userId
+    builder[Profile.goal] = profile.goal
+    builder[Profile.gender] = profile.gender
+    builder[Profile.age] = profile.age
+    builder[Profile.level] = profile.level
+    builder[Profile.weight] = BigDecimal.valueOf(profile.weight)
+    builder[Profile.height] = BigDecimal.valueOf(profile.height)
+    builder[Profile.workoutFrequency] = profile.workoutFrequency
+}
+
+private fun getProfileById(id: Long): ProfileDTO? = transaction {
+    Profile.selectAll()
+        .where { Profile.id eq id }
+        .map { it.toProfileDTO() }
+        .singleOrNull()
+}
+
+private fun findProfileByUserId(userId: Long): ProfileDTO? = transaction {
+    Profile.selectAll()
+        .where { Profile.userId eq userId }
+        .map { it.toProfileDTO() }
+        .singleOrNull()
+}
 
 fun Route.profileRoutes() { 
     route("/profiles") { 
         get { 
             val profiles = transaction { 
-                Profile.selectAll().map {
-                    ProfileDTO(
-                        id = it[Profile.id],
-                        userId = it[Profile.userId],
-                        goal = it[Profile.goal],
-                        gender = it[Profile.gender],
-                        age = it[Profile.age],
-                        level = it[Profile.level],
-                        weight = it[Profile.weight].toDouble(),
-                        height = it[Profile.height].toDouble(),
-                        workoutFrequency = it[Profile.workoutFrequency]
-                    )
-                }
+                Profile.selectAll().map { it.toProfileDTO() }
             }
 
             call.respond(HttpStatusCode.OK, profiles)
@@ -41,22 +71,7 @@ fun Route.profileRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val profile = transaction { 
-                Profile.selectAll().where { Profile.id eq id }
-                    .map {
-                        ProfileDTO(
-                            id = it[Profile.id],
-                            userId = it[Profile.userId],
-                            goal = it[Profile.goal],
-                            gender = it[Profile.gender],
-                            age = it[Profile.age],
-                            level = it[Profile.level],
-                            weight = it[Profile.weight].toDouble(),
-                            height = it[Profile.height].toDouble(),
-                            workoutFrequency = it[Profile.workoutFrequency]
-                        )
-                    }.singleOrNull()
-            }
+            val profile = getProfileById(id)
 
             if (profile == null ) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")
@@ -69,22 +84,7 @@ fun Route.profileRoutes() {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid User ID")
 
-            val profile = transaction { 
-                Profile.selectAll().where { Profile.userId eq userId }
-                    .map { 
-                        ProfileDTO(
-                            id = it[Profile.id],
-                            userId = it[Profile.userId],
-                            goal = it[Profile.goal],
-                            gender = it[Profile.gender],
-                            age = it[Profile.age],
-                            level = it[Profile.level],
-                            weight = it[Profile.weight].toDouble(),
-                            height = it[Profile.height].toDouble(),
-                            workoutFrequency = it[Profile.workoutFrequency]
-                        )
-                    }.singleOrNull()
-            }
+            val profile = findProfileByUserId(userId)
 
             if (profile == null) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")
@@ -94,18 +94,11 @@ fun Route.profileRoutes() {
         }
 
         post { 
-            val profile = call.receive<ProfileDTO>()
+            val profile = call.receive<ProfileDTO>().copy(id = null)
 
-            val createdProfileId = transaction { 
-                Profile.insert {
-                    it[userId] = profile.userId
-                    it[goal] = profile.goal
-                    it[gender] = profile.gender
-                    it[age] = profile.age
-                    it[level] = profile.level
-                    it[weight] = profile.weight.let { BigDecimal.valueOf(it) }
-                    it[height] = profile.height.let { BigDecimal.valueOf(it) }
-                    it[workoutFrequency] = profile.workoutFrequency
+            val createdProfileId = transaction {
+                Profile.insert { builder ->
+                    createProfile(builder, profile)
                 } get Profile.id
             }
 

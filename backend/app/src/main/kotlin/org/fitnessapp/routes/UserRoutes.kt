@@ -10,21 +10,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 
-private fun findUserById(id: Long): UserResponse? = transaction {
-    User.selectAll()
-        .where { User.id eq id }
-        .map {
-            UserResponse(
-                id = it[User.id],
-                firstName = it[User.firstName],
-                lastName = it[User.lastName],
-                email = it[User.email],
-                createdAt = it[User.createdAt].toString(),
-            )
-        }
-        .singleOrNull()
-}
-
+import org.fitnessapp.services.UserService
 
 fun Route.userRoutes() {
     route("/user") {
@@ -56,7 +42,7 @@ fun Route.userRoutes() {
                 } get User.id
             }
 
-            val createdUser = findUserById(userId)
+            val createdUser = UserService.findUserById(userId)
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
             
             call.respond(

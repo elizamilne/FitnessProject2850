@@ -23,6 +23,7 @@ import org.fitnessapp.models.Program
 
 import org.fitnessapp.services.ExerciseService
 import org.fitnessapp.services.MetricTypeService
+import org.fitnessapp.services.ProgramService
 
 import java.math.BigDecimal
 
@@ -54,7 +55,7 @@ fun Route.programExerciseRoutes() {
         post {
             val request = call.receive<CreateProgramExerciseRequest>()
 
-            val program = findProgramById(request.programId)
+            val program = ProgramService.findProgramById(request.programId)
             if (program == null) {
                 return@post call.respond(HttpStatusCode.BadRequest, "Program not found")
             }

@@ -26,72 +26,7 @@ import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProgramExercise
 import org.fitnessapp.models.ProgramExerciseMetric
 
-
-private fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
-    id = this[Program.id],
-    profileId = this[Program.profileId],
-    title = this[Program.title],
-    bannerUrl = this[Program.bannerUrl],
-    weeklyFrequency = days
-)
-
-private fun createProgram(
-    builder: InsertStatement<*>,
-    request: CreateProgramRequest
-) {
-    builder[Program.title] = request.title
-    builder[Program.bannerUrl] = request.bannerUrl
-    builder[Program.profileId] = request.profileId
-}
-
-private fun findProgramsByProfileId(profileId: Long): List<ProgramDTO> = transaction {
-    Program.selectAll()
-        .where { Program.profileId eq profileId }
-        .map { row ->
-            val programId = row[Program.id]
-
-            val days = ProgramSchedule.selectAll()
-                .where { ProgramSchedule.programId eq programId }
-                .map { it[ProgramSchedule.day] }
-
-            row.toProgramDTO(days)
-        }
-}
-
-private fun findProgramsByProfileIdAndDay(
-    profileId: Long, 
-    day: String
-): List<ProgramDTO> = transaction {
-
-    Program.selectAll()
-        .where { Program.profileId eq profileId }
-        .mapNotNull { row ->
-            val programId = row[Program.id]
-
-            val days = ProgramSchedule.selectAll()
-                .where { ProgramSchedule.programId eq programId }
-                .map { it[ProgramSchedule.day] }
-
-            if (day in days) {
-                row.toProgramDTO(days)
-            } else {
-                null
-            }
-        }
-}
-
-private fun getDayOfWeek(dateParam: String?): String? {
-    return dateParam?.let {
-        val date = LocalDate.parse(it) 
-        date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH)
-    }
-}
-
-fun findProgramById(programId: Long): ResultRow? = transaction {
-    Program
-        .selectAll().where { Program.id eq programId }
-        .singleOrNull()
-}
+import org.fitnessapp.services.ProgramService
 
 fun Route.programRoutes() { 
     route("/programs") {
@@ -106,16 +41,16 @@ fun Route.programRoutes() {
             val dateParam = call.request.queryParameters["date"]
 
             val dayOfWeek = try {
-                getDayOfWeek(dateParam)
+                ProgramService.getDayOfWeek(dateParam)
             } catch (e: DateTimeParseException) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid date format. Use YYYY-MM-DD")
                 return@get
             }
 
             val programs = if (dayOfWeek != null) {
-                findProgramsByProfileIdAndDay(profileId, dayOfWeek)
+                ProgramService.findProgramsByProfileIdAndDay(profileId, dayOfWeek)
             } else {
-                findProgramsByProfileId(profileId)
+                ProgramService.findProgramsByProfileId(profileId)
             }
 
             call.respond(HttpStatusCode.OK, programs)
@@ -137,7 +72,7 @@ fun Route.programRoutes() {
 
             val programId = transaction { 
                  Program.insert { builder ->
-                    createProgram(builder, request)
+                    ProgramService.createProgram(builder, request)
                 } get Program.id
             }
 

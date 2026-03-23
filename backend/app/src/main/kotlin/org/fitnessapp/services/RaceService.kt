@@ -47,11 +47,34 @@ object RaceService {
         builder[Race.bannerUrl] = request.bannerUrl
     }
 
+    fun getAllRaces(): List<RaceDTO> {
+        return transaction {
+            Race.selectAll()
+                .map { it.toRaceDTO() }
+            }
+    }
+
     fun findRaceById(id: Long): RaceDTO? = transaction {
         Race
             .selectAll()
             .where { Race.id eq id }
             .map { it.toRaceDTO() }
             .singleOrNull()
+    }
+
+    fun createRaceAndReturnId(request: CreateRaceRequest): Long = transaction {
+        Race.insert { builder ->
+            createRace(builder, request)
+        } get Race.id
+    }
+
+    fun updateRaceById(id: Long, request: UpdateRaceRequest): Int = transaction {
+        Race.update({ Race.id eq id }) { builder ->
+            updateRace(builder, request)
+        }
+    }
+
+    fun deleteRaceById(id: Long): Int = transaction {
+        Race.deleteWhere { Race.id eq id }
     }
 }

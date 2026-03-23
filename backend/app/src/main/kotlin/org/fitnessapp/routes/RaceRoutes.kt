@@ -25,10 +25,7 @@ import org.fitnessapp.services.toRaceDTO
 fun Route.raceRoutes() {
     route("/races") {
         get {
-            val races = transaction {
-                Race.selectAll()
-                    .map { it.toRaceDTO() }
-            }
+            val races = RaceService.getAllRaces()
             
             call.respond(HttpStatusCode.OK, races)
         }
@@ -46,12 +43,8 @@ fun Route.raceRoutes() {
         post {
             val request = call.receive<CreateRaceRequest>()
 
-            val raceId = transaction {
-                Race.insert { builder ->
-                    RaceService.createRace(builder, request)
-                } get Race.id
-            }
-
+            val raceId = RaceService.createRaceAndReturnId(request)
+            
             val createdRace = RaceService.findRaceById(raceId)
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
         
@@ -64,13 +57,9 @@ fun Route.raceRoutes() {
             
             val request = call.receive<UpdateRaceRequest>()
             
-            val updated = transaction {
-                Race.update({ Race.id eq id }) { builder ->
-                    RaceService.updateRace(builder, request)
-                }
-            }
-
-            if (updated == 0) {
+            val updatedCount = RaceService.updateRaceById(id, request)
+            
+            if (updatedCount == 0) {
                 return@put call.respond(HttpStatusCode.NotFound, "Race not found")
             }
 
@@ -84,11 +73,9 @@ fun Route.raceRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid Id")
 
-            val deleted = transaction {
-                Race.deleteWhere { Race.id eq id }
-            }
+            val deletedCount = RaceService.deleteRaceById(id)
 
-            if (deleted == 0) {
+            if (deletedCount == 0) {
                 return@delete call.respond(HttpStatusCode.NotFound, "Race not found")
             }
 

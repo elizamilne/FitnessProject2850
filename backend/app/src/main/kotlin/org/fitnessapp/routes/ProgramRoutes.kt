@@ -12,6 +12,11 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
+import java.time.LocalDate
+import java.time.format.DateTimeParseException
+import java.time.format.TextStyle
+import java.util.Locale
+
 import org.fitnessapp.models.Program
 import org.fitnessapp.models.ProgramDTO
 import org.fitnessapp.models.ProgramSchedule
@@ -21,36 +26,8 @@ import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProgramExercise
 import org.fitnessapp.models.ProgramExerciseMetric
 
-private fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
-    id = this[Program.id],
-    profileId = this[Program.profileId],
-    title = this[Program.title],
-    bannerUrl = this[Program.bannerUrl],
-    weeklyFrequency = days
-)
-
-private fun findProgramsByProfileId(profileId: Long): List<ProgramDTO> = transaction {
-    Program.selectAll()
-        .where { Program.profileId eq profileId }
-        .map { row ->
-            val programId = row[Program.id]
-
-            val days = ProgramSchedule.selectAll()
-                .where { ProgramSchedule.programId eq programId }
-                .map { it[ProgramSchedule.day] }
-
-            row.toProgramDTO(days)
-        }
-}
-
-private fun createProgram(
-    builder: InsertStatement<*>,
-    request: CreateProgramRequest
-) {
-    builder[Program.title] = request.title
-    builder[Program.bannerUrl] = request.bannerUrl
-    builder[Program.profileId] = request.profileId
-}
+import org.fitnessapp.services.ProgramService
+import org.fitnessapp.services.ProfileService
 
 fun Route.programRoutes() { 
     route("/programs") {
@@ -62,7 +39,20 @@ fun Route.programRoutes() {
                 return@get
             }
 
-            val programs = findProgramsByProfileId(profileId)
+            val dateParam = call.request.queryParameters["date"]
+
+            val dayOfWeek = try {
+                ProgramService.getDayOfWeek(dateParam)
+            } catch (e: DateTimeParseException) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid date format. Use YYYY-MM-DD")
+                return@get
+            }
+
+            val programs = if (dayOfWeek != null) {
+                ProgramService.getProgramsByProfileIdAndDay(profileId, dayOfWeek)
+            } else {
+                ProgramService.getProgramsByProfileId(profileId)
+            }
 
             call.respond(HttpStatusCode.OK, programs)
         }
@@ -70,22 +60,16 @@ fun Route.programRoutes() {
         post {
             val request = call.receive<CreateProgramRequest>()
 
-            val existingProfile = transaction {
-                Profile.selectAll()
-                    .where { Profile.id eq request.profileId }
-                    .singleOrNull()
-            }
+            ProfileService.getProfileById(request.profileId)
+            
+            val existingProfile = ProfileService.findProfileRowById(request.profileId) 
 
             if (existingProfile == null) {
                 call.respond(HttpStatusCode.BadRequest, "Profile not found")
                 return@post
             }
 
-            val programId = transaction { 
-                 Program.insert { builder ->
-                    createProgram(builder, request)
-                } get Program.id
-            }
+            val programId = ProgramService.createProgramAndReturnId(request)
 
             call.respond(
                 HttpStatusCode.Created,
@@ -101,30 +85,14 @@ fun Route.programRoutes() {
                 return@delete
             }
 
-            val existingProgram = transaction {
-                Program.selectAll()
-                    .where { Program.id eq id }
-                    .singleOrNull()
-            }
+            val existingProgram = ProgramService.findProgramRowById(id)
 
             if (existingProgram == null) {
                 call.respond(HttpStatusCode.NotFound, "Program not found")
                 return@delete
             }
 
-            transaction {
-                val programExerciseIds = ProgramExercise.selectAll()
-                    .where { ProgramExercise.programId eq id }
-                    .map { it[ProgramExercise.id] }
-                
-                if (programExerciseIds.isNotEmpty()) {
-                    ProgramExerciseMetric.deleteWhere { programExerciseId inList programExerciseIds }
-                }
-
-                ProgramExercise.deleteWhere { ProgramExercise.programId eq id }
-                ProgramSchedule.deleteWhere { ProgramSchedule.programId eq id }
-                Program.deleteWhere { Program.id eq id }
-            }
+            ProgramService.deleteProgramDependencies(id)
 
             call.respond(HttpStatusCode.OK, "Program deleted")
         }

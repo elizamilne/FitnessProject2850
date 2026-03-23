@@ -1,5 +1,8 @@
 package org.fitnessapp.routes
 
+import org.fitnessapp.services.ActivityService
+import org.fitnessapp.services.toActivityDTO
+
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -8,12 +11,9 @@ import io.ktor.http.*
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 import org.fitnessapp.models.Activity
-import org.fitnessapp.models.ActivityDTO
-
-import java.time.LocalDate
+import org.fitnessapp.models.CreateActivityRequest
 
 fun Route.activityRoutes() { 
     route("/activities") {
@@ -29,47 +29,27 @@ fun Route.activityRoutes() {
                 }
             }
 
-            val activities = transaction {
-                Activity.selectAll().where {
-                    if (date != null) {
-                        (Activity.profileId eq profileId) and (Activity.date eq date)
-                    } else {
-                        Activity.profileId eq profileId
-                    }
-                }.map {
-                    ActivityDTO(
-                        id = it[Activity.id],
-                        date = it[Activity.date].toString(),
-                        profileId = it[Activity.profileId],
-                        exerciseId = it[Activity.exerciseId]
-                    )
-                }
-            }
+            val activities = ActivityService.findActivitiesByProfile(profileId, date)
 
             call.respond(HttpStatusCode.OK, activities)
         }
 
         post {
-            val activity = call.receive<ActivityDTO>()
+            val activity = call.receive<CreateActivityRequest>()
 
-            val createdActivityId = transaction { 
-                Activity.insert {
-                    it[date] = LocalDate.parse(activity.date)
-                    it[profileId] = activity.profileId
-                    it[exerciseId] = activity.exerciseId
-                } get Activity.id
-            }
+            val createdActivityId = ActivityService.createActivityAndReturnId(activity)
 
-            call.respond(HttpStatusCode.Created, activity.copy(id=createdActivityId))
+            call.respond(
+                HttpStatusCode.Created,
+                activity.toActivityDTO(createdActivityId)
+            )
         }
 
         delete("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = transaction { 
-                Activity.deleteWhere { Activity.id eq id }
-            }
+            val rowsDeleted = ActivityService.deleteActivityById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Activity not found")

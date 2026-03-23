@@ -9,25 +9,22 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.fitnessapp.models.ProgramExerciseMetric
 import org.fitnessapp.models.ProgramExerciseMetricDTO
+import org.fitnessapp.models.CreateProgramExerciseMetricRequest
+import org.fitnessapp.models.UpdateProgramExerciseMetricRequest
 
 import java.math.BigDecimal
+
+import org.fitnessapp.services.ProgramExerciseMetricService
+import org.fitnessapp.services.toProgramExerciseMetricDTO
 
 fun Route.programExerciseMetricRoutes() { 
     route("/program-exercise-metrics") {
         get {
-            val programExerciseMetrics = transaction { 
-                ProgramExerciseMetric.selectAll().map {
-                    ProgramExerciseMetricDTO(
-                        id = it[ProgramExerciseMetric.id],
-                        metricTypeId = it[ProgramExerciseMetric.metricTypeId],
-                        programExerciseId = it[ProgramExerciseMetric.programExerciseId],
-                        value = it[ProgramExerciseMetric.value].toDouble()
-                    )
-                }
-            }
+            val programExerciseMetrics = ProgramExerciseMetricService.findAllProgramExerciseMetrics()
 
             call.respond(HttpStatusCode.OK, programExerciseMetrics)
         }
@@ -36,19 +33,7 @@ fun Route.programExerciseMetricRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val programExerciseMetric = transaction {
-                ProgramExerciseMetric
-                    .selectAll().where { ProgramExerciseMetric.id eq id }
-                    .map {
-                        ProgramExerciseMetricDTO(
-                            id = it[ProgramExerciseMetric.id],
-                            metricTypeId = it[ProgramExerciseMetric.metricTypeId],
-                            programExerciseId = it[ProgramExerciseMetric.programExerciseId],
-                            value = it[ProgramExerciseMetric.value].toDouble()
-                        )
-                    }
-                    .singleOrNull()
-            }
+            val programExerciseMetric = ProgramExerciseMetricService.findProgramExerciseMetricById(id)
 
             if (programExerciseMetric == null){ 
                 call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")
@@ -58,19 +43,13 @@ fun Route.programExerciseMetricRoutes() {
         }
 
         post {
-            val request = call.receive<ProgramExerciseMetricDTO>()
+            val request = call.receive<CreateProgramExerciseMetricRequest>()
 
-            val newId = transaction { 
-                ProgramExerciseMetric.insert { 
-                    it[metricTypeId] = request.metricTypeId
-                    it[programExerciseId] = request.programExerciseId
-                    it[value] = request.value.toBigDecimal()
-                } get ProgramExerciseMetric.id
-            }
+            val createdProgramExerciseMetricId = ProgramExerciseMetricService.createProgramExerciseMetricAndReturnId(request)
 
             call.respond(
                 HttpStatusCode.Created,
-                request.copy(id = newId)
+                request.toProgramExerciseMetricDTO(createdProgramExerciseMetricId)
             )
         }
 
@@ -79,7 +58,7 @@ fun Route.programExerciseMetricRoutes() {
                 ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid id")
             
             val request = try {
-                call.receive<ProgramExerciseMetricDTO>()
+                call.receive<UpdateProgramExerciseMetricRequest>()
             } catch (e: Exception) {
                 return@put call.respond(
                     HttpStatusCode.BadRequest,
@@ -87,15 +66,7 @@ fun Route.programExerciseMetricRoutes() {
                 )
             }
 
-            val rowsUpdated = transaction { 
-                ProgramExerciseMetric.update(
-                    { ProgramExerciseMetric.id eq id }
-                ) {
-                    it[metricTypeId] = request.metricTypeId
-                    it[programExerciseId] = request.programExerciseId
-                    it[value] = request.value.toBigDecimal()
-                }
-            }
+            val rowsUpdated = ProgramExerciseMetricService.updateProgramExerciseMetricById(id, request)
 
             if (rowsUpdated == 0) {
                 call.respond(
@@ -114,11 +85,7 @@ fun Route.programExerciseMetricRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = transaction {
-                ProgramExerciseMetric.deleteWhere { 
-                    ProgramExerciseMetric.id eq id 
-                }
-            }
+            val rowsDeleted = ProgramExerciseMetricService.deleteProgramExerciseMetricById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")

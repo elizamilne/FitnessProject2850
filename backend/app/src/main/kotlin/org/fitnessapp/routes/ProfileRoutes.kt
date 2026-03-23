@@ -9,30 +9,21 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProfileDTO
+import org.fitnessapp.models.CreateProfileRequest
+
+import org.fitnessapp.services.ProfileService
+import org.fitnessapp.services.toProfileDTO
 
 import java.math.BigDecimal
 
 fun Route.profileRoutes() { 
     route("/profiles") { 
         get { 
-            val profiles = transaction { 
-                Profile.selectAll().map {
-                    ProfileDTO(
-                        id = it[Profile.id],
-                        userId = it[Profile.userId],
-                        goal = it[Profile.goal],
-                        gender = it[Profile.gender],
-                        age = it[Profile.age],
-                        level = it[Profile.level],
-                        weight = it[Profile.weight].toDouble(),
-                        height = it[Profile.height].toDouble(),
-                        workoutFrequency = it[Profile.workoutFrequency]
-                    )
-                }
-            }
+            val profiles = ProfileService.getAllProfiles()
 
             call.respond(HttpStatusCode.OK, profiles)
         }
@@ -41,22 +32,7 @@ fun Route.profileRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val profile = transaction { 
-                Profile.selectAll().where { Profile.id eq id }
-                    .map {
-                        ProfileDTO(
-                            id = it[Profile.id],
-                            userId = it[Profile.userId],
-                            goal = it[Profile.goal],
-                            gender = it[Profile.gender],
-                            age = it[Profile.age],
-                            level = it[Profile.level],
-                            weight = it[Profile.weight].toDouble(),
-                            height = it[Profile.height].toDouble(),
-                            workoutFrequency = it[Profile.workoutFrequency]
-                        )
-                    }.singleOrNull()
-            }
+            val profile = ProfileService.getProfileById(id)
 
             if (profile == null ) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")
@@ -69,22 +45,7 @@ fun Route.profileRoutes() {
             val userId = call.parameters["userId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid User ID")
 
-            val profile = transaction { 
-                Profile.selectAll().where { Profile.userId eq userId }
-                    .map { 
-                        ProfileDTO(
-                            id = it[Profile.id],
-                            userId = it[Profile.userId],
-                            goal = it[Profile.goal],
-                            gender = it[Profile.gender],
-                            age = it[Profile.age],
-                            level = it[Profile.level],
-                            weight = it[Profile.weight].toDouble(),
-                            height = it[Profile.height].toDouble(),
-                            workoutFrequency = it[Profile.workoutFrequency]
-                        )
-                    }.singleOrNull()
-            }
+            val profile = ProfileService.getProfileByUserId(userId)
 
             if (profile == null) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")
@@ -94,31 +55,21 @@ fun Route.profileRoutes() {
         }
 
         post { 
-            val profile = call.receive<ProfileDTO>()
+            val profile = call.receive<CreateProfileRequest>()
 
-            val createdProfileId = transaction { 
-                Profile.insert {
-                    it[userId] = profile.userId
-                    it[goal] = profile.goal
-                    it[gender] = profile.gender
-                    it[age] = profile.age
-                    it[level] = profile.level
-                    it[weight] = profile.weight.let { BigDecimal.valueOf(it) }
-                    it[height] = profile.height.let { BigDecimal.valueOf(it) }
-                    it[workoutFrequency] = profile.workoutFrequency
-                } get Profile.id
-            }
+            val createdProfileId = ProfileService.createProfileAndReturnId(profile)
 
-            call.respond(HttpStatusCode.Created, profile.copy(id=createdProfileId))
+            call.respond(
+                HttpStatusCode.Created, 
+                profile.toProfileDTO(createdProfileId)
+            )
         }
 
         delete("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val rowsDeleted = transaction {
-                Profile.deleteWhere { Profile.id eq id }
-            }
+            val rowsDeleted = ProfileService.deleteProfileById(id)
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Profile not found")

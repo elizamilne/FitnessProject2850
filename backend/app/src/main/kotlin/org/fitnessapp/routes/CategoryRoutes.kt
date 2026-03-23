@@ -1,5 +1,8 @@
 package org.fitnessapp.routes
 
+import org.fitnessapp.services.CategoryService
+import org.fitnessapp.services.toCategoryDTO
+
 import io.ktor.server.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -16,15 +19,7 @@ import org.fitnessapp.models.CategoryDTO
 fun Route.categoryRoutes() {
     route("/categories") {
         get {
-            val categories = transaction {
-                Category.selectAll().map {
-                    CategoryDTO(
-                        id = it[Category.id],
-                        name = it[Category.name],
-                        image = it[Category.image]
-                    )
-                }
-            }
+            val categories = CategoryService.findAllCategories()
             
             call.respond(HttpStatusCode.OK, categories)
         }
@@ -33,16 +28,7 @@ fun Route.categoryRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val category = transaction { 
-                Category.selectAll().where { Category.id eq id }
-                    .map {
-                        CategoryDTO(
-                            id = it[Category.id],
-                            name = it[Category.name],
-                            image = it[Category.image]
-                        )
-                    }.singleOrNull()
-            }
+            val category = CategoryService.findCategoryById(id)
 
             if (category == null) {
                 call.respond(HttpStatusCode.NotFound, "Category not found")

@@ -12,20 +12,11 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 import org.fitnessapp.models.ProgramSchedule
 import org.fitnessapp.models.ProgramScheduleDTO
+import org.fitnessapp.models.CreateProgramScheduleRequest
 
 import java.time.LocalDate
 
-private fun ResultRow.toProgramScheduleDTO() = ProgramScheduleDTO(
-    id = this[ProgramSchedule.id],
-    day = this[ProgramSchedule.day],
-    programId = this[ProgramSchedule.programId]
-)
-
-private fun findSchedulesByProgramId(programId: Long) = transaction {
-    ProgramSchedule.selectAll()
-        .where { ProgramSchedule.programId eq programId }
-        .map { it.toProgramScheduleDTO() }
-}
+import org.fitnessapp.services.ProgramScheduleService
 
 fun Route.programScheduleRoutes() {
     route("/program-schedules") {
@@ -34,7 +25,7 @@ fun Route.programScheduleRoutes() {
             val programId = call.parameters["programId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Program ID")
 
-            val schedules = findSchedulesByProgramId(programId)
+            val schedules = ProgramScheduleService.findSchedulesByProgramId(programId)
 
             if (schedules.isEmpty()) {
                 call.respond(HttpStatusCode.NotFound, "No schedules found")
@@ -44,25 +35,21 @@ fun Route.programScheduleRoutes() {
         }
 
         post {
-            val request = call.receive<ProgramScheduleDTO>()
+            val request = call.receive<CreateProgramScheduleRequest>()
 
-            val newId = transaction {
-                ProgramSchedule.insert {
-                    it[programId] = request.programId
-                    it[day] = request.day
-                } get ProgramSchedule.id
-            }
+            val programScheduleId = ProgramScheduleService.createProgramScheduleAndReturnId(request)
 
-            call.respond(HttpStatusCode.Created, request.copy(id = newId))
+            val createdProgramSchedule = ProgramScheduleService.findScheduleById(programScheduleId)
+                ?: return@post call.respond(HttpStatusCode.NotFound, "Not found")
+
+            call.respond(HttpStatusCode.Created, createdProgramSchedule)
         }
 
         delete("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
-            val deleted = transaction {
-                ProgramSchedule.deleteWhere { ProgramSchedule.id eq id }
-            }
+            val deleted = ProgramScheduleService.deleteProgramScheduleById(id)
 
             if (deleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Schedule not found")

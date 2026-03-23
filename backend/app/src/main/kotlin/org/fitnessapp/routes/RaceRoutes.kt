@@ -19,51 +19,13 @@ import org.fitnessapp.models.CreateRaceRequest
 
 import java.time.LocalDate
 
-private fun ResultRow.toRaceDTO() = RaceDTO(
-    id = this[Race.id],
-    profileId = this[Race.profileId],
-    title = this[Race.title],
-    location = this[Race.location],
-    date = this[Race.date].toString(),
-    bannerUrl = this[Race.bannerUrl]
-)
-
-private fun updateRace(
-    builder: UpdateBuilder<*>, 
-    request: UpdateRaceRequest
-) {
-    builder[Race.title] = request.title
-    builder[Race.location] = request.location
-    builder[Race.date] = LocalDate.parse(request.date)
-    builder[Race.bannerUrl] = request.bannerUrl
-}
-
-private fun createRace(
-    builder: InsertStatement<*>,
-    request: CreateRaceRequest
-) {
-    builder[Race.profileId] = request.profileId
-    builder[Race.title] = request.title
-    builder[Race.location] = request.location
-    builder[Race.date] = LocalDate.parse(request.date)
-    builder[Race.bannerUrl] = request.bannerUrl
-}
-
-private fun findRaceById(id: Long): RaceDTO? = transaction {
-    Race
-        .selectAll()
-        .where { Race.id eq id }
-        .map { it.toRaceDTO() }
-        .singleOrNull()
-}
+import org.fitnessapp.services.RaceService
+import org.fitnessapp.services.toRaceDTO
 
 fun Route.raceRoutes() {
     route("/races") {
         get {
-            val races = transaction {
-                Race.selectAll()
-                    .map { it.toRaceDTO() }
-            }
+            val races = RaceService.getAllRaces()
             
             call.respond(HttpStatusCode.OK, races)
         }
@@ -72,7 +34,7 @@ fun Route.raceRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid id")
             
-            val race = findRaceById(id)
+            val race = RaceService.findRaceById(id)
                 ?: return@get call.respond(HttpStatusCode.NotFound, "Race not found")
         
             call.respond(HttpStatusCode.OK, race)
@@ -81,13 +43,9 @@ fun Route.raceRoutes() {
         post {
             val request = call.receive<CreateRaceRequest>()
 
-            val raceId = transaction {
-                Race.insert { builder ->
-                    createRace(builder, request)
-                } get Race.id
-            }
-
-            val createdRace = findRaceById(raceId)
+            val raceId = RaceService.createRaceAndReturnId(request)
+            
+            val createdRace = RaceService.findRaceById(raceId)
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
         
             call.respond(HttpStatusCode.Created, createdRace)
@@ -99,17 +57,13 @@ fun Route.raceRoutes() {
             
             val request = call.receive<UpdateRaceRequest>()
             
-            val updated = transaction {
-                Race.update({ Race.id eq id }) { builder ->
-                    updateRace(builder, request)
-                }
-            }
-
-            if (updated == 0) {
+            val updatedCount = RaceService.updateRaceById(id, request)
+            
+            if (updatedCount == 0) {
                 return@put call.respond(HttpStatusCode.NotFound, "Race not found")
             }
 
-            val updatedRace = findRaceById(id)
+            val updatedRace = RaceService.findRaceById(id)
                 ?: return@put call.respond(HttpStatusCode.InternalServerError)
             
             call.respond(HttpStatusCode.OK, updatedRace)
@@ -119,11 +73,9 @@ fun Route.raceRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid Id")
 
-            val deleted = transaction {
-                Race.deleteWhere { Race.id eq id }
-            }
+            val deletedCount = RaceService.deleteRaceById(id)
 
-            if (deleted == 0) {
+            if (deletedCount == 0) {
                 return@delete call.respond(HttpStatusCode.NotFound, "Race not found")
             }
 

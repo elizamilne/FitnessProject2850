@@ -28,3 +28,15 @@ data class ProfileDTO(
     val height: Double,             
     val workoutFrequency: Int?      
 )
+
+@Serializable
+data class CreateProfileRequest(
+    val userId: Long,
+    val goal: String?,
+    val gender: String?,
+    val age: Int?,
+    val level: String?,
+    val weight: Double,
+    val height: Double,
+    val workoutFrequency: Int?
+)

@@ -23,3 +23,10 @@ data class ActivityDTO(
     val profileId: Long,
     val exerciseId: Long
 )
+
+@Serializable
+data class CreateActivityRequest(
+    val date: String,
+    val profileId: Long,
+    val exerciseId: Long
+)

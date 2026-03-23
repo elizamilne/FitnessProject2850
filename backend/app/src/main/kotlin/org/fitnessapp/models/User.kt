@@ -39,3 +39,11 @@ data class UserResponse(
     val email: String,
     val createdAt: String
 )
+
+@Serializable
+data class CreateUserRequest(
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val hashPass: String
+)

@@ -33,26 +33,26 @@ private fun nameContains(search: String): Op<Boolean> =
 
 private fun findExerciseIdsByCategoryId(categoryId: Long): List<Long> = 
     ExerciseCategory
-        .slice(ExerciseCategory.exerciseId)
-        .select { ExerciseCategory.categoryId eq categoryId }
+        .selectAll()
+        .where { ExerciseCategory.categoryId eq categoryId }
         .map { it[ExerciseCategory.exerciseId] }
 
 private fun findExerciseIdsByMuscleGroupId(muscleGroupId: Long): List<Long> =
     ExerciseMuscleGroup
-        .slice(ExerciseMuscleGroup.exerciseId)
-        .select { ExerciseMuscleGroup.muscleGroupId eq muscleGroupId }
+        .selectAll()
+        .where { ExerciseMuscleGroup.muscleGroupId eq muscleGroupId }
         .map { it[ExerciseMuscleGroup.exerciseId] }
 
 private fun findCategoryIdsByExerciseId(exerciseId: Long): List<Long> =
     ExerciseCategory
-        .slice(ExerciseCategory.categoryId)
-        .select { ExerciseCategory.exerciseId eq exerciseId }
+        .selectAll()
+        .where { ExerciseCategory.exerciseId eq exerciseId }
         .map { it[ExerciseCategory.categoryId] }
 
 private fun findMuscleGroupIdsByExerciseId(exerciseId: Long): List<Long> =
     ExerciseMuscleGroup
-        .slice(ExerciseMuscleGroup.muscleGroupId)
-        .select { ExerciseMuscleGroup.exerciseId eq exerciseId }
+        .selectAll()
+        .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
         .map { it[ExerciseMuscleGroup.muscleGroupId] }
 
 // Query helpers

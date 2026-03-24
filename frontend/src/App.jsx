@@ -43,6 +43,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomeScreen from "./components/HomeScreen";
 import Login from "./components/Login";
+import TrainingPage from "./pages/TrainingPage";
 
 function App() {
   return (
@@ -50,7 +51,8 @@ function App() {
       <Routes>
         
         <Route path="/" element={<HomeScreen />} />
-
+        
+        <Route path="/training-page" element={<TrainingPage/>} />
        
         <Route path="/login" element={<Login />} />
 

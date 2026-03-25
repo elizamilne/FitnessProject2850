@@ -44,6 +44,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomeScreen from "./components/HomeScreen";
 import Login from "./components/Login";
 import TrainingPage from "./pages/TrainingPage";
+import ActivitiesPage from "./pages/ActivitiesPage";
 
 function App() {
   return (
@@ -53,7 +54,8 @@ function App() {
         <Route path="/" element={<HomeScreen />} />
         
         <Route path="/training-page" element={<TrainingPage/>} />
-       
+        <Route path="/activities-page" element={<ActivitiesPage/>} />
+
         <Route path="/login" element={<Login />} />
 
         

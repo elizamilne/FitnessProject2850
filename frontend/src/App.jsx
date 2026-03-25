@@ -41,10 +41,12 @@ export default App; */
 // App.js
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomeScreen from "./components/HomeScreen";
-import Login from "./components/Login";
-import TrainingPage from "./pages/TrainingPage";
-import ActivitiesPage from "./pages/ActivitiesPage";
+
+
+import HomeScreen from "./features/home/HomeScreen"
+import ActivitiesPage from "./features/activities/ActivitiesPage";
+import TrainingPage from "./features/training/TrainingPage";
+import Login from "./features/auth/Login";
 
 function App() {
   return (

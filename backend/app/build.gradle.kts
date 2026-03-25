@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.guava)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // CSV
+    implementation("org.apache.commons:commons-csv:1.10.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

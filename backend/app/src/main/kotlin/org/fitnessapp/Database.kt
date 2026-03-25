@@ -5,6 +5,8 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
+import org.fitnessapp.data.seed.ExerciseSeeder
+
 fun initDatabase() {
     Database.connect(
         "jdbc:sqlite:fitness_app.db?foreign_keys=on",
@@ -31,5 +33,7 @@ fun initDatabase() {
             User
         )
     }
+
+    ExerciseSeeder.seedExercisesFromCsv()
 }
 

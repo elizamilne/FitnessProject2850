@@ -1,6 +1,7 @@
 import TrainingCalendar from "../components/TrainingPage/TrainingCalendar";
 import TrainingContentList from "../components/TrainingPage/TrainingContentList";
 import TrainingProgramSelector from "../components/TrainingPage/TrainingProgramSelector";
+import TrainingStatistics from "../components/TrainingPage/TrainingStatistics";
 
 const TrainingPage = () => {
   return (
@@ -16,6 +17,10 @@ const TrainingPage = () => {
         
         <TrainingProgramSelector></TrainingProgramSelector>
         <TrainingContentList></TrainingContentList>
+
+        <div className="mt-5 bt-5"></div>
+
+        <TrainingStatistics></TrainingStatistics>
       </div>
     </div>
   );

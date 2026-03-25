@@ -41,8 +41,12 @@ export default App; */
 // App.js
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import HomeScreen from "./components/HomeScreen";
-import Login from "./components/Login";
+
+
+import HomeScreen from "./features/home/HomeScreen"
+import ActivitiesPage from "./features/activities/ActivitiesPage";
+import TrainingPage from "./features/training/TrainingPage";
+import Login from "./features/auth/Login";
 
 function App() {
   return (
@@ -50,8 +54,10 @@ function App() {
       <Routes>
         
         <Route path="/" element={<HomeScreen />} />
+        
+        <Route path="/training-page" element={<TrainingPage/>} />
+        <Route path="/activities-page" element={<ActivitiesPage/>} />
 
-       
         <Route path="/login" element={<Login />} />
 
         

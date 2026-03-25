@@ -1,4 +1,5 @@
 import ActivitiesPrograms from "../components/ActivitiesPage/ActivitiesPrograms";
+import ActivitiesRaces from "../components/ActivitiesPage/ActivitiesRaces";
 
 const ActivitiesPage = () => {
     return (
@@ -7,6 +8,8 @@ const ActivitiesPage = () => {
 
             <div className="w-[90%] lg:w-4/5 mx-auto  rounded-xl">
                 <ActivitiesPrograms></ActivitiesPrograms>
+                <div className="mt-12 bt-12"></div>
+                <ActivitiesRaces></ActivitiesRaces>
             </div>
         </div>
     )

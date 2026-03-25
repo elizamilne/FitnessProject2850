@@ -1,5 +1,6 @@
 import TrainingCalendar from "../components/TrainingPage/TrainingCalendar";
 import TrainingContentList from "../components/TrainingPage/TrainingContentList";
+import TrainingProgramSelector from "../components/TrainingPage/TrainingProgramSelector";
 
 const TrainingPage = () => {
   return (
@@ -12,7 +13,8 @@ const TrainingPage = () => {
         <div className="mt-12 mb-12 text-center">
           <h1 className="text-2xl font-semibold">Today's Plan</h1>
         </div>
-
+        
+        <TrainingProgramSelector></TrainingProgramSelector>
         <TrainingContentList></TrainingContentList>
       </div>
     </div>

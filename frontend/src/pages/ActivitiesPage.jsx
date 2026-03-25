@@ -1,3 +1,4 @@
+import ActivitiesHistory from "../components/ActivitiesPage/ActivitiesHistory";
 import ActivitiesPrograms from "../components/ActivitiesPage/ActivitiesPrograms";
 import ActivitiesRaces from "../components/ActivitiesPage/ActivitiesRaces";
 
@@ -10,6 +11,8 @@ const ActivitiesPage = () => {
                 <ActivitiesPrograms></ActivitiesPrograms>
                 <div className="mt-12 bt-12"></div>
                 <ActivitiesRaces></ActivitiesRaces>
+                <div className="mt-12 bt-12"></div>
+                <ActivitiesHistory></ActivitiesHistory>
             </div>
         </div>
     )

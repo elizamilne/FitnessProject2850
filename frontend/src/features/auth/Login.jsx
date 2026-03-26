@@ -62,7 +62,7 @@ export default function Login() {
   return (
     <div className="relative h-screen w-full overflow-hidden">
       
-      {/* 🎥 Background Video */}
+      {/*  Background Video */}
       <video
         autoPlay
         loop
@@ -72,20 +72,20 @@ export default function Login() {
         <source src="/fitness.mp4" type="video/mp4" />
       </video>
 
-      {/* 🌑 Dark overlay */}
+      {/*  Dark overlay */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* 🧱 Content */}
+      {/*  Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4">
         
-        {/* 🏋️ Title */}
+        {/*  Title */}
         <img
           src="/logo.png"
           alt="SILO FITNESS"
           className="w-60 mb-8"
         />
 
-        {/* 🔐 Login Box */}
+        {/*  Login Box */}
         <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-sm">
           
           <form onSubmit={handleSubmit} className="space-y-4">

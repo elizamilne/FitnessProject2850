@@ -1,15 +1,15 @@
 package org.fitnessapp.data
 
-import org.fitnessapp.models.Exercise
+import org.fitnessapp.models.Category
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 
-object ExerciseSeeder {
+object CategorySeeder {
 
     fun seed() {
         val inputStream = object {}.javaClass
-            .getResourceAsStream("/data/exercises.csv")
-            ?: error("Cannot find exercises.csv")
+            .getResourceAsStream("/data/categories.csv")
+            ?: error("Cannot find categories.csv")
 
         inputStream.bufferedReader().useLines { lines ->
             lines.drop(1).forEach { line ->
@@ -19,15 +19,15 @@ object ExerciseSeeder {
                     val name = parts[0].trim()
                     val image = parts[1].trim()
 
-                    val exists = Exercise
+                    val exists = Category
                         .selectAll()
-                        .where { Exercise.name eq name }
+                        .where { Category.name eq name }
                         .singleOrNull()
 
                     if (exists == null) {
-                        Exercise.insert {
-                            it[Exercise.name] = name
-                            it[Exercise.image] = image
+                        Category.insert {
+                            it[Category.name] = name
+                            it[Category.image] = image
                         }
                     }
                 }

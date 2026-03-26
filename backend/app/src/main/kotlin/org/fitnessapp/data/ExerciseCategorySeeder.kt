@@ -46,8 +46,8 @@ object ExerciseCategorySeeder {
 
                         if (exists == null) {
                             ExerciseCategory.insert {
-                                it[exerciseId] = exerciseId
-                                it[categoryId] = categoryId
+                                it[ExerciseCategory.exerciseId] = exerciseId
+                                it[ExerciseCategory.categoryId] = categoryId
                             }
                         }
                     }

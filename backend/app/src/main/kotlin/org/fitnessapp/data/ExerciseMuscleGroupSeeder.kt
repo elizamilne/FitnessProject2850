@@ -46,8 +46,8 @@ object ExerciseMuscleGroupSeeder {
 
                         if (exists == null) {
                             ExerciseMuscleGroup.insert {
-                                it[exerciseId] = exerciseId
-                                it[muscleGroupId] = muscleId
+                                it[ExerciseMuscleGroup.exerciseId] = exerciseId
+                                it[ExerciseMuscleGroup.muscleGroupId] = muscleId
                             }
                         }
                     }

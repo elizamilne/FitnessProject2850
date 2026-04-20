@@ -14,6 +14,10 @@ object ProgramSchedule : Table("program_schedule") {
         onDelete = ReferenceOption.CASCADE
     )
     override val primaryKey = PrimaryKey(id)
+
+    init {
+        uniqueIndex("unique_day_per_program", day, programId)
+    }
 }
 
 @Serializable

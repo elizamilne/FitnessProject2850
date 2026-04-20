@@ -92,7 +92,8 @@ fun Route.programRoutes() {
                 return@delete
             }
 
-            ProgramService.deleteProgramDependencies(id)
+            // ProgramService.deleteProgramDependencies(id)
+            ProgramService.deleteProgramById(id)
 
             call.respond(HttpStatusCode.OK, "Program deleted")
         }

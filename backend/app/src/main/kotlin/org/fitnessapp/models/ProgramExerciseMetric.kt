@@ -6,17 +6,29 @@ import kotlinx.serialization.Serializable
 object ProgramExerciseMetric : Table("program_exercise_metric") {
     val id = long("id").autoIncrement()
     val metricTypeId = reference("metric_type_id", MetricType.id)
-    val programExerciseId = reference("program_exercise_id", ProgramExercise.id)
+    val programExerciseId = reference(
+        "program_exercise_id", 
+        ProgramExercise.id,
+        onDelete = ReferenceOption.CASCADE    
+    )
     val value = decimal("value", 10, 2)
     override val primaryKey = PrimaryKey(id)
 }
 
+// DELETE THIS 
 @Serializable
 data class ProgramExerciseMetricDTO(
     val id: Long? = null,
     val metricTypeId: Long,
     val programExerciseId: Long,
     val value: Double
+)
+// ---
+
+@Serializable
+data class ProgramExerciseMetricResponseDTO (
+    val metricTypeId: Long,
+    val value: Double,
 )
 
 @Serializable
@@ -28,8 +40,6 @@ data class CreateProgramExerciseMetricRequest(
 
 @Serializable
 data class UpdateProgramExerciseMetricRequest(
-    val metricTypeId: Long,
-    val programExerciseId: Long,
     val value: Double
 )
 
@@ -38,11 +48,3 @@ data class ProgramExerciseMetricRequest(
     val metricTypeId: Long,
     val value: Double
 )
-
-@Serializable
-data class ProgramExerciseMetricUpdate(
-    val value: Double
-)
-
-
-

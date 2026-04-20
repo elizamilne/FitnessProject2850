@@ -33,6 +33,7 @@ import org.fitnessapp.services.toProgramExerciseDTO
 
 fun Route.programExerciseRoutes() { 
     route("/program-exercises") {
+
         get("/program/{programId}") {
             val programId = call.parameters["programId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Program Id")

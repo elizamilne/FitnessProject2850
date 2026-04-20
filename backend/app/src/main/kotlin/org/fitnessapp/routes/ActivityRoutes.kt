@@ -35,13 +35,17 @@ fun Route.activityRoutes() {
         }
 
         post {
-            val activity = call.receive<CreateActivityRequest>()
+            val request = call.receive<CreateActivityRequest>()
 
-            val createdActivityId = ActivityService.createActivityAndReturnId(activity)
-
+            val createdActivityId = transaction {
+                val currentActivityId = ActivityService.createActivityAndReturnId(request)
+                ActivityService.insertMetricsForActivity(currentActivityId, request.metrics)
+                currentActivityId
+            }
+             
             call.respond(
                 HttpStatusCode.Created,
-                activity.toActivityDTO(createdActivityId)
+                request.toActivityDTO(createdActivityId)
             )
         }
 

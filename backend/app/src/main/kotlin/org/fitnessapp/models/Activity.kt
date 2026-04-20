@@ -28,5 +28,6 @@ data class ActivityDTO(
 data class CreateActivityRequest(
     val date: String,
     val profileId: Long,
-    val exerciseId: Long
+    val exerciseId: Long,
+    val metrics: List<CreateActivityMetricRequest>
 )

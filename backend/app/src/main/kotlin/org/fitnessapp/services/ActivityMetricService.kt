@@ -6,10 +6,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import org.jetbrains.exposed.sql.update
 
 import org.fitnessapp.models.ActivityMetric
 import org.fitnessapp.models.ActivityMetricDTO
 import org.fitnessapp.models.CreateActivityMetricRequest
+import org.fitnessapp.models.UpdateActivityMetricRequest
 
 fun ResultRow.toActivityMetricDTO() = ActivityMetricDTO(
     id = this[ActivityMetric.id],
@@ -18,21 +21,12 @@ fun ResultRow.toActivityMetricDTO() = ActivityMetricDTO(
     value = this[ActivityMetric.value]?.toDouble()
 )
 
-fun CreateActivityMetricRequest.toActivityMetricDTO(id: Long) = ActivityMetricDTO(
-    id = id,
-    activityId = activityId,
-    metricTypeId = metricTypeId,
-    value = value
-)
-
 object ActivityMetricService {
-    fun createActivityMetric(
-        builder: InsertStatement<*>,
-        request: CreateActivityMetricRequest
+    fun updateActivityMetric(
+        builder: UpdateBuilder<*>,
+        request: UpdateActivityMetricRequest
     ) {
-        builder[ActivityMetric.activityId] = request.activityId
-        builder[ActivityMetric.metricTypeId] = request.metricTypeId
-        builder[ActivityMetric.value] = request.value?.toBigDecimal()
+        builder[ActivityMetric.value] = request.value.toBigDecimal()
     }
 
     fun findActivityMetricsByActivityId(activityId: Long): List<ActivityMetricDTO> = transaction {
@@ -42,9 +36,13 @@ object ActivityMetricService {
             .map { it.toActivityMetricDTO() }
     }
 
-    fun createActivityMetricAndReturnId(activityMetric: CreateActivityMetricRequest): Long = transaction {
-        ActivityMetric.insert { builder ->
-            createActivityMetric(builder, activityMetric)
-        } get ActivityMetric.id
-    }
+    fun updateActivityMetricById(
+        id: Long,
+        request: UpdateActivityMetricRequest
+    ): Int = transaction {
+        ActivityMetric.update({ ActivityMetric.id eq id }) 
+        { 
+            builder -> updateActivityMetric(builder, request)
+        }
+    } 
 }

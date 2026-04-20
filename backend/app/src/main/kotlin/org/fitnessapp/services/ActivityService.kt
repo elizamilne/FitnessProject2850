@@ -7,6 +7,7 @@ import java.time.LocalDate
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.math.BigDecimal
+import org.jetbrains.exposed.sql.max
 
 fun ResultRow.toActivityDTO() = ActivityDTO(
     id = this[Activity.id],
@@ -55,6 +56,27 @@ object ActivityService {
         }.map {
             it.toActivityDTO()
         }
+    }
+
+    fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {
+        val bestValue = ActivityMetric.value.max().alias("best_value")
+
+        return (Activity innerJoin ActivityMetric)
+            .select(
+                Activity.exerciseId,
+                ActivityMetric.metricTypeId,
+                bestValue
+            )
+            .where { Activity.profileId eq profileId }
+            .groupBy(Activity.exerciseId, ActivityMetric.metricTypeId)
+            .map { row -> 
+                BestMetricDTO(
+                    exerciseId = row[Activity.exerciseId],
+                    metricTypeId = row[ActivityMetric.metricTypeId]
+                        ?: error("metricTypeId is null"),
+                    bestValue = row[bestValue]?.toDouble()
+                )
+            }
     }
 
     fun createActivityAndReturnId(

@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.deleteWhere
 
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -94,11 +95,7 @@ object ProgramService {
         } get Program.id
     }
 
-    fun deleteProgramDependencies(programId: Long) = transaction {
-        val programExerciseIds = ProgramExerciseService.getProgramExerciseIds(programId)
-
-        ProgramExerciseMetricService.deleteProgramExerciseMetrics(programExerciseIds)
-        ProgramExerciseService.deleteProgramExercises(programId)
-        ProgramScheduleService.deleteProgramSchedules(programId)
+    fun deleteProgramById(id: Long): Int = transaction {
+        Program.deleteWhere { Program.id eq id }
     }
 }

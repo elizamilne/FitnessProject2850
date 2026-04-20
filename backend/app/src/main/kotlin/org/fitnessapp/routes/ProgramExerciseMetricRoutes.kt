@@ -23,12 +23,6 @@ import org.fitnessapp.services.toProgramExerciseMetricDTO
 
 fun Route.programExerciseMetricRoutes() { 
     route("/program-exercise-metrics") {
-        get {
-            val programExerciseMetrics = ProgramExerciseMetricService.findAllProgramExerciseMetrics()
-
-            call.respond(HttpStatusCode.OK, programExerciseMetrics)
-        }
-
         get("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
@@ -40,17 +34,6 @@ fun Route.programExerciseMetricRoutes() {
             } else {
                 call.respond(HttpStatusCode.OK, programExerciseMetric)
             }
-        }
-
-        post {
-            val request = call.receive<CreateProgramExerciseMetricRequest>()
-
-            val createdProgramExerciseMetricId = ProgramExerciseMetricService.createProgramExerciseMetricAndReturnId(request)
-
-            call.respond(
-                HttpStatusCode.Created,
-                request.toProgramExerciseMetricDTO(createdProgramExerciseMetricId)
-            )
         }
 
         put("/{id}") {
@@ -78,19 +61,6 @@ fun Route.programExerciseMetricRoutes() {
                     HttpStatusCode.OK,
                     mapOf("message" to "ProgramExerciseMetric updated successfully")
                 )
-            }
-        }
-
-        delete("/{id}") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
-            
-            val rowsDeleted = ProgramExerciseMetricService.deleteProgramExerciseMetricById(id)
-
-            if (rowsDeleted == 0) {
-                call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")
-            } else {
-                call.respond(HttpStatusCode.NoContent)
             }
         }
     }

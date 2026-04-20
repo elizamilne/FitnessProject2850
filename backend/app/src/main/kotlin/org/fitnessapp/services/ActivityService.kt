@@ -6,6 +6,8 @@ import org.fitnessapp.models.*
 import java.time.LocalDate
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import java.math.BigDecimal
+import org.jetbrains.exposed.sql.max
 
 fun ResultRow.toActivityDTO() = ActivityDTO(
     id = this[Activity.id],
@@ -31,6 +33,16 @@ object ActivityService {
         builder[Activity.exerciseId] = request.exerciseId
     }
 
+    fun createActivityMetric(
+        builder: InsertStatement<*>,
+        activityId: Long,
+        metric: CreateActivityMetricRequest
+    ) {
+        builder[ActivityMetric.activityId] = activityId
+        builder[ActivityMetric.metricTypeId] = metric.metricTypeId
+        builder[ActivityMetric.value] = BigDecimal.valueOf(metric.value)
+    }
+
     fun findActivitiesByProfile(
         profileId: Long,
         date: java.time.LocalDate?
@@ -46,10 +58,53 @@ object ActivityService {
         }
     }
 
-    fun createActivityAndReturnId(request: CreateActivityRequest): Long = transaction {
+    fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {
+        val bestValue = ActivityMetric.value.max().alias("best_value")
+
+        return (Activity innerJoin ActivityMetric)
+            .select(
+                Activity.exerciseId,
+                ActivityMetric.metricTypeId,
+                bestValue
+            )
+            .where { Activity.profileId eq profileId }
+            .groupBy(Activity.exerciseId, ActivityMetric.metricTypeId)
+            .map { row -> 
+                BestMetricDTO(
+                    exerciseId = row[Activity.exerciseId],
+                    metricTypeId = row[ActivityMetric.metricTypeId]
+                        ?: error("metricTypeId is null"),
+                    bestValue = row[bestValue]?.toDouble()
+                )
+            }
+    }
+
+    fun createActivityAndReturnId(
+        request: CreateActivityRequest
+    ): Long = transaction {
         Activity.insert { builder ->
             createActivity(builder, request)
         } get Activity.id
+    }
+
+    fun insertMetricIfTypeExists(
+        activityId: Long,
+        metric: CreateActivityMetricRequest
+    ) {
+        if (MetricTypeService.metricTypeExists(metric.metricTypeId)) {
+            ActivityMetric.insert { builder -> 
+                createActivityMetric(builder, activityId, metric)
+            }
+        }
+    }
+
+    fun insertMetricsForActivity(
+        activityId: Long,
+        metrics: List<CreateActivityMetricRequest>
+    ) {
+        metrics.forEach { metric ->
+            insertMetricIfTypeExists(activityId, metric)
+        }
     }
 
     fun deleteActivityById(id: Long): Int = transaction {

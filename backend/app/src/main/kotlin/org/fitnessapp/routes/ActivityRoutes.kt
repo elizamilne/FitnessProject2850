@@ -8,6 +8,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.http.*
+import io.ktor.http.HttpStatusCode
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -34,14 +35,29 @@ fun Route.activityRoutes() {
             call.respond(HttpStatusCode.OK, activities)
         }
 
+        get("/{profileId}/best") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid profile ID")
+        
+            val result = transaction { 
+                ActivityService.getBestMetricsByProfile(profileId)
+            }
+
+            call.respond(HttpStatusCode.OK, result)
+        }
+
         post {
-            val activity = call.receive<CreateActivityRequest>()
+            val request = call.receive<CreateActivityRequest>()
 
-            val createdActivityId = ActivityService.createActivityAndReturnId(activity)
-
+            val createdActivityId = transaction {
+                val currentActivityId = ActivityService.createActivityAndReturnId(request)
+                ActivityService.insertMetricsForActivity(currentActivityId, request.metrics)
+                currentActivityId
+            }
+             
             call.respond(
                 HttpStatusCode.Created,
-                activity.toActivityDTO(createdActivityId)
+                request.toActivityDTO(createdActivityId)
             )
         }
 

@@ -13,10 +13,12 @@ import java.math.BigDecimal
 
 import org.fitnessapp.models.ProgramExercise
 import org.fitnessapp.models.ProgramExerciseDTO
+import org.fitnessapp.models.ProgramExerciseWithMetricsDTO
 import org.fitnessapp.models.CreateProgramExerciseRequest
 
 import org.fitnessapp.models.ProgramExerciseMetric
 import org.fitnessapp.models.ProgramExerciseMetricRequest
+import org.fitnessapp.models.ProgramExerciseMetricResponseDTO
 
 import org.fitnessapp.models.MetricType
 import org.fitnessapp.models.Exercise
@@ -29,16 +31,16 @@ fun ResultRow.toProgramExerciseDTO() = ProgramExerciseDTO(
     exerciseId = this[ProgramExercise.exerciseId]
 )
 
-fun ResultRow.toProgramExerciseWithMetrics(): Map<String, Any?> {
+fun ResultRow.toProgramExerciseWithMetrics(): ProgramExerciseWithMetricsDTO {
     val peId = this[ProgramExercise.id]
 
     val metrics = ProgramExerciseService.getMetricsForProgramExercise(peId)
 
-    return mapOf(
-        "programExerciseId" to peId,
-        "exerciseName" to this[Exercise.name],
-        "image" to this[Exercise.image],
-        "metrics" to metrics
+    return ProgramExerciseWithMetricsDTO(
+        programExerciseId = peId,
+        exerciseName = this[Exercise.name] ?: "",
+        image = this[Exercise.image] ?: "",
+        metrics = metrics
     )
 }
 
@@ -61,15 +63,17 @@ object ProgramExerciseService {
         builder[ProgramExerciseMetric.value] = BigDecimal.valueOf(metric.value)
     }
 
-    fun getMetricsForProgramExercise(programExerciseId: Long): List<Map<String, Any>> =
-        (ProgramExerciseMetric innerJoin MetricType)
-            .selectAll().where { ProgramExerciseMetric.programExerciseId eq programExerciseId }
-            .map { mRow ->
-                mapOf(
-                    "metricName" to mRow[MetricType.name],
-                    "value" to mRow[ProgramExerciseMetric.value].toDouble()
+    fun getMetricsForProgramExercise(programExerciseId: Long): List<ProgramExerciseMetricResponseDTO> {
+        return ProgramExerciseMetric
+            .selectAll()
+            .where { ProgramExerciseMetric.programExerciseId eq programExerciseId }
+            .map { row ->
+                ProgramExerciseMetricResponseDTO(
+                    metricTypeId = row[ProgramExerciseMetric.metricTypeId],
+                    value = row[ProgramExerciseMetric.value].toDouble()
                 )
             }
+    } 
     
     fun getProgramExerciseIds(programId: Long): List<Long> {
         return ProgramExercise
@@ -118,12 +122,6 @@ object ProgramExerciseService {
 
         ProgramExercise.deleteWhere {
             ProgramExercise.id eq programExerciseId
-        }
-    }
-
-    fun deleteProgramExercises(programId: Long) {
-        ProgramExercise.deleteWhere { 
-            ProgramExercise.programId eq programId 
         }
     }
 }

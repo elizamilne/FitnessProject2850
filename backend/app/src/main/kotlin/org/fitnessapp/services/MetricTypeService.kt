@@ -10,7 +10,8 @@ import org.fitnessapp.models.MetricTypeDTO
 
 fun ResultRow.toMetricTypeDTO() = MetricTypeDTO(
     id = this[MetricType.id],
-    name = this[MetricType.name]
+    name = this[MetricType.name],
+    unit = this[MetricType.unit]
 )
 
 object MetricTypeService {

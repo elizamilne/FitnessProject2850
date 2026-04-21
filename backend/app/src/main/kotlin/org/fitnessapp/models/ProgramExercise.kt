@@ -3,11 +3,14 @@ package org.fitnessapp.models
 import org.jetbrains.exposed.sql.*
 import kotlinx.serialization.Serializable
 import org.fitnessapp.models.ProgramExerciseMetricRequest
-import org.fitnessapp.models.ProgramExerciseMetricDTO
 
 object ProgramExercise : Table("program_exercise") {
     val id = long("id").autoIncrement()
-    val programId = reference("program_id", Program.id)
+    val programId = reference(
+        "program_id", 
+        Program.id,
+        onDelete = ReferenceOption.CASCADE
+    )
     val exerciseId = reference("exercise_id", Exercise.id)
     override val primaryKey = PrimaryKey(id)
 }
@@ -19,12 +22,12 @@ data class ProgramExerciseDTO(
     val exerciseId: Long
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class ProgramExerciseWithMetricsDTO(
     val programExerciseId: Long,
     val exerciseName: String,
     val image: String,
-    val metrics: List<ProgramExerciseMetricDTO> 
+    val metrics: List<ProgramExerciseMetricResponseDTO> 
 )
 
 @Serializable
@@ -33,7 +36,6 @@ data class CreateProgramExerciseRequest(
     val exerciseId: Long,
     val metrics: List<ProgramExerciseMetricRequest> 
 )
-
 
 @Serializable
 data class MetricRequest(

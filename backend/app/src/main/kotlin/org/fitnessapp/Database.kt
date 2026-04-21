@@ -5,6 +5,13 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
+import org.fitnessapp.data.ExerciseSeeder
+import org.fitnessapp.data.CategorySeeder
+import org.fitnessapp.data.MuscleGroupSeeder
+import org.fitnessapp.data.MetricTypeSeeder
+import org.fitnessapp.data.ExerciseCategorySeeder
+import org.fitnessapp.data.ExerciseMuscleGroupSeeder
+
 fun initDatabase() {
     Database.connect(
         "jdbc:sqlite:fitness_app.db?foreign_keys=on",
@@ -13,7 +20,7 @@ fun initDatabase() {
 
     transaction {
         SchemaUtils.create(
-            Activity,    
+            Activity,
             ActivityMetric,
             Category,
             Exercise,
@@ -30,6 +37,12 @@ fun initDatabase() {
             RaceCategory,
             User
         )
+
+        ExerciseSeeder.seed()
+        CategorySeeder.seed()
+        MuscleGroupSeeder.seed()
+        MetricTypeSeeder.seed()
+        ExerciseCategorySeeder.seed()
+        ExerciseMuscleGroupSeeder.seed()
     }
 }
-

@@ -33,11 +33,6 @@ import org.fitnessapp.services.toProgramExerciseDTO
 
 fun Route.programExerciseRoutes() { 
     route("/program-exercises") {
-        get {
-            val programExercises = ProgramExerciseService.findAllProgramExercises()
-
-            call.respond(HttpStatusCode.OK, programExercises)
-        }
 
         get("/program/{programId}") {
             val programId = call.parameters["programId"]?.toLongOrNull()

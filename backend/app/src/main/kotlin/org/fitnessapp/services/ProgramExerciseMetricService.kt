@@ -48,15 +48,7 @@ object ProgramExerciseMetricService {
         builder: UpdateBuilder<*>,
         request: UpdateProgramExerciseMetricRequest
     ) {
-        builder[ProgramExerciseMetric.metricTypeId] = request.metricTypeId
-        builder[ProgramExerciseMetric.programExerciseId] = request.programExerciseId
         builder[ProgramExerciseMetric.value] = request.value.toBigDecimal()
-    }
-
-    fun findAllProgramExerciseMetrics(): List<ProgramExerciseMetricDTO> = transaction {
-        ProgramExerciseMetric
-            .selectAll()
-            .map { it.toProgramExerciseMetricDTO() }
     }
 
     fun findProgramExerciseMetricById(id: Long): ProgramExerciseMetricDTO? = transaction {
@@ -83,22 +75,6 @@ object ProgramExerciseMetricService {
             { ProgramExerciseMetric.id eq id }
         ) { builder ->
             updateProgramExerciseMetric(builder, request)
-        }
-    }
-
-    fun deleteProgramExerciseMetricById(id: Long): Int = transaction {
-        ProgramExerciseMetric.deleteWhere {
-            ProgramExerciseMetric.id eq id
-        }
-    }
-
-    fun deleteProgramExerciseMetrics(ids: List<Long>) {
-        if (ids.isEmpty()) return
-
-        ids.forEach { id ->
-            ProgramExerciseMetric.deleteWhere {
-                ProgramExerciseMetric.programExerciseId eq id
-            }
         }
     }
 }

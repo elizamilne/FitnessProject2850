@@ -88,13 +88,7 @@ const TrainingOverviewRow = () => {
         {/* Right */}
         <div className="bg-white p-5 rounded-2xl shadow-sm flex-1">
           <h4 className="text-sm text-gray-500 mb-2">Personal Records</h4>
-
-          {/* <ul className="space-y-1 text-sm text-gray-700">
-          
-            <li>5km - 30m</li>
-            <li>10km - 1h 10m</li>
-            <li>Half Marathon - 2h 30m</li>
-          </ul> */}
+           
           <ul className="space-y-1 text-sm text-gray-700">
             {personalBests.length === 0 ? (
               <li className="text-gray-400">No records yet</li>

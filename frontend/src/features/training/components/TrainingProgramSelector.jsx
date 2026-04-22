@@ -129,7 +129,7 @@ const TrainingProgramSelector = ({
 
             return (
               <div
-                key={program}
+                key={program.id}
                 onClick={() => {
                     if (isAnimating.current) return;
 

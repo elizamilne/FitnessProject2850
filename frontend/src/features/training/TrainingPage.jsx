@@ -69,7 +69,7 @@ const TrainingPage = () => {
 
         <div className="mt-12 bt-12"></div>
 
-        {/* <TrainingStatistics></TrainingStatistics> */}
+        <TrainingStatistics></TrainingStatistics>
 
         <div className="mt-12 bt-12"></div>
 

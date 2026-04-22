@@ -1,8 +1,32 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { raceService } from "../../../services/race";
+import { useEffect, useState } from "react";
 
 const ActivitiesRaces = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [races, setRaces] = useState([]);
+
+  useEffect(() => {
+    const loadPrograms = async () => {
+      try {
+        const profileId = 1;
+
+        let response;
+
+        if (activeTab === "upcoming") {
+          response = await raceService.getUpcoming(profileId);
+        } else {
+          response = await raceService.getCompleted(profileId);
+        }
+
+        setRaces(response.data);
+      } catch (err) {
+        console.error("Failed to load programs", err);
+      }
+    };
+
+    loadPrograms();
+  }, [activeTab]);
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 space-y-6">
@@ -41,56 +65,37 @@ const ActivitiesRaces = () => {
 
       {/* Race Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Race 1 */}
-        <div className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32">
-          <img
-            src="https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf"
-            alt="London Marathon"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+        {races.length === 0 ? (
+          <p className="text-gray-500 text-sm">No races found</p>
+        ) : (
+          races.slice(0, 3).map((race) => (
+            <div
+              key={race.id}
+              className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32"
+            >
+              <img
+                src={
+                  race.bannerUrl ||
+                  "https://via.placeholder.com/300x200?text=Race"
+                }
+                alt={race.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
 
-          <div className="relative h-full flex items-center px-4">
-            <div className="text-white">
-              <h3 className="font-semibold text-lg">London Marathon</h3>
-              <p className="text-sm text-white/80">21 Apr · 42.2km</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+
+              <div className="relative h-full flex items-center px-4">
+                <div className="text-white">
+                  <h3 className="font-semibold text-lg">{race.title}</h3>
+
+                  <p className="text-sm text-white/80">
+                    {new Date(race.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Race 2 */}
-        <div className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32">
-          <img
-            src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211"
-            alt="City 10K"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
-
-          <div className="relative h-full flex items-center px-4">
-            <div className="text-white">
-              <h3 className="font-semibold text-lg">City 10K</h3>
-              <p className="text-sm text-white/80">12 May · 10km</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Race 3 */}
-        <div className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32">
-          <img
-            src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5"
-            alt="Trail Half Marathon"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
-
-          <div className="relative h-full flex items-center px-4">
-            <div className="text-white">
-              <h3 className="font-semibold text-lg">Trail Half Marathon</h3>
-              <p className="text-sm text-white/80">2 Jun · 21.1km</p>
-            </div>
-          </div>
-        </div>
+          ))
+        )}
       </div>
 
       {/* Footer */}

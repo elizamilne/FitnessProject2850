@@ -2,16 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { gsap } from "gsap";
 
-const programsData = [
-  "Program 1",
-  "Program 2",
-  "Program 3",
-  "Program 4",
-  "Program 5",
-  "Program 6",
-  "Program 7",
-  "Program 8",
-];
+// const programsData = [
+//   "Program 1",
+//   "Program 2",
+//   "Program 3",
+//   "Program 4",
+//   "Program 5",
+//   "Program 6",
+//   "Program 7",
+//   "Program 8",
+// ];
 
 // same pattern as calendar
 const getItemsFromWidth = () => {
@@ -22,14 +22,17 @@ const getItemsFromWidth = () => {
   return 4; // desktop
 };
 
-const WorkoutSelector = () => {
+const TrainingProgramSelector = ({ 
+  programs, 
+  selectedProgram,
+  onProgramChange 
+}) => {
   const [startIndex, setStartIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(getItemsFromWidth);
-  const [selectedProgram, setSelectedProgram] = useState(null);
   const containerRef = useRef(null);
   const isAnimating = useRef(false);
 
-  // identical resize logic to the calendar
+  // Update items count based on screen size
   useEffect(() => {
     const updateItems = () => {
       const newValue = getItemsFromWidth();
@@ -40,21 +43,18 @@ const WorkoutSelector = () => {
     return () => window.removeEventListener("resize", updateItems);
   }, []);
 
-  const maxIndex = programsData.length - itemsToShow;
+  // Select a default program on page load
+  useEffect(() => {
+    if (!selectedProgram && programs.length > 0) {
+      onProgramChange?.(programs[0]);
+    }
+  }, [programs, selectedProgram, onProgramChange]);
 
-  const isStart = startIndex === 0;
-  const isEnd = startIndex >= maxIndex;
-
-  const visiblePrograms = programsData.slice(
-    startIndex,
-    startIndex + itemsToShow,
-  );
-
+  // Handles carousel navigation with animation
   const shiftPrograms = (direction) => {
     if ((direction === -1 && isStart) || (direction === 1 && isEnd)) {
       return;
     }
-
     isAnimating.current = true;
 
     gsap.to(containerRef.current, {
@@ -84,8 +84,24 @@ const WorkoutSelector = () => {
     });
   };
 
+  const maxIndex = programs.length - itemsToShow;
+
+  const isStart = startIndex === 0;
+  const isEnd = startIndex >= maxIndex;
+
+  const visiblePrograms = programs.slice(
+    startIndex,
+    startIndex + itemsToShow,
+  );
+
   return (
     <div className="w-[80%] mx-auto mb-5">
+      {programs && programs.length > 0 ? (
+        <div>Programs loaded</div>
+      ) : (
+        <div>No programs</div>
+      )}
+      
       {/* Title */}
       <h3 className="text-xl font-semibold mb-3">Workouts</h3>
 
@@ -116,7 +132,8 @@ const WorkoutSelector = () => {
                 key={program}
                 onClick={() => {
                     if (isAnimating.current) return;
-                    setSelectedProgram(program);
+
+                    onProgramChange?.(program)
                     }}
                 className={`flex-1 min-w-0 rounded-xl p-4 cursor-pointer text-center transition-all duration-200 border
                     ${
@@ -126,7 +143,7 @@ const WorkoutSelector = () => {
                     }
                 `}
               >
-                {program}
+                {program.title}
               </div>
             );
           })}
@@ -151,4 +168,4 @@ const WorkoutSelector = () => {
   );
 };
 
-export default WorkoutSelector;
+export default TrainingProgramSelector;

@@ -7,6 +7,9 @@ export const raceService = {
     getById: (id) => 
         api.get(`/races/${id}`),
 
+    getNextRace: (profileId) => 
+        api.get(`/races/next-race/${profileId}`),
+
     createRace: (data) => 
         api.post("/races", data),
 

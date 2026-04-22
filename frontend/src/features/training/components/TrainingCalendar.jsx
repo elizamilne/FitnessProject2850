@@ -10,11 +10,15 @@ const getDaysFromWidth = () => {
   return 7;
 };
 
-const TrainingCalendar = () => {
+const TrainingCalendar = ({ selectedDate, onDateChange }) => {
   const [startDate, setStartDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // const [selectedDate, setSelectedDate] = useState(new Date());
   const [daysToShow, setDaysToShow] = useState(getDaysFromWidth);
   const containerRef = useRef(null);
+
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
+  };
 
   // Responsive logic
   useEffect(() => {
@@ -27,6 +31,13 @@ const TrainingCalendar = () => {
     window.addEventListener("resize", updateDays);
     return () => window.removeEventListener("resize", updateDays);
   }, []);
+
+  useEffect(() => {
+    if (!selectedDate) {
+      const today = formatDate(new Date());
+      onDateChange?.(today);
+    }
+  }); 
 
   const generateDates = () => {
     const dates = [];
@@ -68,6 +79,10 @@ const TrainingCalendar = () => {
 
   const dates = generateDates();
 
+  const currentDate = selectedDate
+    ? new Date(selectedDate)
+    : new Date();
+
   return (
     <div className="w-full">
       {/* Title */}
@@ -90,12 +105,14 @@ const TrainingCalendar = () => {
         >
           {dates.map((date, index) => {
             const isSelected =
-              date.toDateString() === selectedDate.toDateString();
+              date.toDateString() === currentDate.toDateString();
 
             return (
               <div
                 key={index}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => {
+                  onDateChange?.(formatDate(date));
+                }}
                 className={`flex-1 min-w-0 aspect-square flex flex-col items-center justify-center rounded-xl cursor-pointer transition text-sm sm:text-base
                   ${
                     isSelected

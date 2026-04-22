@@ -11,6 +11,7 @@ object Race : Table("race") {
     val location = varchar("location", 255)
     val date = date("date")
     val bannerUrl = text("banner_url").nullable()
+    val completed = bool("completed").default(false)
     override val primaryKey = PrimaryKey(id)
 }
 
@@ -21,7 +22,8 @@ data class RaceDTO(
     val title: String,
     val location: String,
     val date: String,
-    val bannerUrl: String? = null
+    val bannerUrl: String? = null,
+    val completed: Boolean
 )
 
 @Serializable
@@ -29,7 +31,8 @@ data class UpdateRaceRequest(
     val title: String,
     val location: String,
     val date: String,
-    val bannerUrl: String? = null
+    val bannerUrl: String? = null,
+    val completed: Boolean
 )
 
 @Serializable

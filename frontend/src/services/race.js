@@ -10,6 +10,15 @@ export const raceService = {
     getNextRace: (profileId) => 
         api.get(`/races/next-race/${profileId}`),
 
+    getCompleted: (profileId) =>
+        api.get(`/races/profile/${profileId}/completed`),
+
+    getUpcoming: (profileId) =>
+        api.get(`/races/profile/${profileId}/upcoming`),
+
+    toggleComplete: (id) =>
+        api.post(`/races/${id}/complete`),
+
     createRace: (data) => 
         api.post("/races", data),
 

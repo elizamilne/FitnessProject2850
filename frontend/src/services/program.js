@@ -9,6 +9,15 @@ export const programService = {
             params: { date },
         }),
 
+    getActive: (profileId) =>
+        api.get(`/programs/profile/${profileId}/active`),
+
+    getArchived: (profileId) =>
+        api.get(`/programs/profile/${profileId}/archived`),
+
+     toggleArchive: (id) =>
+        api.post(`/programs/${id}/archive`),
+     
     createProgram: (programData) => 
         api.post("/programs", programData),
     

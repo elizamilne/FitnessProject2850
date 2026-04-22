@@ -12,7 +12,6 @@ object Activity : Table("activity") {
     
     val profileId = reference("profile_id", Profile.id)
     val exerciseId = reference("exercise_id", Exercise.id)
-    val archived = bool("archived").default(false)
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -23,7 +22,6 @@ data class ActivityDTO(
     val date: String,
     val profileId: Long,
     val exerciseId: Long,
-    val archived: Boolean
 )
 
 @Serializable

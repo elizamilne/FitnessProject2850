@@ -104,6 +104,19 @@ object RaceService {
             .singleOrNull()
     }  
 
+    fun getProgramsByProfileAndCompletion(
+        profileId: Long,
+        completed: Boolean
+    ): List<RaceDTO> = transaction {
+
+        Race.selectAll()
+            .where {
+                (Race.profileId eq profileId) and
+                (Race.completed eq completed)
+            }
+            .map { it.toRaceDTO() }
+    } 
+
     fun createRaceAndReturnId(request: CreateRaceRequest): Long = transaction {
         Race.insert { builder ->
             createRace(builder, request)

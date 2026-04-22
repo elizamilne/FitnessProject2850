@@ -61,19 +61,6 @@ fun Route.activityRoutes() {
             )
         }
 
-        post("/{id}/archive") {
-            val id = call.parameters["id"]?.toLongOrNull()
-                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid ID")
-            
-            val activity = ActivityService.toggleArchiveActivity(id)
-                ?: return@post call.respond(HttpStatusCode.NotFound, "Activity not found")
-
-            call.respond(
-                HttpStatusCode.OK,
-                activity
-            )
-        }
-
         delete("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")

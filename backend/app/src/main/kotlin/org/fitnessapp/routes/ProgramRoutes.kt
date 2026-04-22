@@ -57,6 +57,24 @@ fun Route.programRoutes() {
             call.respond(HttpStatusCode.OK, programs)
         }
 
+        get("/profile/{profileId}/active") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Profile ID")
+
+            val programs = ProgramService.getProgramsByProfileAndStatus(profileId, archived = false)
+
+            call.respond(HttpStatusCode.OK, programs)
+        }
+
+        get("/profile/{profileId}/archived") {
+             val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Profile ID")
+
+            val programs = ProgramService.getProgramsByProfileAndStatus(profileId, archived = true)
+
+            call.respond(HttpStatusCode.OK, programs)
+        }
+
         post {
             val request = call.receive<CreateProgramRequest>()
 
@@ -74,6 +92,19 @@ fun Route.programRoutes() {
             call.respond(
                 HttpStatusCode.Created,
                 mapOf("id" to programId)
+            )
+        }
+
+        post("/{id}/archive") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+            
+            val program = ProgramService.toggleArchiveProgram(id)
+                ?: return@post call.respond(HttpStatusCode.NotFound, "Program not found")
+
+            call.respond(
+                HttpStatusCode.OK,
+                program
             )
         }
 

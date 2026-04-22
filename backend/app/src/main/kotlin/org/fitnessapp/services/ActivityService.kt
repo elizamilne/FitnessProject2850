@@ -13,14 +13,16 @@ fun ResultRow.toActivityDTO() = ActivityDTO(
     id = this[Activity.id],
     date = this[Activity.date].toString(),
     profileId = this[Activity.profileId],
-    exerciseId = this[Activity.exerciseId]
+    exerciseId = this[Activity.exerciseId],
+    archived = this[Activity.archived]
 )
 
 fun CreateActivityRequest.toActivityDTO(id: Long) = ActivityDTO(
     id = id,
     date = date,
     profileId = profileId,
-    exerciseId = exerciseId
+    exerciseId = exerciseId,
+    archived = false
 )
 
 object ActivityService {
@@ -41,6 +43,26 @@ object ActivityService {
         builder[ActivityMetric.activityId] = activityId
         builder[ActivityMetric.metricTypeId] = metric.metricTypeId
         builder[ActivityMetric.value] = BigDecimal.valueOf(metric.value)
+    }
+
+    fun toggleArchiveActivity(id: Long): ActivityDTO? = transaction {
+        val row = Activity
+            .selectAll()
+            .where { Activity.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val current = row[Activity.archived]
+
+        Activity.update({ Activity.id eq id }) {
+            it[archived] = !current  
+        }
+
+        Activity
+            .selectAll()
+            .where { Activity.id eq id }
+            .singleOrNull()
+            ?.toActivityDTO()
     }
 
     fun findActivitiesByProfile(

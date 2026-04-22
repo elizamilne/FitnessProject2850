@@ -68,6 +68,16 @@ fun Route.raceRoutes() {
             call.respond(HttpStatusCode.Created, createdRace)
         }
 
+        post("/{id}/complete") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+            val race = RaceService.toggleRaceCompleted(id)
+                ?: return@post call.respond(HttpStatusCode.NotFound, "Race not found")
+
+            call.respond(HttpStatusCode.OK, race)
+        }
+
         put("/{id}") {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID")

@@ -67,6 +67,30 @@ object RaceService {
             .singleOrNull()
     }
 
+    fun toggleRaceCompleted(id: Long): RaceDTO? = transaction {
+        val row = Race
+            .selectAll()
+            .where { Race.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val newState = !row[Race.completed]
+
+        Race.update({ Race.id eq id }) {
+            it[completed] = newState
+        }
+
+        RaceDTO(
+            id = row[Race.id],
+            profileId = row[Race.profileId],
+            title = row[Race.title],
+            location = row[Race.location],
+            date = row[Race.date].toString(),
+            bannerUrl = row[Race.bannerUrl],
+            completed = newState
+        )
+    }
+
     fun getNextIncompleteRace(profileId: Long): RaceDTO? = transaction {
         Race
             .selectAll()
@@ -78,7 +102,7 @@ object RaceService {
             .limit(1)
             .map { it.toRaceDTO() }
             .singleOrNull()
-    }
+    }  
 
     fun createRaceAndReturnId(request: CreateRaceRequest): Long = transaction {
         Race.insert { builder ->

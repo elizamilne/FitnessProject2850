@@ -61,10 +61,17 @@ object ActivityService {
     fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {
         val bestValue = ActivityMetric.value.max().alias("best_value")
 
-        return (Activity innerJoin ActivityMetric)
+        return (Activity 
+            .innerJoin(ActivityMetric)
+            .innerJoin(Exercise)
+            .innerJoin(MetricType)
+        )
             .select(
                 Activity.exerciseId,
+                Exercise.name,
                 ActivityMetric.metricTypeId,
+                MetricType.name,
+                MetricType.unit,
                 bestValue
             )
             .where { Activity.profileId eq profileId }
@@ -72,8 +79,11 @@ object ActivityService {
             .map { row -> 
                 BestMetricDTO(
                     exerciseId = row[Activity.exerciseId],
+                    exerciseName = row[Exercise.name],
                     metricTypeId = row[ActivityMetric.metricTypeId]
                         ?: error("metricTypeId is null"),
+                    metricName = row[MetricType.name],
+                    metricUnit = row[MetricType.unit],
                     bestValue = row[bestValue]?.toDouble()
                 )
             }

@@ -24,6 +24,13 @@ data class ActivityMetricDTO(
 )
 
 @Serializable
+data class ActivityMetricWithTypeDTO(
+    val name: String,
+    val value: Double?,
+    val unit: String?
+)
+
+@Serializable
 data class CreateActivityMetricRequest(     
     val metricTypeId: Long,   
     val value: Double        

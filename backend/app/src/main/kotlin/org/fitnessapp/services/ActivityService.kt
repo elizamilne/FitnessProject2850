@@ -9,19 +9,23 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.math.BigDecimal
 import org.jetbrains.exposed.sql.max
 
-fun ResultRow.toActivityDTO() = ActivityDTO(
+fun ResultRow.toActivityDTO(
+    metrics: List<ActivityMetricWithTypeDTO> = emptyList()
+) = ActivityDTO(
     id = this[Activity.id],
     date = this[Activity.date].toString(),
     profileId = this[Activity.profileId],
     exerciseId = this[Activity.exerciseId],
+    metrics = metrics
 )
 
-fun CreateActivityRequest.toActivityDTO(id: Long) = ActivityDTO(
-    id = id,
-    date = date,
-    profileId = profileId,
-    exerciseId = exerciseId,
-)
+// fun CreateActivityRequest.toActivityDTO(id: Long) = ActivityDTO(
+//     id = id,
+//     date = date,
+//     profileId = profileId,
+//     exerciseId = exerciseId,
+//     metrics = emptyList()
+// )
 
 object ActivityService {
     fun createActivity(
@@ -53,9 +57,46 @@ object ActivityService {
             } else {
                 Activity.profileId eq profileId
             }
-        }.map {
-            it.toActivityDTO()
+        }.map { activityRow ->
+
+            val activityId = activityRow[Activity.id]
+
+            val metrics = (ActivityMetric innerJoin MetricType)
+                .selectAll()
+                .where { ActivityMetric.activityId eq activityId }
+                .map { row ->
+                    ActivityMetricWithTypeDTO(
+                        name = row[MetricType.name],
+                        value = row[ActivityMetric.value]?.toDouble(),
+                        unit = row[MetricType.unit]
+                    )
+                }
+
+            activityRow.toActivityDTO(metrics) 
         }
+    }
+
+    fun findActivityById(id: Long): ActivityDTO? = transaction {
+        Activity.selectAll()
+            .where { Activity.id eq id }
+            .singleOrNull()
+            ?.let { activityRow ->
+
+                val activityId = activityRow[Activity.id]
+
+                val metrics = (ActivityMetric innerJoin MetricType)
+                    .selectAll()
+                    .where { ActivityMetric.activityId eq activityId }
+                    .map { row ->
+                        ActivityMetricWithTypeDTO(
+                            name = row[MetricType.name],
+                            value = row[ActivityMetric.value]?.toDouble(),
+                            unit = row[MetricType.unit]
+                        )
+                    }
+
+                activityRow.toActivityDTO(metrics)
+            }
     }
 
     fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {

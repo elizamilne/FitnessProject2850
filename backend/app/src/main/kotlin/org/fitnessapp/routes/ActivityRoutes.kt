@@ -54,10 +54,13 @@ fun Route.activityRoutes() {
                 ActivityService.insertMetricsForActivity(currentActivityId, request.metrics)
                 currentActivityId
             }
-             
+            
+            val activity = ActivityService.findActivityById(createdActivityId)
+                ?: return@post call.respond(HttpStatusCode.InternalServerError)
+
             call.respond(
                 HttpStatusCode.Created,
-                request.toActivityDTO(createdActivityId)
+                activity
             )
         }
 

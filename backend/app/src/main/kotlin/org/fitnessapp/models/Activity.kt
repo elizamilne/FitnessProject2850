@@ -22,6 +22,7 @@ data class ActivityDTO(
     val date: String,
     val profileId: Long,
     val exerciseId: Long,
+    val metrics: List<ActivityMetricWithTypeDTO>
 )
 
 @Serializable

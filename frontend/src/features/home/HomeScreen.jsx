@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
 import Navbar from "../../common/layout/HS_NavBar"
+import BackgroundVideo from "../../common/ui/BackgroundVideo";
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -13,17 +14,7 @@ const HomeScreen = () => {
       <Navbar />
 
       {/* Background video */}
-      <video
-        autoPlay
-        loop
-        muted
-        className="absolute w-full h-full object-cover"
-      >
-        <source src="/fitness.mp4" type="video/mp4" />
-      </video>
-
-      {/* Overlay */}
-      <div className="absolute w-full h-full bg-black/40 backdrop-blur-sm"></div>
+      <BackgroundVideo></BackgroundVideo>
 
       {/* Social icons */}
       <div

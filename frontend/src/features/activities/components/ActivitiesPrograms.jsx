@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { programService } from "../../../services/program";
 import { useEffect, useState } from "react";
-import Modal from "../../../common/ui/modal";
+import Modal from "../../../common/ui/Modal";
 
 const ActivitiesPrograms = () => {
   const [visibleProgramsMap, setVisibleProgramsMap] = useState({

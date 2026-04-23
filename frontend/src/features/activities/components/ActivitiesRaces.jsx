@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { raceService } from "../../../services/race";
 import { useEffect, useState } from "react";
-import Modal from "../../../common/ui/modal";
+import Modal from "../../../common/ui/Modal";
 
 const ActivitiesRaces = () => {
   const [visisbleRacesMap, setVisibleRacesMap] = useState({

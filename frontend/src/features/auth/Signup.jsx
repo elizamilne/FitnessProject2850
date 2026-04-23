@@ -1,129 +1,164 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { User, UserCheck, Mail, Lock, KeyRound } from "lucide-react";
+import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
+import BackgroundVideo from "../../common/ui/BackgroundVideo";
 
-const SignUp = () => {
-
+const Signup = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    rePassword: "",
   });
 
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password !== formData.rePassword) {
       setError("Passwords do not match");
       return;
     }
 
-    console.log(formData);
+    const { _, ...dataWithoutRePass } = formData;
 
-    navigate("/questions");
+    try {
+      const user = await userService.register(dataWithoutRePass);
+      console.log(user);
+
+      const userId = user?.data.id;
+
+      if (!userId) {
+        throw new Error("User ID not returned from server");
+      }
+
+      sessionStorage.setItem("userId", userId);
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        rePassword: "",
+      });
+
+      setError("");
+
+      navigate("/questions");
+    } catch (err) {
+      setError("Registration failed");
+      console.error(err);
+    }
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden font-sans">
-      
-      {/* Navbar */}
-      
+    <div className="relative z-10 flex items-center justify-center min-h-screen px-4 bg-gray-400">
+      <BackgroundVideo />
 
-      {/* Background video */}
-      <video
-        autoPlay
-        loop
-        muted
-        className="absolute w-full h-full object-cover"
+      <form
+        onSubmit={handleSubmit}
+        className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
       >
-        <source src="/fitness.mp4" type="video/mp4" />
-      </video>
+        <h2 className="text-3xl font-bold mb-6 text-center">Create Account</h2>
 
-      {/* Overlay */}
-      <div className="absolute w-full h-full bg-black/50 backdrop-blur-sm"></div>
+        {/* First + Last Name */}
+        <div className="flex flex-col md:flex-row gap-3 mb-4">
+          {/* First Name */}
+          <div className="flex items-center bg-white/10 rounded-lg px-3 w-full">
+            <User className="text-gray-300 mr-2" size={18} />
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={formData.firstName}
+              onChange={handleChange}
+              className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
+              required
+            />
+          </div>
 
-      {/* Form */}
-      <div className="relative z-10 flex items-center justify-center h-full px-4">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
-        >
-          <h2 className="text-3xl font-bold mb-6 text-center">
-            Create Account
-          </h2>
+          {/* Last Name */}
+          <div className="flex items-center bg-white/10 rounded-lg px-3 w-full">
+            <UserCheck className="text-gray-300 mr-2" size={18} />
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
+              required
+            />
+          </div>
+        </div>
 
-          {/* Name */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full mb-4 p-3 rounded-lg bg-white/10 focus:outline-none"
-            required
-          />
-
-          {/* Email */}
+        {/* Email */}
+        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
+          <Mail className="text-gray-300 mr-2" size={18} />
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full mb-4 p-3 rounded-lg bg-white/10 focus:outline-none"
+            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
             required
           />
+        </div>
 
-          {/* Password */}
+        {/* Password */}
+        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
+          <Lock className="text-gray-300 mr-2" size={18} />
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full mb-4 p-3 rounded-lg bg-white/10 focus:outline-none"
+            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
             required
           />
+        </div>
 
-          {/* Confirm Password */}
+        {/* Re-enter Password */}
+        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
+          <KeyRound className="text-gray-300 mr-2" size={18} />
           <input
             type="password"
-            name="confirmPassword"
+            name="rePassword"
             placeholder="Re-enter Password"
-            value={formData.confirmPassword}
+            value={formData.rePassword}
             onChange={handleChange}
-            className="w-full mb-4 p-3 rounded-lg bg-white/10 focus:outline-none"
+            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
             required
           />
+        </div>
 
-          {/* Error */}
-          {error && (
-            <p className="text-red-400 text-sm mb-3">{error}</p>
-          )}
+        {/* Error */}
+        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
-          {/* Button */}
-          <button
-            type="submit"
-            className="w-full py-3 mt-2 bg-gradient-to-r from-gray-800 to-black hover:from-gray-600 hover:to-gray-900 rounded-xl font-bold transition duration-300"
-          >
-            Sign Up
-          </button>
-        </form>
-      </div>
+        {/* Button */}
+        <button
+          type="submit"
+          className="w-full py-3 mt-2 bg-gradient-to-r from-gray-800 to-black hover:from-gray-600 hover:to-gray-900 rounded-xl font-bold transition duration-300"
+        >
+          Sign Up
+        </button>
+      </form>
     </div>
   );
 };
 
-export default SignUp;
+export default Signup;

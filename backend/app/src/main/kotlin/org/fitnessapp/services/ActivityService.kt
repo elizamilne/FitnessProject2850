@@ -49,16 +49,32 @@ object ActivityService {
 
     fun findActivitiesByProfile(
         profileId: Long,
-        date: java.time.LocalDate?
+        date: java.time.LocalDate?,
+        page: Int? = null,
+        limit: Int? = null,
+        sort: String? = "desc"
     ): List<ActivityDTO> = transaction {
-        Activity.selectAll().where {
+        var query = Activity.selectAll().where {
             if (date != null) {
                 (Activity.profileId eq profileId) and (Activity.date eq date)
             } else {
                 Activity.profileId eq profileId
             }
-        }.map { activityRow ->
+        }
 
+        val order = when (sort) {
+            "asc" -> SortOrder.ASC
+            else -> SortOrder.DESC
+        }
+
+        query = query.orderBy(Activity.date, order)
+
+        if (page != null && limit != null) {
+            val offset = (page - 1) * limit
+            query = query.limit(limit, offset.toLong())
+        }
+        
+        query.map { activityRow ->
             val activityId = activityRow[Activity.id]
 
             val metrics = (ActivityMetric innerJoin MetricType)

@@ -1,6 +1,6 @@
-import ActivitiesPrograms from "./components/ActivitiesPrograms";
-import ActivitiesRaces from "./components/ActivitiesRaces";
 import ActivitiesHistory from "./components/ActivitiesHistory";
+import ActivitiesPrograms from "./programs";
+import ActivitiesRaces from "./races";
 
 const ActivitiesPage = () => {
     return (

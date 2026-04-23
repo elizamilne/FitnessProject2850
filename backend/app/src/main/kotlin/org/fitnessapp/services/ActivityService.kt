@@ -19,14 +19,6 @@ fun ResultRow.toActivityDTO(
     metrics = metrics
 )
 
-// fun CreateActivityRequest.toActivityDTO(id: Long) = ActivityDTO(
-//     id = id,
-//     date = date,
-//     profileId = profileId,
-//     exerciseId = exerciseId,
-//     metrics = emptyList()
-// )
-
 object ActivityService {
     fun createActivity(
         builder: InsertStatement<*>,
@@ -52,14 +44,21 @@ object ActivityService {
         date: java.time.LocalDate?,
         page: Int? = null,
         limit: Int? = null,
-        sort: String? = "desc"
+        sort: String? = "desc",
+        search: String? = null
     ): List<ActivityDTO> = transaction {
-        var query = Activity.selectAll().where {
+        var query = (Activity innerJoin Exercise).selectAll().where {
+            var condition: Op<Boolean> = Activity.profileId eq profileId
+
             if (date != null) {
-                (Activity.profileId eq profileId) and (Activity.date eq date)
-            } else {
-                Activity.profileId eq profileId
+                condition = condition and (Activity.date eq date)
             }
+
+            if (!search.isNullOrBlank()) {
+                condition = condition and (Exercise.name.lowerCase() like "%$search%")
+            }
+
+            condition
         }
 
         val order = when (sort) {

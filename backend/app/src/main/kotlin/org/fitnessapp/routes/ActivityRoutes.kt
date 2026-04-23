@@ -31,9 +31,11 @@ fun Route.activityRoutes() {
             }
 
             // pagination params (optional)
+            // val limit = call.request.queryParameters["limit"]?.toIntOrNull()
+            
             val page = call.request.queryParameters["page"]?.toIntOrNull()
             val sort = call.request.queryParameters["sort"]?.lowercase()
-            // val limit = call.request.queryParameters["limit"]?.toIntOrNull()
+            val search = call.request.queryParameters["search"]?.lowercase()
             var limit = 8
             
             val activities = ActivityService.findActivitiesByProfile(
@@ -41,7 +43,8 @@ fun Route.activityRoutes() {
                 date = date,
                 page = page,
                 limit = limit,
-                sort = sort
+                sort = sort,
+                search = search
             )
 
             call.respond(HttpStatusCode.OK, activities)

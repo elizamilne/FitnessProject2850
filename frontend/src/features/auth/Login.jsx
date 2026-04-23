@@ -2,8 +2,12 @@ import { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import BackgroundVideo from "../../common/ui/BackgroundVideo";
 import { userService } from "../../services/user";
+import { useNavigate } from "react-router-dom";
+import { profileService } from "../../services/profile";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -11,14 +15,28 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const data = {email, password}
-      const result = await userService.login(data);
+      const res = await userService.login({ email, password });
 
-      if (result.ok || result.success) {
-        setEmail("");
-        setPassword("");
+      const user = res?.data || res;
+      const userId = user?.id || user?.userId;
+
+      if (!userId) throw new Error("No userId returned");
+
+      try {
+        const profileRes = await profileService.getUserProfile(userId);
+        const profile = profileRes?.data || profileRes;
+
+        sessionStorage.setItem("profile", JSON.stringify(profile));
+        navigate("/dashboard");
+      } catch (profileErr) {
+        console.error("No profile found: ", profileErr);
+        sessionStorage.setItem("userId", userId); 
+        navigate("/questions");
       }
 
+      // optional cleanup
+      setEmail("");
+      setPassword("");
     } catch (err) {
       console.error("Login failed:", err);
     }

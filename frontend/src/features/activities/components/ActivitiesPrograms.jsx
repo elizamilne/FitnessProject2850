@@ -1,10 +1,22 @@
 import { Plus } from "lucide-react";
 import { programService } from "../../../services/program";
 import { useEffect, useState } from "react";
+import Modal from "../../../common/ui/modal";
 
 const ActivitiesPrograms = () => {
+  const [visibleProgramsMap, setVisibleProgramsMap] = useState({
+    active: [],
+    archived: [],
+  });
+
   const [activeTab, setActiveTab] = useState("active");
   const [programs, setPrograms] = useState([]);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
   const dayOrder = [
     "Monday",
     "Tuesday",
@@ -16,10 +28,8 @@ const ActivitiesPrograms = () => {
   ];
 
   const sortDays = (days = []) => {
-    return [...days].sort(
-      (a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b)
-    );
-  }; 
+    return [...days].sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b));
+  };
 
   useEffect(() => {
     const loadPrograms = async () => {
@@ -34,7 +44,18 @@ const ActivitiesPrograms = () => {
           response = await programService.getArchived(profileId);
         }
 
-        setPrograms(response.data);
+        const data = response.data;
+
+        setPrograms(data);
+        setVisibleProgramsMap((prev) => {
+          if (prev[activeTab].length > 0) return prev;
+
+          return {
+            ...prev,
+            [activeTab]: data.slice(0, 3),
+          };
+        });
+        setSelectedProgram(null);
       } catch (err) {
         console.error("Failed to load programs", err);
       }
@@ -42,6 +63,24 @@ const ActivitiesPrograms = () => {
 
     loadPrograms();
   }, [activeTab]);
+
+  const handleSelectProgram = (program) => {
+    setSelectedProgram(program);
+
+    setVisibleProgramsMap((prev) => {
+      const current = prev[activeTab];
+
+      const filtered = current.filter((p) => p.id !== program.id);
+      const updated = [program, ...filtered].slice(0, 3);
+
+      return {
+        ...prev,
+        [activeTab]: updated,
+      };
+    });
+
+    setIsViewModalOpen(false);
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 space-y-6">
@@ -82,10 +121,14 @@ const ActivitiesPrograms = () => {
         {programs.length === 0 ? (
           <p className="text-gray-500 text-sm">No programs found</p>
         ) : (
-          programs.slice(0, 3).map((program) => (
+          visibleProgramsMap[activeTab].map((program) => (
             <div
               key={program.id}
               className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32"
+              onClick={() => {
+                setSelectedProgram(program);
+                setIsDetailModalOpen(true);
+              }}
             >
               <img
                 src={
@@ -103,7 +146,8 @@ const ActivitiesPrograms = () => {
                   <h3 className="font-semibold text-lg">{program.title}</h3>
 
                   <p className="text-sm text-white/80">
-                    {sortDays(program.weeklyFrequency).join(", ") || "No schedule"}
+                    {sortDays(program.weeklyFrequency).join(", ") ||
+                      "No schedule"}
                   </p>
                 </div>
               </div>
@@ -114,11 +158,17 @@ const ActivitiesPrograms = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between">
-        <button className="w-9 h-9 shrink-0 flex items-center justify-center border border-gray-300 text-gray-700 rounded-full hover:bg-gray-100 transition">
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="w-9 h-9 shrink-0 flex items-center justify-center border border-gray-300 text-gray-700 rounded-full hover:bg-gray-100 transition"
+        >
           <Plus size={18} />
         </button>
 
-        <button className="group relative inline-flex items-center gap-1 text-sm text-blue-600">
+        <button
+          onClick={() => setIsViewModalOpen(true)}
+          className="group relative inline-flex items-center gap-1 text-sm text-blue-600"
+        >
           View All
           <span className="transition-transform duration-200 group-hover:translate-x-[2px]">
             →
@@ -126,6 +176,86 @@ const ActivitiesPrograms = () => {
           <span className="absolute left-0 -bottom-0.5 h-[1px] w-0 bg-blue-600 transition-all duration-300 group-hover:w-full" />
         </button>
       </div>
+
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        header={<h3 className="text-lg font-semibold">Select Program</h3>}
+        body={
+          <div className="space-y-2">
+            {programs.length === 0 ? (
+              <p className="text-sm text-gray-500">No programs found</p>
+            ) : (
+              programs.map((program) => (
+                <div
+                  key={program.id}
+                  onClick={() => {
+                    console.log("Selected program:", program);
+                    handleSelectProgram(program);
+                    setIsViewModalOpen(false);
+                  }}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition"
+                >
+                  <img
+                    src={program.bannerUrl || "https://via.placeholder.com/60"}
+                    alt={program.title}
+                    className="w-12 h-12 rounded-md object-cover"
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{program.title}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {sortDays(program.weeklyFrequency).join(", ") ||
+                        "No schedule"}
+                    </p>
+                  </div>
+
+                  <span className="text-xs text-gray-400">→</span>
+                </div>
+              ))
+            )}
+          </div>
+        }
+      />
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        header={<h3 className="text-lg font-semibold">Create Program</h3>}
+        body={
+          <div>
+            <p>Create The Program</p>
+          </div>
+        }
+      />
+
+      <Modal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        header={<h3 className="text-lg font-semibold">View Program</h3>}
+        body={
+          selectedProgram ? (
+            <div className="space-y-3">
+              <img
+                src={
+                  selectedProgram.bannerUrl ||
+                  "https://via.placeholder.com/300x200"
+                }
+                className="w-full h-40 object-cover rounded-lg"
+              />
+
+              <h4 className="text-lg font-semibold">{selectedProgram.title}</h4>
+
+              <p className="text-sm text-gray-500">
+                {sortDays(selectedProgram.weeklyFrequency).join(", ") ||
+                  "No schedule"}
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No program selected</p>
+          )
+        }
+      />
     </div>
   );
 };

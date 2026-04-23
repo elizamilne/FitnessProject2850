@@ -89,7 +89,7 @@ const ActivitiesRaces = () => {
                   <h3 className="font-semibold text-lg">{race.title}</h3>
 
                   <p className="text-sm text-white/80">
-                    {new Date(race.date).toLocaleDateString()}
+                    {new Date(race.date).toLocaleDateString()} * {race.location}
                   </p>
                 </div>
               </div>

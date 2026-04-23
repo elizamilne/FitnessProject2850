@@ -5,6 +5,21 @@ import { useEffect, useState } from "react";
 const ActivitiesPrograms = () => {
   const [activeTab, setActiveTab] = useState("active");
   const [programs, setPrograms] = useState([]);
+  const dayOrder = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const sortDays = (days = []) => {
+    return [...days].sort(
+      (a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b)
+    );
+  }; 
 
   useEffect(() => {
     const loadPrograms = async () => {
@@ -88,7 +103,7 @@ const ActivitiesPrograms = () => {
                   <h3 className="font-semibold text-lg">{program.title}</h3>
 
                   <p className="text-sm text-white/80">
-                    {program.weeklyFrequency?.join(", ") || "No schedule"}
+                    {sortDays(program.weeklyFrequency).join(", ") || "No schedule"}
                   </p>
                 </div>
               </div>

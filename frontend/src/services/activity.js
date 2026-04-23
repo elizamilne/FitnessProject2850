@@ -1,8 +1,8 @@
 import { api } from "./api";
 
 export const activityService = {
-    getActivityById: (id) => 
-        api.get(`/activities/${id}`),
+    getActivitiesById: (id, params = {}) => 
+        api.get(`/activities/${id}`, { params }),
 
     getBestActivity: (id) =>
         api.get(`/activities/${id}/best`),

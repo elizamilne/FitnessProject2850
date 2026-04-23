@@ -45,7 +45,7 @@ const TrainingStatistics = () => {
   useEffect(() => {
     const loadStats = async () => {
       const profileId = 1;
-      const { data } = await activityService.getActivityById(profileId);
+      const { data } = await activityService.getActivitiesById(profileId);
 
       // Workouts per week
       const daysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

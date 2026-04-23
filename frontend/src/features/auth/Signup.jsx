@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Navbar from "../components/HS_NavBar";
 import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {

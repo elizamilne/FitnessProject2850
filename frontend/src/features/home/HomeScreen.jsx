@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
- import Navbar from "../../components/HS_NavBar";
+import Navbar from "../../common/layout/HS_NavBar"
 
 const HomeScreen = () => {
   const navigate = useNavigate();

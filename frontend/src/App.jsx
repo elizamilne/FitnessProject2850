@@ -1,12 +1,17 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomeScreen from "./features/home/HomeScreen";
-import Login from "./features/auth/Login";
-import SignUp from "./components/Signup";
-import Questions from "./components/Questions";
+// import Login from "./features/auth/Login";
+// import SignUp from "./components/Signup";
+// import Questions from "./components/Questions";
 
 import TrainingPage from "./features/training/TrainingPage";
 import ActivitiesPage from "./features/activities/ActivitiesPage";
+
+import SignUp from "./features/auth/Signup";
+import Login from "./features/auth/Login";
+import Questions from "./features/auth/Questions"
+
 
 function App() {
   return (

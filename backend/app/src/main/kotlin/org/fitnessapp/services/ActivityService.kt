@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.math.BigDecimal
 import org.jetbrains.exposed.sql.max
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 fun ResultRow.toActivityDTO(
     metrics: List<ActivityMetricWithTypeDTO> = emptyList()
@@ -16,6 +17,7 @@ fun ResultRow.toActivityDTO(
     date = this[Activity.date].toString(),
     profileId = this[Activity.profileId],
     exerciseId = this[Activity.exerciseId],
+    exerciseName = this[Exercise.name],
     metrics = metrics
 )
 
@@ -41,39 +43,40 @@ object ActivityService {
 
     fun findActivitiesByProfile(
         profileId: Long,
-        date: java.time.LocalDate?,
+        date: LocalDate?,
         page: Int? = null,
         limit: Int? = null,
         sort: String? = "desc",
         search: String? = null
-    ): List<ActivityDTO> = transaction {
-        var query = (Activity innerJoin Exercise).selectAll().where {
-            var condition: Op<Boolean> = Activity.profileId eq profileId
+    ): PaginatedResponse<ActivityDTO> = transaction {
+        var condition: Op<Boolean> = Activity.profileId eq profileId
 
-            if (date != null) {
-                condition = condition and (Activity.date eq date)
-            }
-
-            if (!search.isNullOrBlank()) {
-                condition = condition and (Exercise.name.lowerCase() like "%$search%")
-            }
-
-            condition
+        if (date != null) {
+            condition = condition and (Activity.date eq date)
         }
 
-        val order = when (sort) {
-            "asc" -> SortOrder.ASC
-            else -> SortOrder.DESC
+        if (!search.isNullOrBlank()) {
+            condition = condition and (Exercise.name.lowerCase() like "%$search%")
         }
 
+        val total = (Activity innerJoin Exercise)
+            .selectAll()
+            .where { condition }
+            .count()
+
+        var query = (Activity innerJoin Exercise)
+            .selectAll()
+            .where { condition }
+
+        val order = if (sort == "asc") SortOrder.ASC else SortOrder.DESC
         query = query.orderBy(Activity.date, order)
 
         if (page != null && limit != null) {
             val offset = (page - 1) * limit
             query = query.limit(limit, offset.toLong())
         }
-        
-        query.map { activityRow ->
+
+        val data = query.map { activityRow ->
             val activityId = activityRow[Activity.id]
 
             val metrics = (ActivityMetric innerJoin MetricType)
@@ -87,8 +90,13 @@ object ActivityService {
                     )
                 }
 
-            activityRow.toActivityDTO(metrics) 
+            activityRow.toActivityDTO(metrics)
         }
+
+        PaginatedResponse(
+            data = data,
+            totalElements = total
+        )
     }
 
     fun findActivityById(id: Long): ActivityDTO? = transaction {

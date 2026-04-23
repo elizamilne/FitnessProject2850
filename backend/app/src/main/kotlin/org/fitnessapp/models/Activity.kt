@@ -22,7 +22,14 @@ data class ActivityDTO(
     val date: String,
     val profileId: Long,
     val exerciseId: Long,
+    val exerciseName: String?,
     val metrics: List<ActivityMetricWithTypeDTO>
+)
+
+@Serializable
+data class PaginatedResponse<T>(
+    val data: List<T>,
+    val totalElements: Long
 )
 
 @Serializable

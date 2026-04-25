@@ -54,7 +54,7 @@ const TrainingStatistics = () => {
 
       // Filter by week
       const now = new Date();
-      const day = now.getDay(); 
+      const day = now.getDay();
       const diff = day === 0 ? -6 : 1 - day;
 
       const startOfWeek = new Date(now);
@@ -106,41 +106,71 @@ const TrainingStatistics = () => {
   }, []);
 
   return (
-    <div className="gap-4 w-[100%] lg:w-[90%] mx-auto">
-      <h2 className="text-xl font-semibold mb-3">Statistics</h2>
-
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Graph 1 */}
-        <div className="flex-1 min-w-0 bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-          <h4 className="mb-2 text-sm font-medium text-gray-600 text-left">
+    <div className="w-full lg:w-[90%] mx-auto space-y-6">
+      <div className="flex flex-col sm:flex-row gap-5">
+        {/* 🔹 WEEKLY BAR */}
+        <div
+          className="relative flex-1 min-w-0 p-5 rounded-3xl
+                      bg-white/70 backdrop-blur-xl border border-white/50
+                      shadow-[0_10px_40px_rgba(0,0,0,0.06)]"
+        >
+          <h4 className="mb-3 text-sm font-medium text-gray-600">
             Weekly Workouts
           </h4>
 
-          <div className="h-[250px] sm:h-[350px] w-full">
+          <div className="h-[260px] sm:h-[340px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={barData}>
                 <XAxis
                   dataKey="day"
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis hide />
-                <Tooltip />
-                <Bar dataKey="value" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Tooltip
+                  cursor={{ fill: "rgba(99,102,241,0.08)" }}
+                  contentStyle={{
+                    background: "rgba(255,255,255,0.8)",
+                    border: "1px solid rgba(255,255,255,0.5)",
+                    backdropFilter: "blur(10px)",
+                    borderRadius: "12px",
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  radius={[8, 8, 0, 0]}
+                  fill="url(#barGradient)"
+                />
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#8b5cf6" />
+                  </linearGradient>
+                </defs>
               </BarChart>
             </ResponsiveContainer>
           </div>
+
+          {/* subtle glow */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none 
+                        bg-gradient-to-r from-indigo-500/5 to-purple-500/5"
+          />
         </div>
 
-        {/* Graph 2 (only render on desktop) */}
+        {/* 🔹 LINE CHART */}
         {isDesktop && (
-          <div className="flex-1 min-w-0 bg-white p-4 rounded-xl shadow hover:shadow-md transition">
-            <h4 className="mb-2 text-sm font-medium text-gray-600 text-left">
+          <div
+            className="relative flex-1 min-w-0 p-5 rounded-3xl
+                        bg-white/70 backdrop-blur-xl border border-white/50
+                        shadow-[0_10px_40px_rgba(0,0,0,0.06)]"
+          >
+            <h4 className="mb-3 text-sm font-medium text-gray-600">
               Workout Trend
             </h4>
 
-            <div className="h-[250px] sm:h-[350px] w-full">
+            <div className="h-[260px] sm:h-[340px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={lineData}>
                   <XAxis
@@ -154,7 +184,7 @@ const TrainingStatistics = () => {
                     angle={-30}
                     textAnchor="end"
                     height={50}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -166,17 +196,41 @@ const TrainingStatistics = () => {
                         month: "long",
                       })
                     }
+                    contentStyle={{
+                      background: "rgba(255,255,255,0.8)",
+                      border: "1px solid rgba(255,255,255,0.5)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "12px",
+                    }}
                   />
                   <Line
                     type="monotone"
                     dataKey="value"
-                    stroke="#22c55e"
-                    strokeWidth={2}
+                    stroke="url(#lineGradient)"
+                    strokeWidth={2.5}
                     dot={false}
                   />
+                  <defs>
+                    <linearGradient
+                      id="lineGradient"
+                      x1="0"
+                      y1="0"
+                      x2="1"
+                      y2="0"
+                    >
+                      <stop offset="0%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#8b5cf6" />
+                    </linearGradient>
+                  </defs>
                 </LineChart>
               </ResponsiveContainer>
             </div>
+
+            {/* subtle glow */}
+            <div
+              className="absolute inset-0 rounded-3xl pointer-events-none 
+                          bg-gradient-to-r from-indigo-500/5 to-purple-500/5"
+            />
           </div>
         )}
       </div>

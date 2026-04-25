@@ -22,10 +22,10 @@ const getItemsFromWidth = () => {
   return 4; // desktop
 };
 
-const TrainingProgramSelector = ({ 
-  programs, 
+const TrainingProgramSelector = ({
+  programs,
   selectedProgram,
-  onProgramChange 
+  onProgramChange,
 }) => {
   const [startIndex, setStartIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(getItemsFromWidth);
@@ -89,41 +89,51 @@ const TrainingProgramSelector = ({
   const isStart = startIndex === 0;
   const isEnd = startIndex >= maxIndex;
 
-  const visiblePrograms = programs.slice(
-    startIndex,
-    startIndex + itemsToShow,
-  );
+  const visiblePrograms = programs.slice(startIndex, startIndex + itemsToShow);
 
   return (
-    <div className="w-[80%] mx-auto mb-5">
-      {programs && programs.length > 0 ? (
-        <div>Programs loaded</div>
-      ) : (
-        <div>No programs</div>
-      )}
-      
-      {/* Title */}
-      <h3 className="text-xl font-semibold mb-3">Workouts</h3>
+    <div className="w-[80%] mx-auto mb-6 space-y-3">
+      {/* status */}
+      <div className="text-sm text-gray-600 font-medium">
+        {programs?.length ? `${programs.length} programs` : "No programs"}
+      </div>
 
-      {/* Row */}
+      {/* row */}
       <div className="flex items-center gap-3">
-        {/* Left */}
+        {/* LEFT */}
         <button
           onClick={() => shiftPrograms(-1)}
           disabled={isStart}
-          className={`p-2 rounded-full shadow transition
+          className={`
+            w-11 h-11 flex items-center justify-center rounded-full
+            transition-all duration-200
+
             ${
               isStart
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
+                ? `
+                  bg-gray-100 text-gray-300 cursor-not-allowed
+                `
+                : `
+                  bg-white/80 backdrop-blur-md
+                  text-gray-700
+
+                  border border-white/60
+                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
+
+                  hover:bg-white
+                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
+                  hover:text-gray-900
+
+                  active:scale-95
+                `
             }
           `}
         >
-          <ChevronLeft />
+          <ChevronLeft size={20} />
         </button>
 
-        {/* Programs */}
-        <div ref={containerRef} className="flex flex-1 gap-3 overflow-hidden">
+        {/* PROGRAMS */}
+        <div ref={containerRef} className="flex flex-1 gap-2 overflow-hidden">
           {visiblePrograms.map((program) => {
             const isSelected = selectedProgram === program;
 
@@ -131,37 +141,63 @@ const TrainingProgramSelector = ({
               <div
                 key={program.id}
                 onClick={() => {
-                    if (isAnimating.current) return;
+                  if (isAnimating.current) return;
+                  onProgramChange?.(program);
+                }}
+                className={`
+          flex-1 min-w-0 px-5 py-3 text-center cursor-pointer
+          rounded-xl transition-all duration-200
 
-                    onProgramChange?.(program)
-                    }}
-                className={`flex-1 min-w-0 rounded-xl p-4 cursor-pointer text-center transition-all duration-200 border
-                    ${
-                      isSelected
-                        ? "bg-blue-50 border-blue-300 text-blue-700 shadow-sm"
-                        : "bg-white border-gray-200 hover:shadow-md hover:-translate-y-1"
-                    }
-                `}
+          ${
+            isSelected
+              ? `
+                bg-indigo-100 text-indigo-600
+              `
+              : `
+                bg-white text-gray-500
+                hover:bg-gray-100 hover:text-gray-600
+              `
+          }
+        `}
               >
-                {program.title}
+                <span className="block truncate text-base font-semibold">
+                  {program.title}
+                </span>
               </div>
             );
           })}
         </div>
 
-        {/* Right */}
+        {/* RIGHT */}
         <button
           onClick={() => shiftPrograms(1)}
           disabled={isEnd}
-          className={`p-2 rounded-full shadow transition
+          className={`
+            w-11 h-11 flex items-center justify-center rounded-full
+            transition-all duration-200
+
             ${
               isEnd
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
+                ? `
+                  bg-gray-100 text-gray-300 cursor-not-allowed
+                `
+                : `
+                  bg-white/80 backdrop-blur-md
+                  text-gray-700
+
+                  border border-white/60
+                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
+
+                  hover:bg-white
+                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
+                  hover:text-gray-900
+
+                  active:scale-95
+                `
             }
           `}
         >
-          <ChevronRight />
+          <ChevronRight size={20} />
         </button>
       </div>
     </div>

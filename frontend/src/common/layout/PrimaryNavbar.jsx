@@ -1,28 +1,56 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AppNavbar() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="relative top-0 left-0 w-full flex justify-center items-center px-6 py-4 z-50 bg-black/30 backdrop-blur-md text-white">
-      
-      {/* Navigation links */}
-      <div className="flex space-x-8">
-        <button
+    <nav className="sticky top-0 z-50 bg-white">
+      <div className="w-[92%] lg:w-[70%] mx-auto flex items-center justify-between py-6">
+        {/* Left */}
+        <div
           onClick={() => navigate("/training-page")}
-          className="text-lg hover:text-gray-300 transition"
+          className="text-xl font-semibold text-gray-900 cursor-pointer"
         >
-          Training
-        </button>
+          SILA
+        </div>
 
-        <button
-          onClick={() => navigate("/activities-page")}
-          className="text-lg hover:text-gray-300 transition"
-        >
-          Activities
-        </button>
+        {/* Center */}
+        <div className="flex items-center gap-12">
+          <button
+            onClick={() => navigate("/training-page")}
+            className={`
+          text-base font-medium transition
+          ${
+            isActive("/training-page")
+              ? "text-gray-900"
+              : "text-gray-500 hover:text-gray-800"
+          }
+        `}
+          >
+            Training
+          </button>
+
+          <button
+            onClick={() => navigate("/activities-page")}
+            className={`
+          text-base font-medium transition
+          ${
+            isActive("/activities-page")
+              ? "text-gray-900"
+              : "text-gray-500 hover:text-gray-800"
+          }
+        `}
+          >
+            Activities
+          </button>
+        </div>
+
+        {/* Right */}
+        <div className="w-12" />
       </div>
-
     </nav>
   );
 }

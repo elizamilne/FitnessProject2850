@@ -69,37 +69,71 @@ const TrainingOverviewRow = () => {
   };
 
   return (
-    <div className="w-[90%] mx-auto">
-      {/* Section Title */}
-      <h2 className="text-xl font-semibold mb-4">Overview</h2>
-
+    <div className="w-[90%] mx-auto space-y-6">
       {/* Row */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-        {/* Left */}
+      <div className="flex flex-col sm:flex-row gap-5">
+        {/* 🔹 NEXT RACE */}
         {nextRace && (
-          <div className="bg-white p-5 rounded-2xl shadow-sm flex-1 flex flex-col items-center justify-center text-center">
-            <h4 className="text-sm text-gray-500">Next Race</h4>
-            <p className="text-lg font-semibold mt-1">
+          <div
+            className="relative flex-1 p-6 rounded-3xl
+                        bg-white/70 backdrop-blur-xl border border-white/50
+                        shadow-[0_10px_40px_rgba(0,0,0,0.06)]
+                        flex flex-col items-center justify-center text-center"
+          >
+            <h4 className="text-sm text-gray-500 mb-1">Next Race</h4>
+
+            <p className="text-2xl font-semibold text-gray-900 tracking-tight">
               {formatRaceDate(nextRace.date)}
             </p>
+
+            {/* subtle glow */}
+            <div
+              className="absolute inset-0 rounded-3xl pointer-events-none 
+                          bg-gradient-to-br from-indigo-500/5 to-purple-500/5"
+            />
           </div>
         )}
 
-        {/* Right */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm flex-1">
-          <h4 className="text-sm text-gray-500 mb-2">Personal Records</h4>
-           
-          <ul className="space-y-1 text-sm text-gray-700">
+        {/* 🔹 PERSONAL RECORDS */}
+        <div
+          className="relative flex-1 p-6 rounded-3xl
+                      bg-white/70 backdrop-blur-xl border border-white/50
+                      shadow-[0_10px_40px_rgba(0,0,0,0.06)]"
+        >
+          <h4 className="text-sm text-gray-500 mb-3">Personal Records</h4>
+
+          <ul className="space-y-2 text-sm">
             {personalBests.length === 0 ? (
               <li className="text-gray-400">No records yet</li>
             ) : (
               personalBests.map((item) => (
-                <li key={`${item.exerciseId}-${item.metricTypeId}`}>
-                  {item.exerciseName} - {item.bestValue}{item.metricUnit} {item.metricName}
+                <li
+                  key={`${item.exerciseId}-${item.metricTypeId}`}
+                  className="flex items-center justify-between
+                           px-3 py-2 rounded-lg
+                           bg-white/60 hover:bg-white/80
+                           transition"
+                >
+                  <span className="text-gray-700 truncate">
+                    {item.exerciseName}
+                  </span>
+
+                  <span className="font-medium text-gray-900">
+                    {item.bestValue}
+                    <span className="text-gray-500 ml-1 text-xs">
+                      {item.metricUnit}
+                    </span>
+                  </span>
                 </li>
               ))
             )}
           </ul>
+
+          {/* subtle glow */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none 
+                        bg-gradient-to-br from-indigo-500/5 to-purple-500/5"
+          />
         </div>
       </div>
     </div>

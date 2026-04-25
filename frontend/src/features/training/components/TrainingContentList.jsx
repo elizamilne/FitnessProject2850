@@ -95,8 +95,9 @@ const TrainingContentList = ({ program, date }) => {
 
     try {
       completed.map(async (e) => {
-        const exerciseId = e.programExerciseId
-        const res = await programExerciseMetricService.getByProgramExerciseId(exerciseId);
+        const exerciseId = e.programExerciseId;
+        const res =
+          await programExerciseMetricService.getByProgramExerciseId(exerciseId);
 
         const metrics = res.data;
         const cleanedMetrics = metrics.map(({ metricTypeId, value }) => ({
@@ -108,12 +109,12 @@ const TrainingContentList = ({ program, date }) => {
           date,
           profileId,
           exerciseId,
-          metrics: cleanedMetrics
-        }
-        console.log(payload)
+          metrics: cleanedMetrics,
+        };
+        console.log(payload);
 
-        activityService.createActivity(payload)
-      })
+        activityService.createActivity(payload);
+      });
     } catch (error) {
       console.error("Error fetching:", error);
     }
@@ -128,47 +129,50 @@ const TrainingContentList = ({ program, date }) => {
   }
 
   return (
-    <div className="w-[100%] lg:w-[80%] mx-auto bg-gray-50 p-6 rounded-xl shadow">
-      {/* Title */}
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h2 className="text-2xl font-semibold min-w-0 truncate">
+    <div className="w-full lg:w-[80%] mx-auto space-y-6">
+      {/* 🔹 HEADER */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900 truncate">
           {program.title}
         </h2>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button className="w-9 h-9 flex items-center justify-center border border-gray-300 text-gray-700 rounded-full hover:bg-gray-100 transition">
+        <div className="flex items-center gap-2">
+          <button
+            className="w-9 h-9 flex items-center justify-center rounded-full
+                           bg-white/70 backdrop-blur border border-white/50
+                           hover:bg-white transition"
+          >
             <Plus size={18} />
           </button>
 
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+            className="px-4 py-2 rounded-lg text-sm font-medium
+                     bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                     hover:opacity-90 active:scale-95 transition"
           >
-            Save changes
+            Save
           </button>
         </div>
       </div>
 
-      {/* Progress */}
-      <div className="flex items-center justify-between mb-6 gap-4">
-        <span className="px-3 py-1 bg-[#f9e59e] text-[#b78d02] rounded-full text-sm font-medium">
-          In Progress
-        </span>
+      {/* 🔹 PROGRESS */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-sm text-gray-500">
+          <span>In progress</span>
+          <span>{progress}%</span>
+        </div>
 
-        <div className="flex-1">
-          <div className="text-sm mb-1 text-gray-600">{progress}% / 100%</div>
-
-          <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#f1c21c]"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="h-2 bg-gray-200/70 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
 
-      {/* Exercises */}
-      <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
+      {/* 🔹 EXERCISES */}
+      <div className="space-y-2">
         {exercises.map((exercise) => {
           const isCompleted = completed.some(
             (item) => item.programExerciseId === exercise.programExerciseId,
@@ -178,21 +182,32 @@ const TrainingContentList = ({ program, date }) => {
             <div
               key={exercise.programExerciseId}
               onClick={() => toggleExercise(exercise)}
-              className={`p-4 rounded-xl shadow transition flex items-center gap-3 cursor-pointer relative
-                ${
-                  isCompleted
-                    ? "bg-green-100 border border-green-400"
-                    : "bg-white hover:shadow-md"
-                }`}
+              className={`
+              flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer
+              transition-all duration-200 relative
+
+              ${
+                isCompleted
+                  ? `
+                    bg-white/70 backdrop-blur border border-indigo-100
+                    shadow-[0_4px_20px_rgba(99,102,241,0.08)]
+                  `
+                  : `
+                    hover:bg-white/60
+                  `
+              }
+            `}
             >
+              {/* image */}
               <img
                 src={exercise.image}
                 alt={exercise.exerciseName}
-                className="w-12 h-12 object-cover rounded-lg"
+                className="w-12 h-12 rounded-lg object-cover"
               />
 
-              <div className="min-w-0 flex-1">
-                <h3 className="font-semibold truncate">
+              {/* text */}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-gray-800 truncate">
                   {exercise.exerciseName}
                 </h3>
 
@@ -201,10 +216,28 @@ const TrainingContentList = ({ program, date }) => {
                 </p>
               </div>
 
+              {/* status */}
+              <div
+                className={`
+                w-5 h-5 rounded-full flex items-center justify-center
+                transition-all text-xs font-medium
+
+                ${
+                  isCompleted
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
+                    : "border border-gray-300"
+                }
+              `}
+              >
+                {isCompleted && "✓"}
+              </div>
+
+              {/* subtle AI glow */}
               {isCompleted && (
-                <div className="absolute top-0 right-2 text-green-600 text-lg">
-                  ✓
-                </div>
+                <div
+                  className="absolute inset-0 rounded-xl pointer-events-none
+                              bg-gradient-to-r from-indigo-500/5 to-purple-500/5"
+                />
               )}
             </div>
           );

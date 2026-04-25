@@ -17,7 +17,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
   const containerRef = useRef(null);
 
   const formatDate = (date) => {
-    return date.toLocaleDateString("en-CA"); 
+    return date.toLocaleDateString("en-CA");
   };
 
   // Responsive logic
@@ -37,7 +37,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
       const today = formatDate(new Date());
       onDateChange?.(today);
     }
-  }); 
+  });
 
   const generateDates = () => {
     const dates = [];
@@ -79,29 +79,29 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
 
   const dates = generateDates();
 
-  const currentDate = selectedDate
-    ? new Date(selectedDate)
-    : new Date();
+  const currentDate = selectedDate ? new Date(selectedDate) : new Date();
 
   return (
-    <div className="w-full">
-      {/* Title */}
-      <h1 className="text-xl font-semibold mb-4">Calendar</h1>
-
+    <div className="w-full space-y-4">
+      
       {/* Row */}
-      <div className="flex items-center gap-2 sm:gap-4">
-        {/* Left Arrow */}
+      <div className="flex items-center gap-4">
+        {/* LEFT */}
         <button
           onClick={() => shiftDays(-1)}
-          className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+          className="w-10 h-10 flex items-center justify-center rounded-full
+                   bg-white/70 backdrop-blur border border-white/50
+                   text-gray-700 hover:bg-white active:scale-95 transition"
         >
-          <ChevronLeft />
+          <ChevronLeft size={20} />
         </button>
 
-        {/* Dates */}
+        {/* DATES CONTAINER */}
         <div
           ref={containerRef}
-          className="flex flex-1 gap-2 sm:gap-3 flex-nowrap overflow-hidden"
+          className="flex flex-1 gap-2 sm:gap-3 overflow-hidden p-1 rounded-2xl
+                   bg-white/60 backdrop-blur-xl border border-white/50
+                   shadow-[0_6px_20px_rgba(0,0,0,0.05)]"
         >
           {dates.map((date, index) => {
             const isSelected =
@@ -110,37 +110,58 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
             return (
               <div
                 key={index}
-                onClick={() => {
-                  onDateChange?.(formatDate(date));
-                }}
-                className={`flex-1 min-w-0 aspect-square flex flex-col items-center justify-center rounded-xl cursor-pointer transition text-sm sm:text-base
-                  ${
-                    isSelected
-                      ? "bg-blue-500 text-white"
-                      : "bg-white shadow-sm hover:shadow-md hover:bg-gray-50 hover:scale-105"
-                  }`}
+                onClick={() => onDateChange?.(formatDate(date))}
+                className={`
+                flex-1 min-w-0 aspect-square flex flex-col items-center justify-center
+                rounded-xl cursor-pointer transition-all duration-200 relative
+
+                ${
+                  isSelected
+                    ? `
+                      bg-white text-gray-900 shadow-sm
+                      ring-1 ring-indigo-100
+                    `
+                    : `
+                      text-gray-500 hover:text-gray-700 hover:bg-white/60
+                    `
+                }
+              `}
               >
-                <span>
+                <span className="text-xs sm:text-sm">
                   {date.toLocaleDateString("en-GB", {
                     weekday: "short",
                   })}
                 </span>
-                <span className="font-semibold">{date.getDate()}</span>
+
+                <span className="font-semibold text-sm sm:text-base">
+                  {date.getDate()}
+                </span>
+
+                {/* subtle AI glow */}
+                {isSelected && (
+                  <div
+                    className="absolute inset-0 rounded-xl pointer-events-none 
+                                bg-gradient-to-r from-indigo-500/5 to-purple-500/5"
+                  />
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Right Arrow */}
+        {/* RIGHT */}
         <button
           onClick={() => shiftDays(1)}
-          className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+          className="w-10 h-10 flex items-center justify-center rounded-full
+                   bg-white/70 backdrop-blur border border-white/50
+                   text-gray-700 hover:bg-white active:scale-95 transition"
         >
-          <ChevronRight />
+          <ChevronRight size={20} />
         </button>
       </div>
 
-      <div className="mt-4 text-center text-gray-600 font-medium">
+      {/* Month label */}
+      <div className="text-center text-sm text-gray-500 font-medium tracking-wide">
         {startDate.toLocaleDateString("en-GB", {
           month: "long",
           year: "numeric",

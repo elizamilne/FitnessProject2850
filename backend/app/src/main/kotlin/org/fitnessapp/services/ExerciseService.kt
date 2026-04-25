@@ -16,6 +16,11 @@ import org.fitnessapp.models.ExerciseDetailDTO
 import org.fitnessapp.models.ExerciseCategory
 import org.fitnessapp.models.ExerciseMuscleGroup
 
+import org.fitnessapp.models.ExerciseMetricTypes
+import org.fitnessapp.models.MetricType
+import org.fitnessapp.models.MetricTypeDTO
+import org.fitnessapp.models.ExerciseWithMetricsDTO
+
 fun ResultRow.toExerciseDTO() = ExerciseDTO(
     id = this[Exercise.id],
     name = this[Exercise.name],
@@ -105,5 +110,31 @@ object ExerciseService {
         Exercise
             .selectAll().where { Exercise.id eq exerciseId }
             .singleOrNull()
+    }
+
+    fun findMetricsForExercises(exerciseIds: List<Long>): List<ExerciseWithMetricsDTO> = transaction {
+        if (exerciseIds.isEmpty()) return@transaction emptyList()
+
+        val query = (ExerciseMetricTypes innerJoin MetricType innerJoin Exercise)
+            .selectAll()
+            .where { Exercise.id inList exerciseIds }
+
+        val grouped = query.groupBy { it[Exercise.id] }
+
+        grouped.map { (exerciseId, rows) ->
+            val first = rows.first()
+
+            ExerciseWithMetricsDTO(
+                exerciseId = exerciseId,
+                exerciseName = first[Exercise.name] ?: "",
+                metrics = rows.map {
+                    MetricTypeDTO(
+                        id = it[MetricType.id],
+                        name = it[MetricType.name],
+                        unit = it[MetricType.unit]
+                    )
+                }
+            )
+        }
     }
 }

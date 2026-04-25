@@ -16,6 +16,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.fitnessapp.models.Exercise
 import org.fitnessapp.models.ExerciseDTO
 import org.fitnessapp.models.ExerciseDetailDTO
+import org.fitnessapp.models.ExerciseIdsRequest
 
 import org.fitnessapp.models.ExerciseCategory
 import org.fitnessapp.models.ExerciseMuscleGroup
@@ -43,6 +44,18 @@ fun Route.exerciseRoutes() {
             } else {
                 call.respond(HttpStatusCode.OK, result)
             }
+        }
+
+        post("/metrics") {
+            val request = call.receive<ExerciseIdsRequest>()
+
+            if (request.ids.isEmpty()) {
+                return@post call.respond(HttpStatusCode.BadRequest, "Empty exercise list")
+            }
+
+            val result = ExerciseService.findMetricsForExercises(request.ids)
+
+            call.respond(HttpStatusCode.OK, result)
         }
     }
 }

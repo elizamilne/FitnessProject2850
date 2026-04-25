@@ -11,6 +11,7 @@ import org.fitnessapp.data.MuscleGroupSeeder
 import org.fitnessapp.data.MetricTypeSeeder
 import org.fitnessapp.data.ExerciseCategorySeeder
 import org.fitnessapp.data.ExerciseMuscleGroupSeeder
+import org.fitnessapp.data.ExerciseMetricTypeSeeder
 
 fun initDatabase() {
     Database.connect(
@@ -26,6 +27,7 @@ fun initDatabase() {
             Exercise,
             ExerciseCategory,
             ExerciseMuscleGroup,
+            ExerciseMetricTypes,
             MetricType,
             MuscleGroup,
             Profile,
@@ -37,12 +39,18 @@ fun initDatabase() {
             RaceCategory,
             User
         )
+    }
 
-        ExerciseSeeder.seed()
+    transaction {
         CategorySeeder.seed()
+        ExerciseSeeder.seed()
         MuscleGroupSeeder.seed()
         MetricTypeSeeder.seed()
+    }
+
+    transaction {
         ExerciseCategorySeeder.seed()
         ExerciseMuscleGroupSeeder.seed()
+        ExerciseMetricTypeSeeder.seed()
     }
 }

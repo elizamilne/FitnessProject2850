@@ -46,16 +46,30 @@ fun Route.exerciseRoutes() {
             }
         }
 
-        post("/metrics") {
-            val request = call.receive<ExerciseIdsRequest>()
+        get("/{id}/full") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
-            if (request.ids.isEmpty()) {
-                return@post call.respond(HttpStatusCode.BadRequest, "Empty exercise list")
+            val result = ExerciseService.findExerciseFullById(id)
+
+            if (result == null) {
+                call.respond(HttpStatusCode.NotFound, "Exercise not found")
+            } else {
+                call.respond(HttpStatusCode.OK, result)
             }
+        }
 
-            val result = ExerciseService.findMetricsForExercises(request.ids)
+        get("/{id}/metrics") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
-            call.respond(HttpStatusCode.OK, result)
+            val result = ExerciseService.findMetricsForExercise(id)
+
+            if (result == null) {
+                call.respond(HttpStatusCode.NotFound, "No metrics found for this exercise")
+            } else {
+                call.respond(HttpStatusCode.OK, result)
+            }
         }
     }
 }

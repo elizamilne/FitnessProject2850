@@ -65,6 +65,33 @@ object ExerciseService {
             .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
             .map { it[ExerciseMuscleGroup.muscleGroupId] }
 
+
+   // Query helpers for other routes
+
+    fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {
+        val baseInfo = Exercise.selectAll()
+            .where { Exercise.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val categories = findCategoryIdsByExerciseId(id) 
+        val muscles = findMuscleGroupIdsByExerciseId(id) 
+
+        ExerciseDetailDTO(
+            id = baseInfo[Exercise.id],
+            name = baseInfo[Exercise.name] ?: "",
+            image = baseInfo[Exercise.image] ?: "",
+            categoryIds = categories,
+            muscleGroupIds = muscles
+        )
+    }
+
+    fun findExerciseById(exerciseId: Long): ResultRow? = transaction {
+        Exercise
+            .selectAll().where { Exercise.id eq exerciseId }
+            .singleOrNull()
+    }
+
     // Query helpers
 
     fun findExercises(
@@ -125,53 +152,63 @@ object ExerciseService {
         }
     }
 
-    fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {
-        val baseInfo = Exercise.selectAll()
-            .where { Exercise.id eq id }
+    fun findExerciseFullById(exerciseId: Long): ExerciseFullDTO? = transaction {
+        val exerciseRow = Exercise
+            .selectAll()
+            .where { Exercise.id eq exerciseId }
             .singleOrNull()
             ?: return@transaction null
 
-        val categories = findCategoryIdsByExerciseId(id) 
-        val muscles = findMuscleGroupIdsByExerciseId(id) 
+        val exercise = exerciseRow.toExerciseDTO()
 
-        ExerciseDetailDTO(
-            id = baseInfo[Exercise.id],
-            name = baseInfo[Exercise.name] ?: "",
-            image = baseInfo[Exercise.image] ?: "",
-            categoryIds = categories,
-            muscleGroupIds = muscles
+        val categories = (ExerciseCategory innerJoin Category)
+            .selectAll()
+            .where { ExerciseCategory.exerciseId eq exerciseId }
+            .map {
+                ExerciseCategoryDTO(
+                    id = it[Category.id],
+                    name = it[Category.name] ?: ""
+                )
+            }
+
+        val muscleGroups = (ExerciseMuscleGroup innerJoin MuscleGroup)
+            .selectAll()
+            .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
+            .map {
+                ExerciseMuscleGroupDTO(
+                    id = it[MuscleGroup.id],
+                    name = it[MuscleGroup.name] ?: ""
+                )
+            }
+
+        ExerciseFullDTO(
+            exercise = exercise,
+            categories = categories,
+            muscleGroups = muscleGroups
         )
     }
 
-    fun findExerciseById(exerciseId: Long): ResultRow? = transaction {
-        Exercise
-            .selectAll().where { Exercise.id eq exerciseId }
-            .singleOrNull()
-    }
+    fun findMetricsForExercise(exerciseId: Long): ExerciseWithMetricsDTO? = transaction {
 
-    fun findMetricsForExercises(exerciseIds: List<Long>): List<ExerciseWithMetricsDTO> = transaction {
-        if (exerciseIds.isEmpty()) return@transaction emptyList()
-
-        val query = (ExerciseMetricTypes innerJoin MetricType innerJoin Exercise)
+        val rows = (ExerciseMetricTypes innerJoin MetricType innerJoin Exercise)
             .selectAll()
-            .where { Exercise.id inList exerciseIds }
+            .where { Exercise.id eq exerciseId }
+            .toList()
 
-        val grouped = query.groupBy { it[Exercise.id] }
+        if (rows.isEmpty()) return@transaction null
 
-        grouped.map { (exerciseId, rows) ->
-            val first = rows.first()
+        val first = rows.first()
 
-            ExerciseWithMetricsDTO(
-                exerciseId = exerciseId,
-                exerciseName = first[Exercise.name] ?: "",
-                metrics = rows.map {
-                    MetricTypeDTO(
-                        id = it[MetricType.id],
-                        name = it[MetricType.name],
-                        unit = it[MetricType.unit]
-                    )
-                }
-            )
-        }
+        ExerciseWithMetricsDTO(
+            exerciseId = exerciseId,
+            exerciseName = first[Exercise.name] ?: "",
+            metrics = rows.map {
+                MetricTypeDTO(
+                    id = it[MetricType.id],
+                    name = it[MetricType.name],
+                    unit = it[MetricType.unit]
+                )
+            }
+        )
     }
 }

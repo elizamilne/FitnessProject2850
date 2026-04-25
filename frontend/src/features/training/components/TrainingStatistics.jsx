@@ -46,11 +46,12 @@ const TrainingStatistics = () => {
     const loadStats = async () => {
       const profileId = 1;
       const { data } = await activityService.getActivitiesById(profileId);
+      const activities = data.data
 
       // Workouts per week
       const daysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-      const perDay = data.reduce((acc, item) => {
+      const perDay = activities.reduce((acc, item) => {
         const day = new Date(item.date).toLocaleDateString("en-GB", {
           weekday: "short",
         });
@@ -64,7 +65,7 @@ const TrainingStatistics = () => {
         value: perDay[day] || 0,
       }));
 
-      const perDate = data.reduce((acc, item) => {
+      const perDate = activities.reduce((acc, item) => {
         acc[item.date] = (acc[item.date] || 0) + 1;
         return acc;
       }, {});

@@ -55,7 +55,8 @@ const TrainingPage = () => {
         <TrainingCalendar
           selectedDate={selectedDate}
           onDateChange={handleDateChange}
-        ></TrainingCalendar>
+        />
+
         <div className="mt-12 mb-12 text-center">
           <h1 className="text-2xl font-semibold">Today's Plan</h1>
         </div>
@@ -64,16 +65,20 @@ const TrainingPage = () => {
           programs={programs}
           selectedProgram={selectedProgram}
           onProgramChange={handleProgramChange}
-        ></TrainingProgramSelector>
-        <TrainingContentList program={selectedProgram}></TrainingContentList>
+        />
+
+        <TrainingContentList 
+          program={selectedProgram}
+          date={selectedDate}
+        />
+        
+        <div className="mt-12 bt-12"></div>
+
+        <TrainingStatistics/>
 
         <div className="mt-12 bt-12"></div>
 
-        <TrainingStatistics></TrainingStatistics>
-
-        <div className="mt-12 bt-12"></div>
-
-        <TrainingOverviewRow></TrainingOverviewRow>
+        <TrainingOverviewRow/>
 
         <div className="mt-12 bt-12"></div>
       </div>

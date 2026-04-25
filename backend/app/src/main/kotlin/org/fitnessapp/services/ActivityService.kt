@@ -100,7 +100,8 @@ object ActivityService {
     }
 
     fun findActivityById(id: Long): ActivityDTO? = transaction {
-        Activity.selectAll()
+        (Activity innerJoin Exercise)
+            .selectAll()
             .where { Activity.id eq id }
             .singleOrNull()
             ?.let { activityRow ->

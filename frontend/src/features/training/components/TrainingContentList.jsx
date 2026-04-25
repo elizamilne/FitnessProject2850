@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { programExerciseService } from "../../../services/programExercise";
 import { metricService } from "../../../services/metricType";
+import { programExerciseMetricService } from "../../../services/programExerciseMetric";
+import { activityService } from "../../../services/activity";
+// import { programExerciseMetricService } from "../../../services/programExerciseMetric";
+// import { activityService } from "../../../services/activity";
 
-const TrainingContentList = ({ program }) => {
+const TrainingContentList = ({ program, date }) => {
   const progress = 66;
-
   const [completed, setCompleted] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [metricMap, setMetricMap] = useState({});
@@ -23,7 +26,7 @@ const TrainingContentList = ({ program }) => {
               name: m.name,
               unit: m.unit,
             },
-          ])
+          ]),
         );
 
         setMetricMap(map);
@@ -39,8 +42,7 @@ const TrainingContentList = ({ program }) => {
   useEffect(() => {
     const loadExercises = async () => {
       try {
-        const { data } =
-          await programExerciseService.getByProgram(program.id);
+        const { data } = await programExerciseService.getByProgram(program.id);
 
         console.log("Exercises", data);
         setExercises(data);
@@ -58,23 +60,18 @@ const TrainingContentList = ({ program }) => {
   const toggleExercise = (exercise) => {
     setCompleted((prev) => {
       const exists = prev.some(
-        (item) => item.programExerciseId === exercise.programExerciseId
+        (item) => item.programExerciseId === exercise.programExerciseId,
       );
 
       if (exists) {
         return prev.filter(
-          (item) => item.programExerciseId !== exercise.programExerciseId
+          (item) => item.programExerciseId !== exercise.programExerciseId,
         );
       } else {
         return [...prev, exercise];
       }
     });
   };
-
-  // Debug
-  useEffect(() => {
-    console.log("Completed:", completed);
-  }, [completed]);
 
   // Format metrics nicely
   const formatMetrics = (metrics) => {
@@ -92,6 +89,36 @@ const TrainingContentList = ({ program }) => {
       .join(" • ");
   };
 
+  const handleSave = async () => {
+    const profile = JSON.parse(sessionStorage.getItem("profile"));
+    const profileId = profile?.id;
+
+    try {
+      completed.map(async (e) => {
+        const exerciseId = e.programExerciseId
+        const res = await programExerciseMetricService.getByProgramExerciseId(exerciseId);
+
+        const metrics = res.data;
+        const cleanedMetrics = metrics.map(({ metricTypeId, value }) => ({
+          metricTypeId,
+          value,
+        }));
+
+        const payload = {
+          date,
+          profileId,
+          exerciseId,
+          metrics: cleanedMetrics
+        }
+        console.log(payload)
+
+        activityService.createActivity(payload)
+      })
+    } catch (error) {
+      console.error("Error fetching:", error);
+    }
+  };
+
   if (!program) {
     return (
       <div className="w-[100%] lg:w-[80%] mx-auto p-6 text-center text-gray-400">
@@ -103,14 +130,23 @@ const TrainingContentList = ({ program }) => {
   return (
     <div className="w-[100%] lg:w-[80%] mx-auto bg-gray-50 p-6 rounded-xl shadow">
       {/* Title */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <h2 className="text-2xl font-semibold min-w-0 truncate">
           {program.title}
         </h2>
 
-        <button className="w-9 h-9 flex items-center justify-center border border-gray-300 text-gray-700 rounded-full hover:bg-gray-100 transition">
-          <Plus size={18} />
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button className="w-9 h-9 flex items-center justify-center border border-gray-300 text-gray-700 rounded-full hover:bg-gray-100 transition">
+            <Plus size={18} />
+          </button>
+
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+          >
+            Save changes
+          </button>
+        </div>
       </div>
 
       {/* Progress */}
@@ -120,9 +156,7 @@ const TrainingContentList = ({ program }) => {
         </span>
 
         <div className="flex-1">
-          <div className="text-sm mb-1 text-gray-600">
-            {progress}% / 100%
-          </div>
+          <div className="text-sm mb-1 text-gray-600">{progress}% / 100%</div>
 
           <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -137,7 +171,7 @@ const TrainingContentList = ({ program }) => {
       <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
         {exercises.map((exercise) => {
           const isCompleted = completed.some(
-            (item) => item.programExerciseId === exercise.programExerciseId
+            (item) => item.programExerciseId === exercise.programExerciseId,
           );
 
           return (

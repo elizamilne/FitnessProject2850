@@ -4,7 +4,7 @@ export const programScheduleService = {
     getById: (id) =>
         api.get(`/program-schedules/${id}`),
 
-    createSchedule: (data) =>
+    addDay: (data) =>
         api.post("/program-schedules", data),
 
     deleteSchedule: (id) =>

@@ -7,8 +7,6 @@ const ViewAllProgramModal = ({
   programs = [],
   onSelect,
 }) => {
-  console.log("hi");
-
   return (
     <Modal
       isOpen={isOpen}

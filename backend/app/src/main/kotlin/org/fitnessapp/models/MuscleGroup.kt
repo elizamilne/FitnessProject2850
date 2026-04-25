@@ -14,3 +14,9 @@ data class MuscleGroupDTO(
     val id: Long? = null,
     val name: String?
 )
+
+@Serializable
+data class ExerciseMuscleGroupDTO(
+    val id: Long,
+    val name: String
+)

@@ -42,3 +42,10 @@ data class ExerciseWithMetricsDTO(
 data class ExerciseIdsRequest(
     val ids: List<Long>
 )
+
+@Serializable
+data class ExerciseFullDTO(
+    val exercise: ExerciseDTO,
+    val categories: List<ExerciseCategoryDTO>,
+    val muscleGroups: List<ExerciseMuscleGroupDTO>
+)

@@ -21,6 +21,12 @@ import org.fitnessapp.models.MetricType
 import org.fitnessapp.models.MetricTypeDTO
 import org.fitnessapp.models.ExerciseWithMetricsDTO
 
+import org.fitnessapp.models.Category
+import org.fitnessapp.models.MuscleGroup
+import org.fitnessapp.models.ExerciseCategoryDTO
+import org.fitnessapp.models.ExerciseMuscleGroupDTO
+import org.fitnessapp.models.ExerciseFullDTO
+
 fun ResultRow.toExerciseDTO() = ExerciseDTO(
     id = this[Exercise.id],
     name = this[Exercise.name],
@@ -65,7 +71,7 @@ object ExerciseService {
         search: String?, 
         categoryId: Long?, 
         muscleGroupId: Long?
-    ): List<ExerciseDTO> = transaction {
+    ): List<ExerciseFullDTO> = transaction {
 
         var query = Exercise.selectAll()
 
@@ -85,7 +91,38 @@ object ExerciseService {
             query = query.andWhere { Exercise.id inList ids }
         }
 
-        query.map { it.toExerciseDTO() }
+        val exercises = query.map { it.toExerciseDTO() }
+
+        exercises.mapNotNull { exercise ->
+
+            val exerciseId = exercise.id ?: return@mapNotNull null
+
+            val categories = (ExerciseCategory innerJoin Category)
+                .selectAll()
+                .where { ExerciseCategory.exerciseId eq exerciseId }
+                .map {
+                    ExerciseCategoryDTO(
+                        id = it[Category.id],
+                        name = it[Category.name] ?: ""
+                    )
+                }
+
+            val muscleGroups = (ExerciseMuscleGroup innerJoin MuscleGroup)
+                .selectAll()
+                .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
+                .map {
+                    ExerciseMuscleGroupDTO(
+                        id = it[MuscleGroup.id],
+                        name = it[MuscleGroup.name] ?: ""
+                    )
+                }
+
+            ExerciseFullDTO(
+                exercise = exercise,
+                categories = categories,
+                muscleGroups = muscleGroups
+            )
+        }
     }
 
     fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {

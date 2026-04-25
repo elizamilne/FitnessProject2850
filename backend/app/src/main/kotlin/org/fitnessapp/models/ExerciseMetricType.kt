@@ -11,6 +11,10 @@ object ExerciseMetricTypes : Table("exercise_metric_types") {
     val metricTypeId = reference("metric_type_id", MetricType.id)
 
     override val primaryKey = PrimaryKey(id)
+
+    init {
+        uniqueIndex("uniq_exercise_metric", exerciseId, metricTypeId)
+    }
 }
 
 @Serializable

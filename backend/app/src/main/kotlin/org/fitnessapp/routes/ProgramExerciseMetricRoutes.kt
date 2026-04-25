@@ -27,7 +27,7 @@ fun Route.programExerciseMetricRoutes() {
             val id = call.parameters["id"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
             
-            val programExerciseMetric = ProgramExerciseMetricService.findProgramExerciseMetricById(id)
+            val programExerciseMetric = ProgramExerciseMetricService.findMetricsByProgramExerciseId(id)
 
             if (programExerciseMetric == null){ 
                 call.respond(HttpStatusCode.NotFound, "Program Exercise Metric not found")

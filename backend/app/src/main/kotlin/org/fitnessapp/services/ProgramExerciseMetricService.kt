@@ -51,12 +51,11 @@ object ProgramExerciseMetricService {
         builder[ProgramExerciseMetric.value] = request.value.toBigDecimal()
     }
 
-    fun findProgramExerciseMetricById(id: Long): ProgramExerciseMetricDTO? = transaction {
+   fun findMetricsByProgramExerciseId(id: Long): List<ProgramExerciseMetricDTO> = transaction {
         ProgramExerciseMetric
             .selectAll()
-            .where { ProgramExerciseMetric.id eq id }
+            .where { ProgramExerciseMetric.programExerciseId eq id }
             .map { it.toProgramExerciseMetricDTO() }
-            .singleOrNull()
     }
 
     fun createProgramExerciseMetricAndReturnId(

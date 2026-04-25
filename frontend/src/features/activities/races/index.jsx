@@ -51,7 +51,6 @@ const ActivitiesRaces = () => {
         onClose={() => setIsViewModalOpen(false)}
         races={races}
         onSelect={(race) => {
-          console.log("Selected program:", race);
           handleSelectRace(race);
         }}
       />

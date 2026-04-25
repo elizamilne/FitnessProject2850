@@ -14,7 +14,7 @@ const TrainingPage = () => {
 
   // Updates the currently selected date
   const handleDateChange = (date) => {
-    console.log("Selected date:", date);
+    // console.log("Selected date:", date);
     setSelectedDate(date);
     setSelectedProgram(null);
     setPrograms([]);
@@ -38,7 +38,7 @@ const TrainingPage = () => {
           selectedDate,
         );
 
-        console.log("Loaded programs:", data);
+        // console.log("Loaded programs:", data);
         setPrograms(data);
       } catch (error) {
         console.error("Failed:", error.response?.data);

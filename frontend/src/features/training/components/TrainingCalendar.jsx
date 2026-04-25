@@ -17,7 +17,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
   const containerRef = useRef(null);
 
   const formatDate = (date) => {
-    return date.toISOString().split("T")[0];
+    return date.toLocaleDateString("en-CA"); 
   };
 
   // Responsive logic

@@ -1,3 +1,4 @@
+import AppNavbar from "../../common/layout/PrimaryNavbar";
 import ActivitiesHistory from "./components/ActivitiesHistory";
 import ActivitiesPrograms from "./programs";
 import ActivitiesRaces from "./races";
@@ -5,7 +6,7 @@ import ActivitiesRaces from "./races";
 const ActivitiesPage = () => {
     return (
         <div>
-            <div className="mb-5 bg-sky-300">.</div>
+            <AppNavbar/>
 
             <div className="w-[90%] lg:w-4/5 mx-auto  rounded-xl">
                 <ActivitiesPrograms></ActivitiesPrograms>

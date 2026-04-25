@@ -5,6 +5,7 @@ import TrainingStatistics from "./components/TrainingStatistics";
 import TrainingProgramSelector from "./components/TrainingProgramSelector";
 import { programService } from "../../services/program";
 import { useEffect, useState } from "react";
+import AppNavbar from "../../common/layout/PrimaryNavbar";
 
 const TrainingPage = () => {
   const [programs, setPrograms] = useState([]);
@@ -49,7 +50,8 @@ const TrainingPage = () => {
 
   return (
     <div>
-      <div className="mb-5 bg-sky-300">.</div>
+
+      <AppNavbar/>
 
       <div className="w-[90%] lg:w-4/5 mx-auto  rounded-xl ">
         <TrainingCalendar

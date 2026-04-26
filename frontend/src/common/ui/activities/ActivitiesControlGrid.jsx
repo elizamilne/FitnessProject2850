@@ -1,3 +1,5 @@
+import ActivityCard from "./ActivityCard";
+
 const ActivitiesControlGrid = ({
   items,
   onSelect,
@@ -12,32 +14,13 @@ const ActivitiesControlGrid = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {items.map((item) => (
-        <div
+        <ActivityCard
           key={item.id}
-          className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-32 cursor-pointer"
-          onClick={() => onSelect(item)}
-        >
-          <img
-            src={
-              item.bannerUrl ||
-              `https://via.placeholder.com/300x200?text=${placeholderText}`
-            }
-            alt={item.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
-
-          <div className="relative h-full flex items-center px-4">
-            <div className="text-white">
-              <h3 className="font-semibold text-lg">{item.title}</h3>
-
-              <p className="text-sm text-white/80">
-                {renderSubtitle ? renderSubtitle(item) : null}
-              </p>
-            </div>
-          </div>
-        </div>
+          item={item}
+          onClick={onSelect}
+          placeholderText={placeholderText}
+          renderSubtitle={renderSubtitle}
+        />
       ))}
     </div>
   );

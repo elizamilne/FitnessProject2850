@@ -3,7 +3,7 @@ import ActivitiesControlHeader from "../../../../common/ui/activities/Activities
 const RacesHeader = ({ activeTab, setActiveTab }) => {
   return (
     <ActivitiesControlHeader
-      title="Races"
+      title=""
       options={[
         { label: "Upcoming", value: "upcoming" },
         { label: "Completed", value: "completed" },

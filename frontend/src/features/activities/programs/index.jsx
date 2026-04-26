@@ -35,7 +35,7 @@ const ActivitiesPrograms = () => {
   } = usePrograms();
 
   return (
-    <div className="bg-white rounded-2xl shadow p-6 space-y-6">
+    <div className="space-y-6">
       <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <ProgramsGrid

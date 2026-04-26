@@ -3,7 +3,7 @@ import ActivitiesControlHeader from "../../../../common/ui/activities/Activities
 const ProgramsHeader = ({ activeTab, setActiveTab }) => {
   return (
     <ActivitiesControlHeader
-      title="Programs"
+      title=""
       options={[
         { label: "Active", value: "active" },
         { label: "Archived", value: "archived" },

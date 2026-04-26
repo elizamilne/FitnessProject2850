@@ -40,7 +40,7 @@ const ActivitiesHistory = () => {
   }, [search, date, sort, page]);
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Activities</h1>
         <p className="text-sm text-gray-500">

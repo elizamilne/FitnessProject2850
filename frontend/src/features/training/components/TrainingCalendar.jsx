@@ -86,7 +86,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
       
       {/* Row */}
       <div className="flex items-center gap-4">
-        {/* LEFT */}
+        {/* Left */}
         <button
           onClick={() => shiftDays(-1)}
           className="w-10 h-10 flex items-center justify-center rounded-full
@@ -96,7 +96,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
           <ChevronLeft size={20} />
         </button>
 
-        {/* DATES CONTAINER */}
+        {/* Dates container */}
         <div
           ref={containerRef}
           className="flex flex-1 gap-2 sm:gap-3 overflow-hidden p-1 rounded-2xl
@@ -149,7 +149,7 @@ const TrainingCalendar = ({ selectedDate, onDateChange }) => {
           })}
         </div>
 
-        {/* RIGHT */}
+        {/* Right */}
         <button
           onClick={() => shiftDays(1)}
           className="w-10 h-10 flex items-center justify-center rounded-full

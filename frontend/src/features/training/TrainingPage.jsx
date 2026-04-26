@@ -53,10 +53,10 @@ const TrainingPage = () => {
       <AppNavbar />
 
       <div className="w-[92%] lg:w-[70%] mx-auto py-12 space-y-14">
-        {/* 🧠 HEADER */}
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-sm text-gray-500">
+            <h1 className="text-base text-gray-500 font-medium">
               {selectedDate
                 ? new Date(selectedDate).toLocaleDateString("en-GB", {
                     weekday: "long",
@@ -66,13 +66,17 @@ const TrainingPage = () => {
                 : "Select a date"}
             </h1>
 
-            <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2
+              className="text-4xl font-bold tracking-tight
+                   bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600
+                   bg-clip-text text-transparent"
+            >
               Training
             </h2>
           </div>
         </div>
 
-        {/* 📅 CALENDAR (NO OUTER CARD) */}
+        {/* Calendar */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Calendar</h3>
 
@@ -82,7 +86,7 @@ const TrainingPage = () => {
           />
         </div>
 
-        {/* 🏋️ WORKOUTS (KEEP CARD — MAIN CONTENT) */}
+        {/* Workouts */}
         <div className="space-y-6">
           <h3 className="text-xl font-semibold text-gray-800">Workouts</h3>
 
@@ -103,14 +107,14 @@ const TrainingPage = () => {
           </div>
         </div>
 
-        {/* 📊 STATISTICS (REMOVE OUTER CARD) */}
+        {/* Statistics */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Statistics</h3>
 
           <TrainingStatistics />
         </div>
 
-        {/* 🧠 OVERVIEW (REMOVE OUTER CARD) */}
+        {/* Overview */}
         <div className="space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Overview</h3>
 

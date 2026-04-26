@@ -92,7 +92,7 @@ const TrainingProgramSelector = ({
   const visiblePrograms = programs.slice(startIndex, startIndex + itemsToShow);
 
   return (
-    <div className="w-[80%] mx-auto mb-6 space-y-3">
+    <div className="w-[60%] mx-auto mb-6 space-y-3">
       {/* status */}
       <div className="text-sm text-gray-600 font-medium">
         {programs?.length ? `${programs.length} programs` : "No programs"}

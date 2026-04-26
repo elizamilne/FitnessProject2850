@@ -129,27 +129,27 @@ const TrainingContentList = ({ program, date }) => {
   }
 
   return (
-    <div className="w-full lg:w-[80%] mx-auto space-y-6">
+    <div className="w-full lg:w-[100%] mx-auto space-y-6">
       {/* 🔹 HEADER */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900 truncate">
+        <h2 className="text-2xl font-semibold text-gray-900 truncate">
           {program.title}
         </h2>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
-            className="w-9 h-9 flex items-center justify-center rounded-full
-                           bg-white/70 backdrop-blur border border-white/50
-                           hover:bg-white transition"
+            className="w-10 h-10 flex items-center justify-center rounded-full
+                 bg-white/80 backdrop-blur border border-white/60
+                 hover:bg-white transition"
           >
-            <Plus size={18} />
+            <Plus size={20} />
           </button>
 
           <button
             onClick={handleSave}
-            className="px-4 py-2 rounded-lg text-sm font-medium
-                     bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-                     hover:opacity-90 active:scale-95 transition"
+            className="px-5 py-2.5 rounded-lg text-base font-semibold
+                 bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                 hover:opacity-90 active:scale-95 transition"
           >
             Save
           </button>
@@ -207,11 +207,11 @@ const TrainingContentList = ({ program, date }) => {
 
               {/* text */}
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-800 truncate">
+                <h3 className="text-lg font-semibold text-gray-900 truncate">
                   {exercise.exerciseName}
                 </h3>
 
-                <p className="text-sm text-gray-500 truncate">
+                <p className="text-base text-gray-500 truncate">
                   {formatMetrics(exercise.metrics)}
                 </p>
               </div>

@@ -106,9 +106,9 @@ const TrainingStatistics = () => {
   }, []);
 
   return (
-    <div className="w-full lg:w-[90%] mx-auto space-y-6">
+    <div className="w-full lg:w-[100%] mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row gap-5">
-        {/* 🔹 WEEKLY BAR */}
+        {/* Weekly Bar */}
         <div
           className="relative flex-1 min-w-0 p-5 rounded-3xl
                       bg-white/70 backdrop-blur-xl border border-white/50
@@ -159,7 +159,7 @@ const TrainingStatistics = () => {
           />
         </div>
 
-        {/* 🔹 LINE CHART */}
+        {/* Line Chart */}
         {isDesktop && (
           <div
             className="relative flex-1 min-w-0 p-5 rounded-3xl

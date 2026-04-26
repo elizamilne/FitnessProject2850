@@ -63,13 +63,13 @@ const TrainingPage = () => {
                 : "Select a date"}
             </h1>
 
-            <h2
-              className="text-4xl font-bold tracking-tight
-                   bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600
-                   bg-clip-text text-transparent"
+            <h1
+              className="inline-block text-5xl font-bold tracking-tight leading-tight
+             bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600
+             bg-clip-text text-transparent"
             >
               Training
-            </h2>
+            </h1>
           </div>
         </div>
 

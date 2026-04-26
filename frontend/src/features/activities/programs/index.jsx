@@ -36,7 +36,7 @@ const ActivitiesPrograms = () => {
 
   return (
     <div className="bg-white rounded-2xl shadow p-6 space-y-6">
-      <ProgramsHeader activeTab={activeTab} onTabChange={setActiveTab} />
+      <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <ProgramsGrid
         programs={visibleProgramsMap[activeTab]}
@@ -47,8 +47,8 @@ const ActivitiesPrograms = () => {
       />
 
       <ProgramsFooter
-        onCreate={() => setIsCreateModalOpen(true)}
-        onViewAll={() => setIsViewModalOpen(true)}
+        setIsCreateModalOpen={() => setIsCreateModalOpen(true)}
+        setIsViewModalOpen={() => setIsViewModalOpen(true)}
       />
 
       <ViewAllProgramModal

@@ -5,6 +5,7 @@ import RacesHeader from "./components/RacesHeader";
 import RacesGrid from "./components/RacesGrid";
 import RacesFooter from "./components/RacesFooter";
 import useRaces from "./hooks/useRaces";
+import { useEffect } from "react";
 
 const ActivitiesRaces = () => {
   const {
@@ -29,16 +30,20 @@ const ActivitiesRaces = () => {
     handleSelectRace,
   } = useRaces();
 
+  useEffect(() => {
+    console.log(visisbleRacesMap)
+  })
+
   return (
     <div className="bg-white rounded-2xl shadow p-6 space-y-6">
       <RacesHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <RacesGrid
-        races={races}
-        visisbleRacesMap={visisbleRacesMap}
-        activeTab={activeTab}
-        setSelectedRace={setSelectedRace}
-        setIsDetailModalOpen={setIsDetailModalOpen}
+        races={visisbleRacesMap[activeTab]}
+        onSelect={(race) => {
+          setSelectedRace(race)
+          setIsDetailModalOpen(true)
+        }}
       />
 
       <RacesFooter

@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { raceService } from "../../../../services/race";
 
 const useRaces = () => {
+  const [races, setRaces] = useState([]);
+
   const [visisbleRacesMap, setVisibleRacesMap] = useState({
     upcoming: [],
     completed: [],
   });
 
   const [activeTab, setActiveTab] = useState("upcoming");
-  const [races, setRaces] = useState([]);
   const [selectedRace, setSelectedRace] = useState(null);
 
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -66,19 +67,28 @@ const useRaces = () => {
   };
 
   return {
+    // Data
+    races,
     visisbleRacesMap,
     activeTab,
-    races,
     selectedRace,
+
+    // Tab control
+    setActiveTab,
+    setSelectedRace,
+
+    // Actions 
+    handleSelectRace,
+    
+    // Modal state
     isViewModalOpen,
     isCreateModalOpen,
     isDetailModalOpen,
-    setActiveTab,
-    setSelectedRace,
+    
+    // Modal setters
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
-    handleSelectRace,
   };
 };
 

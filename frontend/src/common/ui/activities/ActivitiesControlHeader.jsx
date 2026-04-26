@@ -20,7 +20,7 @@ const ActivitiesControlHeader = ({
                    shadow-[0_4px_15px_rgba(0,0,0,0.05)]"
         style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
       >
-        {/* Sliding background (UPDATED) */}
+        {/* Sliding background */}
         <div
           className="absolute top-1 bottom-1 left-1
                      rounded-full

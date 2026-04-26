@@ -44,7 +44,6 @@ const TrainingContentList = ({ program, date }) => {
       try {
         const { data } = await programExerciseService.getByProgram(program.id);
 
-        console.log("Exercises", data);
         setExercises(data);
       } catch (error) {
         console.error("Failed to load exercises:", error);
@@ -111,7 +110,6 @@ const TrainingContentList = ({ program, date }) => {
           exerciseId,
           metrics: cleanedMetrics,
         };
-        console.log(payload);
 
         activityService.createActivity(payload);
       });

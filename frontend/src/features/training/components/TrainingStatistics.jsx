@@ -47,7 +47,6 @@ const TrainingStatistics = () => {
       const profileId = 1;
       const { data } = await activityService.getActivitiesById(profileId);
       const activities = data.data;
-      console.log(activities);
 
       // Workouts per week
       const daysOrder = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

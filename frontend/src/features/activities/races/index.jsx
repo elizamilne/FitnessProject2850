@@ -5,7 +5,6 @@ import RacesHeader from "./components/RacesHeader";
 import RacesGrid from "./components/RacesGrid";
 import RacesFooter from "./components/RacesFooter";
 import useRaces from "./hooks/useRaces";
-import { useEffect } from "react";
 
 const ActivitiesRaces = () => {
   const {
@@ -29,10 +28,6 @@ const ActivitiesRaces = () => {
     // Actions
     handleSelectRace,
   } = useRaces();
-
-  useEffect(() => {
-    console.log(visisbleRacesMap)
-  })
 
   return (
     <div className="space-y-6">

@@ -12,7 +12,6 @@ const TrainingOverviewRow = () => {
       try {
         const profileId = 1;
         const { data } = await raceService.getNextRace(profileId);
-        console.log(data);
         setNextRace(data);
       } catch (error) {
         if (error.response?.status !== 404) {
@@ -33,7 +32,6 @@ const TrainingOverviewRow = () => {
 
         const top5 = data.slice(0, 5);
         setPersonalBests(top5);
-        console.log("BEST", top5);
       } catch (error) {
         if (error.response?.status !== 404) {
           console.error(error);

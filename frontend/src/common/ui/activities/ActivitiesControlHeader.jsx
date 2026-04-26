@@ -8,28 +8,46 @@ const ActivitiesControlHeader = ({
 
   return (
     <div className="flex items-center justify-between">
-      <h2 className="text-xl font-semibold">{title}</h2>
-        
+      {/* Title */}
+      <h2 className="text-xl font-semibold text-gray-900">
+        {title}
+      </h2>
+
+      {/* Control */}
       <div
-        className="relative grid bg-gray-100 p-1 rounded-full w-fit"
+        className="relative grid p-1 rounded-full w-fit
+                   bg-white/60 backdrop-blur-md border border-white/50
+                   shadow-[0_4px_15px_rgba(0,0,0,0.05)]"
         style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
       >
-        {/* Sliding background */}
+        {/* Sliding background (UPDATED) */}
         <div
-          className="absolute top-1 bottom-1 left-1 bg-white rounded-full shadow transition-transform duration-300"
+          className="absolute top-1 bottom-1 left-1
+                     rounded-full
+                     bg-gradient-to-r from-indigo-500 to-purple-500
+                     shadow-[0_4px_12px_rgba(99,102,241,0.35)]
+                     transition-transform duration-300"
           style={{
             width: `calc(${100 / options.length}% - 0.25rem)`,
             transform: `translateX(${activeIndex * 100}%)`,
           }}
         />
 
+        {/* Buttons */}
         {options.map((opt) => (
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className={`relative px-4 py-2 text-sm z-10 text-center ${
-              value === opt.value ? "text-black" : "text-gray-500"
-            }`}
+            className={`
+              relative px-5 py-2.5 text-sm font-medium z-10
+              transition-colors duration-200 rounded-full
+
+              ${
+                value === opt.value
+                  ? "text-white"
+                  : "text-gray-500 hover:text-gray-700"
+              }
+            `}
           >
             {opt.label}
           </button>

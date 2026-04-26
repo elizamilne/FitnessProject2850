@@ -36,7 +36,6 @@ const Signup = () => {
 
     try {
       const user = await userService.register(dataWithoutRePass);
-      console.log(user);
 
       const userId = user?.data.id;
 

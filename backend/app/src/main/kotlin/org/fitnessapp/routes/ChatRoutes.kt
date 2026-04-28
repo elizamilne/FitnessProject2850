@@ -8,6 +8,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 import org.fitnessapp.services.MessageService
+import org.fitnessapp.security.JWTService
+import org.fitnessapp.services.ConversationParticipantService
 
 val rooms = mutableMapOf<Long, MutableList<DefaultWebSocketServerSession>>()
 
@@ -22,22 +24,62 @@ fun Route.chatRoutes() {
 
     webSocket("/chat") {
 
+        // ConversationId (safe)
         val conversationId =
             call.request.queryParameters["conversationId"]?.toLongOrNull()
+                ?: run {
+                    close(
+                        CloseReason(
+                            CloseReason.Codes.CANNOT_ACCEPT,
+                            "Invalid conversationId"
+                        )
+                    )
+                    return@webSocket
+                }
 
+        // Token
+        val token =
+            call.request.queryParameters["token"]
+                ?: run {
+                    close(
+                        CloseReason(
+                            CloseReason.Codes.CANNOT_ACCEPT,
+                            "Missing token"
+                        )
+                    )
+                    return@webSocket
+                }
+
+        // Extract userId from JWT
         val userId =
-            call.request.queryParameters["userId"]?.toLongOrNull()
+            JWTService.verifyToken(token)
+                ?: run {
+                    close(
+                        CloseReason(
+                            CloseReason.Codes.CANNOT_ACCEPT,
+                            "Invalid token"
+                        )
+                    )
+                    return@webSocket
+                }
 
-        if (conversationId == null || userId == null) {
+        // Check if user belongs to conversation
+
+        val isParticipant =
+            ConversationParticipantService.isUserInConversation(userId, conversationId)
+
+        if (!isParticipant) {
             close(
                 CloseReason(
-                    CloseReason.Codes.CANNOT_ACCEPT,
-                    "Missing params"
+                    CloseReason.Codes.VIOLATED_POLICY,
+                    "Not allowed"
                 )
             )
             return@webSocket
         }
+        
 
+        // Join room
         val sessionList =
             rooms.getOrPut(conversationId) { mutableListOf() }
 
@@ -50,13 +92,14 @@ fun Route.chatRoutes() {
 
                     val text = frame.readText()
 
-                    // save message
+                    // Save message
                     MessageService.saveMessage(
                         userId,
                         conversationId,
                         text
                     )
 
+                    // Build message DTO
                     val message = ChatMessage(
                         content = text,
                         profileId = userId,
@@ -65,13 +108,15 @@ fun Route.chatRoutes() {
 
                     val json = Json.encodeToString(message)
 
-                    // broadcast
+                    // Broadcast to all users in room
                     sessionList.forEach {
                         it.send(Frame.Text(json))
                     }
                 }
             }
         } finally {
+
+            // Remove session on disconnect
             sessionList.remove(this)
 
             if (sessionList.isEmpty()) {

@@ -1,8 +1,11 @@
 package org.fitnessapp.services
 
 import org.fitnessapp.models.ConversationParticipant
-import org.jetbrains.exposed.sql.insertIgnore
+
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.insertIgnore
 
 object ConversationParticipantService {
     fun addParticipant(conversationId: Long, profileId: Long) {
@@ -11,6 +14,18 @@ object ConversationParticipantService {
                 it[ConversationParticipant.conversationId] = conversationId
                 it[ConversationParticipant.profileId] = profileId
             }
+        }
+    }
+
+    fun isUserInConversation(userId: Long, conversationId: Long): Boolean {
+        return transaction {
+            ConversationParticipant
+                .selectAll()
+                .where {
+                    (ConversationParticipant.profileId eq userId).and(
+                        ConversationParticipant.conversationId eq conversationId)
+                }
+                .count() > 0
         }
     }
 }

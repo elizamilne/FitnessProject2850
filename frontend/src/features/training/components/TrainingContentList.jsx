@@ -83,7 +83,9 @@ const TrainingContentList = ({ program, date }) => {
 
         if (!metric) return m.value;
 
-        return `${m.value}${metric.unit} ${metric.name.toLowerCase()}`;
+        const unit = metric.unit ? metric.unit : ""; // 👈 fix
+
+        return `${m.value}${unit} ${metric.name.toLowerCase()}`;
       })
       .join(" • ");
   };
@@ -128,7 +130,7 @@ const TrainingContentList = ({ program, date }) => {
 
   return (
     <div className="w-full lg:w-[100%] mx-auto space-y-6">
-      {/* 🔹 HEADER */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-gray-900 truncate">
           {program.title}
@@ -154,7 +156,7 @@ const TrainingContentList = ({ program, date }) => {
         </div>
       </div>
 
-      {/* 🔹 PROGRESS */}
+      {/* Progress */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-gray-500">
           <span>In progress</span>
@@ -169,7 +171,7 @@ const TrainingContentList = ({ program, date }) => {
         </div>
       </div>
 
-      {/* 🔹 EXERCISES */}
+      {/* Exercises */}
       <div className="space-y-2">
         {exercises.map((exercise) => {
           const isCompleted = completed.some(

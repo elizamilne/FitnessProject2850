@@ -57,12 +57,14 @@ const Questions = () => {
   const contentRef = useRef(null);
   const progressRef = useRef(null);
 
+  const videoA = useRef(null);
+  const videoB = useRef(null);
+  const [isAActive, setIsAActive] = useState(true);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState({});
   const [error, setError] = useState("");
-
-  const videoRef = useRef(null);
 
   const currentQuestion = quiz[currentIndex];
   const progress = ((currentIndex + 1) / quiz.length) * 100;
@@ -202,26 +204,44 @@ const Questions = () => {
   };
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    const active = isAActive ? videoA.current : videoB.current;
+    const next = isAActive ? videoB.current : videoA.current;
 
-    const video = videoRef.current;
+    if (!active || !next) return;
 
-    video.src = currentQuestion.video;
-    video.load();
-    video.play();
+    // load next video in hidden player
+    next.src = currentQuestion.video;
+
+    next.oncanplay = () => {
+      next.play();
+
+      // smooth crossfade
+      gsap.to(next, { opacity: 1, duration: 0.6, ease: "power2.out" });
+      gsap.to(active, { opacity: 0, duration: 0.6, ease: "power2.out" });
+
+      setIsAActive((prev) => !prev);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestion.video]);
 
-  
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Background Video */}
       <video
-        ref={videoRef}
+        ref={videoA}
         autoPlay
         loop
         muted
-        className="absolute w-full h-full object-cover"
-        src={currentQuestion.video}
+        className="absolute w-full h-full object-cover opacity-100"
+        src={quiz[0].video}
+      />
+
+      <video
+        ref={videoB}
+        autoPlay
+        loop
+        muted
+        className="absolute w-full h-full object-cover opacity-0"
       />
 
       {/* Overlay */}

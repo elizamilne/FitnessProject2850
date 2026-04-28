@@ -33,6 +33,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-server-status-pages:$ktor_version")
+    implementation("io.ktor:ktor-server-websockets:$ktor_version")
 
     // Exposed
     implementation("org.jetbrains.exposed:exposed-core:0.46.0")

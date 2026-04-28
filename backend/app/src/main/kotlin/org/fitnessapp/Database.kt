@@ -37,7 +37,10 @@ fun initDatabase() {
             ProgramSchedule,
             Race,
             RaceCategory,
-            User
+            User,
+            Message,
+            Conversation,
+            ConversationParticipant
         )
     }
 

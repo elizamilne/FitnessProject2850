@@ -9,6 +9,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
+import io.ktor.server.websocket.*
 
 import org.fitnessapp.routes.userRoutes
 import org.fitnessapp.routes.profileRoutes
@@ -23,6 +24,9 @@ import org.fitnessapp.routes.exerciseRoutes
 import org.fitnessapp.routes.muscleGroupRoutes
 import org.fitnessapp.routes.categoryRoutes
 import org.fitnessapp.routes.raceRoutes
+import org.fitnessapp.routes.conversationRoutes
+import org.fitnessapp.routes.messageRoutes
+import org.fitnessapp.routes.chatRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -66,6 +70,8 @@ fun Application.module() {
         }
     }
 
+    install(WebSockets)
+
     routing {
         userRoutes()
         profileRoutes()
@@ -84,6 +90,10 @@ fun Application.module() {
         categoryRoutes()
 
         raceRoutes()
+
+        conversationRoutes()
+        messageRoutes()
+        chatRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

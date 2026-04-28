@@ -14,6 +14,8 @@ import org.fitnessapp.services.UserService
 import org.fitnessapp.services.toCreateUserRequest
 import org.fitnessapp.services.toUserResponse
 
+import org.fitnessapp.security.JWTService
+
 fun Route.userRoutes() {
     route("/user") {
         post("/register") {
@@ -38,9 +40,14 @@ fun Route.userRoutes() {
             val createdUser = UserService.findUserById(userId)
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
             
+            val token = JWTService.generateToken(createdUser.id)
+
             call.respond(
                 HttpStatusCode.Created,
-                createdUser
+                AuthResponse(
+                    token=token,
+                    user=createdUser
+                )
             )
         }
 
@@ -63,9 +70,14 @@ fun Route.userRoutes() {
 
             val user = existingUser.toUserResponse()
 
+            val token = JWTService.generateToken(user.id)
+
             call.respond(
                 HttpStatusCode.OK,
-                user
+                AuthResponse(
+                    token=token,
+                    user=user
+                )
             )
         }
 

@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 import org.fitnessapp.services.MessageService
 import org.fitnessapp.security.JWTService
 import org.fitnessapp.services.ConversationParticipantService
+import org.fitnessapp.services.ProfileService
 
 val rooms = mutableMapOf<Long, MutableList<DefaultWebSocketServerSession>>()
 
@@ -23,7 +24,6 @@ data class ChatMessage(
 fun Route.chatRoutes() {
 
     webSocket("/chat") {
-
         // ConversationId (safe)
         val conversationId =
             call.request.queryParameters["conversationId"]?.toLongOrNull()
@@ -36,7 +36,7 @@ fun Route.chatRoutes() {
                     )
                     return@webSocket
                 }
-
+        
         // Token
         val token =
             call.request.queryParameters["token"]
@@ -49,7 +49,7 @@ fun Route.chatRoutes() {
                     )
                     return@webSocket
                 }
-
+            
         // Extract userId from JWT
         val userId =
             JWTService.verifyToken(token)
@@ -63,10 +63,24 @@ fun Route.chatRoutes() {
                     return@webSocket
                 }
 
+        val profile = ProfileService.getProfileByUserId(userId)
+            ?: run {
+                close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Profile not found"))
+                return@webSocket
+            }
+
+        val profileId = profile.id
+            ?: run {
+                close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Invalid profile"))
+                return@webSocket
+            }
+        
         // Check if user belongs to conversation
 
         val isParticipant =
-            ConversationParticipantService.isUserInConversation(userId, conversationId)
+            ConversationParticipantService.isUserInConversation(profileId, conversationId)
+
+        println("🔍 isParticipant: $isParticipant")
 
         if (!isParticipant) {
             close(
@@ -78,12 +92,13 @@ fun Route.chatRoutes() {
             return@webSocket
         }
         
-
         // Join room
         val sessionList =
             rooms.getOrPut(conversationId) { mutableListOf() }
 
         sessionList.add(this)
+
+        println("👥 Users in room: ${sessionList.size}")
 
         try {
             for (frame in incoming) {
@@ -94,7 +109,7 @@ fun Route.chatRoutes() {
 
                     // Save message
                     MessageService.saveMessage(
-                        userId,
+                        profileId,
                         conversationId,
                         text
                     )
@@ -102,7 +117,7 @@ fun Route.chatRoutes() {
                     // Build message DTO
                     val message = ChatMessage(
                         content = text,
-                        profileId = userId,
+                        profileId = profileId,
                         conversationId = conversationId
                     )
 

@@ -17,12 +17,12 @@ object ConversationParticipantService {
         }
     }
 
-    fun isUserInConversation(userId: Long, conversationId: Long): Boolean {
+    fun isUserInConversation(profileId: Long, conversationId: Long): Boolean {
         return transaction {
             ConversationParticipant
                 .selectAll()
                 .where {
-                    (ConversationParticipant.profileId eq userId).and(
+                    (ConversationParticipant.profileId eq profileId).and(
                         ConversationParticipant.conversationId eq conversationId)
                 }
                 .count() > 0

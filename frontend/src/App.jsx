@@ -9,6 +9,7 @@ import SignUp from "./features/auth/Signup";
 import Login from "./features/auth/Login";
 import Questions from "./features/auth/Questions"
 import PublicLayout from "./common/layout/PublicLayout";
+import ChatPage from "./features/chats";
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
 
         <Route path="/training-page" element={<TrainingPage />} />
         <Route path="/activities-page" element={<ActivitiesPage />} />
+        <Route path="/chats" element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
   );

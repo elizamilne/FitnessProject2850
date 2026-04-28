@@ -20,8 +20,8 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    console.log(title)
-  }, [title])
+    console.log(title);
+  }, [title]);
 
   const currentStep = steps[stepIndex];
 

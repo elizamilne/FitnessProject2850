@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
-import Navbar from "../../common/layout/HS_NavBar"
+import Navbar from "../../common/layout/HS_NavBar";
 import BackgroundVideo from "../../common/ui/BackgroundVideo";
 
 const HomeScreen = () => {
@@ -9,76 +9,81 @@ const HomeScreen = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden font-sans">
-      
       {/* Navbar */}
       <Navbar />
 
       {/* Background video */}
-      <BackgroundVideo></BackgroundVideo>
+      <BackgroundVideo />
+
+      {/* 🔥 Overlay stack (THIS is the key) */}
+      <div className="absolute inset-0 z-0">
+        {/* Subtle dark tint */}
+        <div className="absolute inset-0 bg-black/30" />
+
+        {/* Brand gradient (lighter) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
+
+        {/* Focus vignette (THIS is the trick) */}
+        <div
+          className="absolute inset-0 
+    bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]"
+        />
+      </div>
 
       {/* Social icons */}
-      <div
-        className="absolute bottom-5 right-5 flex space-x-4 text-white text-xl animate-fadeInUp"
-        style={{ animationDelay: "0.2s" }}
-      >
-        <a
-          href="#"
-          aria-label="Facebook"
-          className="transition-transform hover:scale-110 hover:text-blue-500"
-        >
+      <div className="absolute bottom-6 right-6 flex gap-4 text-white text-xl z-20">
+        <a className="hover:scale-110 hover:text-blue-400 transition">
           <FaFacebook />
         </a>
-
-        <a
-          href="#"
-          aria-label="Twitter"
-          className="transition-transform hover:scale-110 hover:text-blue-400"
-        >
+        <a className="hover:scale-110 hover:text-blue-300 transition">
           <FaTwitter />
         </a>
-
-        <a
-          href="#"
-          aria-label="Instagram"
-          className="transition-transform hover:scale-110 hover:text-pink-500"
-        >
+        <a className="hover:scale-110 hover:text-pink-400 transition">
           <FaInstagram />
         </a>
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4 pt-20">
-        
-        {/* About Us */}
-        <div
-          className="mb-8 sm:mb-12 animate-fadeInUp"
-          style={{ animationDelay: "0.6s" }}
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 pt-20 space-y-8">
+        {/* Headline */}
+        <h1
+          className="
+    text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight
+    bg-gradient-to-r from-white via-indigo-300 to-purple-400
+    bg-clip-text text-transparent
+  "
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading tracking-wide mb-4">
-            About Us
-          </h2>
+          Train smarter. Perform better.
+        </h1>
 
-          <p className="text-base sm:text-lg md:text-xl font-body">
-            We are committed to providing the best experience for our users.
-            Explore our features, connect with others, and enjoy our services.
-          </p>
-        </div>
+        {/* Subtext */}
+        <p className="max-w-xl text-base sm:text-lg md:text-xl text-gray-300 leading-relaxed">
+          Plan workouts, track performance, and stay consistent — without the
+          guesswork.
+        </p>
 
-        {/* Buttons */}
-        <div
-          className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 animate-fadeInUp"
-          style={{ animationDelay: "0.8s" }}
-        >
-          <button
+        {/* CTA */}
+        <button
           onClick={() => navigate("/signup")}
-          className="px-20 py-10 text-3xl font-bold tracking-wide bg-gradient-to-r from-gray-800 to-black hover:from-gray-600 hover:to-gray-900 rounded-xl text-white transition duration-300"
+          className="
+            mt-4 px-10 py-4 text-lg font-semibold rounded-xl
+            bg-gradient-to-r from-indigo-500 to-purple-500
+            text-white
+            hover:opacity-90
+            active:scale-95
+            transition-all duration-200
+            shadow-[0_6px_25px_rgba(99,102,241,0.4)]
+          "
         >
-        Join us today!
+          Get Started
         </button>
-           
-          
-        </div>
 
+        {/* Value strip */}
+        <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-sm text-gray-400">
+          <span>✔ Build training programs</span>
+          <span>✔ Track every workout</span>
+          <span>✔ See your progress</span>
+        </div>
       </div>
     </div>
   );

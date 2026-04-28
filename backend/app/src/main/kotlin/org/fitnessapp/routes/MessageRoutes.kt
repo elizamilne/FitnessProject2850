@@ -25,10 +25,10 @@ fun Route.messageRoutes() {
 
             val messages = MessageService.getMessages(id)
 
-            if (messages.isEmpty()) {
-                call.respond(HttpStatusCode.OK, emptyList<Any>())
-                return@get
-            }
+            // if (messages.isEmpty()) {
+            //     call.respond(HttpStatusCode.OK, emptyList<Any>())
+            //     return@get
+            // }
 
             call.respond(messages)
         }

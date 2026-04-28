@@ -1,6 +1,7 @@
-name
-Reps
-Time
-Distance
-Weight
-Calories
+name,unit
+Distance,km
+Duration,m
+Pace,min/km
+Weight,kg
+Sets,
+Reps,

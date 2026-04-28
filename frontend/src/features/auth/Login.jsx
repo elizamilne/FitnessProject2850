@@ -1,74 +1,121 @@
-
-
 import { useState } from "react";
+import { Mail, Lock } from "lucide-react";
+import { userService } from "../../services/user";
+import { useNavigate } from "react-router-dom";
+import { profileService } from "../../services/profile";
+import AuthInput from "../../common/ui/auth/AuthInput";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Email: ${email}\nPassword: ${password}`);
+
+    try {
+      const res = await userService.login({ email, password });
+
+      const user = res?.data || res;
+      const userId = user?.id || user?.userId;
+
+      if (!userId) throw new Error("No userId returned");
+
+      try {
+        const profileRes = await profileService.getUserProfile(userId);
+        const profile = profileRes?.data || profileRes;
+
+        sessionStorage.setItem("profile", JSON.stringify(profile));
+        navigate("/dashboard");
+      } catch (profileErr) {
+        console.error("No profile found: ", profileErr);
+        sessionStorage.setItem("userId", userId);
+        navigate("/questions");
+      }
+
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4">
       
-      {/*  Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        className="absolute w-full h-full object-cover"
-      >
-        <source src="/fitness.mp4" type="video/mp4" />
-      </video>
+      {/* Form */}
+      <div className="relative z-10 w-full max-w-md">
+        <form
+          onSubmit={handleSubmit}
+          className="
+            relative p-8 rounded-3xl
+            bg-white/10 backdrop-blur-xl
+            border border-white/10
+            shadow-[0_10px_40px_rgba(0,0,0,0.4)]
+            text-white
+          "
+        >
+          {/* Glow */}
+          <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
-      {/*  Dark overlay */}
-      <div className="absolute inset-0 bg-black/60"></div>
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold mb-6 text-center">
+              Welcome Back
+            </h2>
 
-      {/*  Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white px-4">
-        
-        {/*  Title */}
-        <img
-          src="/logo.png"
-          alt="SILO FITNESS"
-          className="w-60 mb-8"
-        />
+            {/* Email */}
+            <div className="mb-4">
+              <AuthInput
+                icon={<Mail size={18} />}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        {/*  Login Box */}
-        <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-sm">
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            
-            <input
-              type="email"
-              placeholder="Email"
-              className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            {/* Password */}
+            <div className="mb-6">
+              <AuthInput
+                icon={<Lock size={18} />}
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
+            {/* Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded-lg font-semibold"
+              className="
+                w-full py-3 rounded-xl font-semibold
+                bg-gradient-to-r from-indigo-500 to-purple-500
+                text-white
+                hover:opacity-90
+                active:scale-95
+                transition-all duration-200
+                shadow-[0_6px_25px_rgba(99,102,241,0.4)]
+              "
             >
-              Sign In
+              Login
             </button>
 
-          </form>
-        </div>
+            {/* Link */}
+            <p className="text-sm text-gray-400 text-center mt-4">
+              Don’t have an account?{" "}
+              <span
+                onClick={() => navigate("/signup")}
+                className="text-indigo-300 cursor-pointer hover:underline"
+              >
+                Sign up
+              </span>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -2,16 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { gsap } from "gsap";
 
-const programsData = [
-  "Program 1",
-  "Program 2",
-  "Program 3",
-  "Program 4",
-  "Program 5",
-  "Program 6",
-  "Program 7",
-  "Program 8",
-];
+// const programsData = [
+//   "Program 1",
+//   "Program 2",
+//   "Program 3",
+//   "Program 4",
+//   "Program 5",
+//   "Program 6",
+//   "Program 7",
+//   "Program 8",
+// ];
 
 // same pattern as calendar
 const getItemsFromWidth = () => {
@@ -22,14 +22,17 @@ const getItemsFromWidth = () => {
   return 4; // desktop
 };
 
-const WorkoutSelector = () => {
+const TrainingProgramSelector = ({
+  programs,
+  selectedProgram,
+  onProgramChange,
+}) => {
   const [startIndex, setStartIndex] = useState(0);
   const [itemsToShow, setItemsToShow] = useState(getItemsFromWidth);
-  const [selectedProgram, setSelectedProgram] = useState(null);
   const containerRef = useRef(null);
   const isAnimating = useRef(false);
 
-  // identical resize logic to the calendar
+  // Update items count based on screen size
   useEffect(() => {
     const updateItems = () => {
       const newValue = getItemsFromWidth();
@@ -40,21 +43,18 @@ const WorkoutSelector = () => {
     return () => window.removeEventListener("resize", updateItems);
   }, []);
 
-  const maxIndex = programsData.length - itemsToShow;
+  // Select a default program on page load
+  useEffect(() => {
+    if (!selectedProgram && programs.length > 0) {
+      onProgramChange?.(programs[0]);
+    }
+  }, [programs, selectedProgram, onProgramChange]);
 
-  const isStart = startIndex === 0;
-  const isEnd = startIndex >= maxIndex;
-
-  const visiblePrograms = programsData.slice(
-    startIndex,
-    startIndex + itemsToShow,
-  );
-
+  // Handles carousel navigation with animation
   const shiftPrograms = (direction) => {
     if ((direction === -1 && isStart) || (direction === 1 && isEnd)) {
       return;
     }
-
     isAnimating.current = true;
 
     gsap.to(containerRef.current, {
@@ -84,49 +84,85 @@ const WorkoutSelector = () => {
     });
   };
 
-  return (
-    <div className="w-[80%] mx-auto mb-5">
-      {/* Title */}
-      <h3 className="text-xl font-semibold mb-3">Workouts</h3>
+  const maxIndex = programs.length - itemsToShow;
 
-      {/* Row */}
+  const isStart = startIndex === 0;
+  const isEnd = startIndex >= maxIndex;
+
+  const visiblePrograms = programs.slice(startIndex, startIndex + itemsToShow);
+
+  return (
+    <div className="w-[60%] mx-auto mb-6 space-y-3">
+      {/* status */}
+      <div className="text-sm text-gray-600 font-medium">
+        {programs?.length ? `${programs.length} programs` : "No programs"}
+      </div>
+
+      {/* row */}
       <div className="flex items-center gap-3">
         {/* Left */}
         <button
           onClick={() => shiftPrograms(-1)}
           disabled={isStart}
-          className={`p-2 rounded-full shadow transition
+          className={`
+            w-11 h-11 flex items-center justify-center rounded-full
+            transition-all duration-200
+
             ${
               isStart
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
+                ? `
+                  bg-gray-100 text-gray-300 cursor-not-allowed
+                `
+                : `
+                  bg-white/80 backdrop-blur-md
+                  text-gray-700
+
+                  border border-white/60
+                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
+
+                  hover:bg-white
+                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
+                  hover:text-gray-900
+
+                  active:scale-95
+                `
             }
           `}
         >
-          <ChevronLeft />
+          <ChevronLeft size={20} />
         </button>
 
         {/* Programs */}
-        <div ref={containerRef} className="flex flex-1 gap-3 overflow-hidden">
+        <div ref={containerRef} className="flex flex-1 gap-2 overflow-hidden">
           {visiblePrograms.map((program) => {
             const isSelected = selectedProgram === program;
 
             return (
               <div
-                key={program}
+                key={program.id}
                 onClick={() => {
-                    if (isAnimating.current) return;
-                    setSelectedProgram(program);
-                    }}
-                className={`flex-1 min-w-0 rounded-xl p-4 cursor-pointer text-center transition-all duration-200 border
-                    ${
-                      isSelected
-                        ? "bg-blue-50 border-blue-300 text-blue-700 shadow-sm"
-                        : "bg-white border-gray-200 hover:shadow-md hover:-translate-y-1"
-                    }
+                  if (isAnimating.current) return;
+                  onProgramChange?.(program);
+                }}
+                className={`
+                  flex-1 min-w-0 px-5 py-3 text-center cursor-pointer
+                  rounded-xl transition-all duration-200
+
+                  ${
+                    isSelected
+                      ? `
+                        bg-indigo-100 text-indigo-600
+                      `
+                      : `
+                        bg-white text-gray-500
+                        hover:bg-gray-100 hover:text-gray-600
+                      `
+                  }
                 `}
               >
-                {program}
+                <span className="block truncate text-base font-semibold">
+                  {program.title}
+                </span>
               </div>
             );
           })}
@@ -136,19 +172,36 @@ const WorkoutSelector = () => {
         <button
           onClick={() => shiftPrograms(1)}
           disabled={isEnd}
-          className={`p-2 rounded-full shadow transition
+          className={`
+            w-11 h-11 flex items-center justify-center rounded-full
+            transition-all duration-200
+
             ${
               isEnd
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
+                ? `
+                  bg-gray-100 text-gray-300 cursor-not-allowed
+                `
+                : `
+                  bg-white/80 backdrop-blur-md
+                  text-gray-700
+
+                  border border-white/60
+                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
+
+                  hover:bg-white
+                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
+                  hover:text-gray-900
+
+                  active:scale-95
+                `
             }
           `}
         >
-          <ChevronRight />
+          <ChevronRight size={20} />
         </button>
       </div>
     </div>
   );
 };
 
-export default WorkoutSelector;
+export default TrainingProgramSelector;

@@ -30,7 +30,22 @@ fun Route.activityRoutes() {
                 }
             }
 
-            val activities = ActivityService.findActivitiesByProfile(profileId, date)
+            // pagination params (optional)
+            // val limit = call.request.queryParameters["limit"]?.toIntOrNull()
+            
+            val page = call.request.queryParameters["page"]?.toIntOrNull()
+            val sort = call.request.queryParameters["sort"]?.lowercase()
+            val search = call.request.queryParameters["search"]?.lowercase()
+            var limit = 8
+            
+            val activities = ActivityService.findActivitiesByProfile(
+                profileId = profileId, 
+                date = date,
+                page = page,
+                limit = limit,
+                sort = sort,
+                search = search
+            )
 
             call.respond(HttpStatusCode.OK, activities)
         }
@@ -54,10 +69,13 @@ fun Route.activityRoutes() {
                 ActivityService.insertMetricsForActivity(currentActivityId, request.metrics)
                 currentActivityId
             }
-             
+            
+            val activity = ActivityService.findActivityById(createdActivityId)
+                ?: return@post call.respond(HttpStatusCode.InternalServerError)
+
             call.respond(
                 HttpStatusCode.Created,
-                request.toActivityDTO(createdActivityId)
+                activity
             )
         }
 

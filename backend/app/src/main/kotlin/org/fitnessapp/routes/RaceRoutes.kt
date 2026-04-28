@@ -40,6 +40,41 @@ fun Route.raceRoutes() {
             call.respond(HttpStatusCode.OK, race)
         }
 
+        get("/profile/{profileId}/completed") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Profile ID")
+
+            val programs = RaceService.getProgramsByProfileAndCompletion(profileId, completed = true)
+
+            call.respond(HttpStatusCode.OK, programs)
+        }
+
+        get("/profile/{profileId}/upcoming") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid Profile ID")
+
+            val programs = RaceService.getProgramsByProfileAndCompletion(profileId, completed = false)
+
+            call.respond(HttpStatusCode.OK, programs)
+        }
+
+        get("/next-race/{profileId}") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+
+            if (profileId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid profileId")
+                return@get
+            }
+
+            val race = RaceService.getNextIncompleteRace(profileId)
+
+            if (race != null) {
+                call.respond(race)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "No upcoming race found")
+            }
+        }
+
         post {
             val request = call.receive<CreateRaceRequest>()
 
@@ -49,6 +84,16 @@ fun Route.raceRoutes() {
                 ?: return@post call.respond(HttpStatusCode.InternalServerError)
         
             call.respond(HttpStatusCode.Created, createdRace)
+        }
+
+        post("/{id}/complete") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+            val race = RaceService.toggleRaceCompleted(id)
+                ?: return@post call.respond(HttpStatusCode.NotFound, "Race not found")
+
+            call.respond(HttpStatusCode.OK, race)
         }
 
         put("/{id}") {

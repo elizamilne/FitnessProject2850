@@ -7,6 +7,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.update
 
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -22,7 +24,8 @@ fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
     profileId = this[Program.profileId],
     title = this[Program.title],
     bannerUrl = this[Program.bannerUrl],
-    weeklyFrequency = days
+    weeklyFrequency = days,
+    archived = this[Program.archived]
 )
 
 object ProgramService { 
@@ -78,6 +81,55 @@ object ProgramService {
                     null
                 }
             }
+    }
+
+    fun getProgramsByProfileAndStatus(
+        profileId: Long,
+        archived: Boolean
+    ): List<ProgramDTO> = transaction {
+
+        Program.selectAll()
+            .where {
+                (Program.profileId eq profileId) and
+                (Program.archived eq archived)
+            }
+            .map { row ->
+                val programId = row[Program.id]
+
+                val days = ProgramSchedule.selectAll()
+                    .where { ProgramSchedule.programId eq programId }
+                    .map { it[ProgramSchedule.day] }
+
+                row.toProgramDTO(days)
+            }
+    }
+
+    fun toggleArchiveProgram(id: Long): ProgramDTO? = transaction {
+        val row = Program
+            .selectAll()
+            .where { Program.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val current = row[Program.archived]
+
+        val updatedCount = Program.update({ Program.id eq id }) {
+            it[archived] = !current
+        }
+
+        if (updatedCount == 0) return@transaction null
+
+        val updatedRow = Program
+            .selectAll()
+            .where { Program.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val days = ProgramSchedule.selectAll()
+            .where { ProgramSchedule.programId eq id }
+            .map { it[ProgramSchedule.day] }
+
+        updatedRow.toProgramDTO(days)
     }
 
     // DB-functions

@@ -30,3 +30,22 @@ data class ExerciseSeed(
     val name: String?,
     val image: String?
 )
+
+@Serializable
+data class ExerciseWithMetricsDTO(
+    val exerciseId: Long,
+    val exerciseName: String,
+    val metrics: List<MetricTypeDTO>
+)
+
+@Serializable
+data class ExerciseIdsRequest(
+    val ids: List<Long>
+)
+
+@Serializable
+data class ExerciseFullDTO(
+    val exercise: ExerciseDTO,
+    val categories: List<ExerciseCategoryDTO>,
+    val muscleGroups: List<ExerciseMuscleGroupDTO>
+)

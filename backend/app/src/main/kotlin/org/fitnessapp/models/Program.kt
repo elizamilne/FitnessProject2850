@@ -8,6 +8,7 @@ object Program : Table("program") {
     val profileId = reference("profile_id", Profile.id)
     val title = varchar("title", 255)
     val bannerUrl = text("banner_url").nullable()
+    val archived = bool("archived").default(false)
     override val primaryKey = PrimaryKey(id)
 }
 
@@ -17,6 +18,7 @@ data class ProgramDTO(
     val profileId: Long,
     val title: String,
     val bannerUrl: String? = null,
+    val archived: Boolean,
     val weeklyFrequency: List<String>
 )
 

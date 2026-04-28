@@ -16,6 +16,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.fitnessapp.models.Exercise
 import org.fitnessapp.models.ExerciseDTO
 import org.fitnessapp.models.ExerciseDetailDTO
+import org.fitnessapp.models.ExerciseIdsRequest
 
 import org.fitnessapp.models.ExerciseCategory
 import org.fitnessapp.models.ExerciseMuscleGroup
@@ -40,6 +41,32 @@ fun Route.exerciseRoutes() {
 
             if (result == null) {
                 call.respond(HttpStatusCode.NotFound, "Exercise not found")
+            } else {
+                call.respond(HttpStatusCode.OK, result)
+            }
+        }
+
+        get("/{id}/full") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+            val result = ExerciseService.findExerciseFullById(id)
+
+            if (result == null) {
+                call.respond(HttpStatusCode.NotFound, "Exercise not found")
+            } else {
+                call.respond(HttpStatusCode.OK, result)
+            }
+        }
+
+        get("/{id}/metrics") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+            val result = ExerciseService.findMetricsForExercise(id)
+
+            if (result == null) {
+                call.respond(HttpStatusCode.NotFound, "No metrics found for this exercise")
             } else {
                 call.respond(HttpStatusCode.OK, result)
             }

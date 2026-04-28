@@ -9,6 +9,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.UpdateBuilder
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.SortOrder
 
 import java.time.LocalDate
 
@@ -23,7 +25,8 @@ fun ResultRow.toRaceDTO() = RaceDTO(
     title = this[Race.title],
     location = this[Race.location],
     date = this[Race.date].toString(),
-    bannerUrl = this[Race.bannerUrl]
+    bannerUrl = this[Race.bannerUrl],
+    completed = this[Race.completed]
 )
 
 object RaceService {
@@ -35,6 +38,7 @@ object RaceService {
         builder[Race.location] = request.location
         builder[Race.date] = LocalDate.parse(request.date)
         builder[Race.bannerUrl] = request.bannerUrl
+        builder[Race.completed] = request.completed
     }
 
     fun createRace(
@@ -62,6 +66,56 @@ object RaceService {
             .map { it.toRaceDTO() }
             .singleOrNull()
     }
+
+    fun toggleRaceCompleted(id: Long): RaceDTO? = transaction {
+        val row = Race
+            .selectAll()
+            .where { Race.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val newState = !row[Race.completed]
+
+        Race.update({ Race.id eq id }) {
+            it[completed] = newState
+        }
+
+        RaceDTO(
+            id = row[Race.id],
+            profileId = row[Race.profileId],
+            title = row[Race.title],
+            location = row[Race.location],
+            date = row[Race.date].toString(),
+            bannerUrl = row[Race.bannerUrl],
+            completed = newState
+        )
+    }
+
+    fun getNextIncompleteRace(profileId: Long): RaceDTO? = transaction {
+        Race
+            .selectAll()
+            .where {
+                (Race.completed eq false) and
+                (Race.profileId eq profileId)
+            }
+            .orderBy(Race.date to SortOrder.ASC)
+            .limit(1)
+            .map { it.toRaceDTO() }
+            .singleOrNull()
+    }  
+
+    fun getProgramsByProfileAndCompletion(
+        profileId: Long,
+        completed: Boolean
+    ): List<RaceDTO> = transaction {
+
+        Race.selectAll()
+            .where {
+                (Race.profileId eq profileId) and
+                (Race.completed eq completed)
+            }
+            .map { it.toRaceDTO() }
+    } 
 
     fun createRaceAndReturnId(request: CreateRaceRequest): Long = transaction {
         Race.insert { builder ->

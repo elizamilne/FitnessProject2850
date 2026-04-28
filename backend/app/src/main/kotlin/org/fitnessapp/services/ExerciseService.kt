@@ -16,6 +16,17 @@ import org.fitnessapp.models.ExerciseDetailDTO
 import org.fitnessapp.models.ExerciseCategory
 import org.fitnessapp.models.ExerciseMuscleGroup
 
+import org.fitnessapp.models.ExerciseMetricTypes
+import org.fitnessapp.models.MetricType
+import org.fitnessapp.models.MetricTypeDTO
+import org.fitnessapp.models.ExerciseWithMetricsDTO
+
+import org.fitnessapp.models.Category
+import org.fitnessapp.models.MuscleGroup
+import org.fitnessapp.models.ExerciseCategoryDTO
+import org.fitnessapp.models.ExerciseMuscleGroupDTO
+import org.fitnessapp.models.ExerciseFullDTO
+
 fun ResultRow.toExerciseDTO() = ExerciseDTO(
     id = this[Exercise.id],
     name = this[Exercise.name],
@@ -54,34 +65,8 @@ object ExerciseService {
             .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
             .map { it[ExerciseMuscleGroup.muscleGroupId] }
 
-    // Query helpers
 
-    fun findExercises(
-        search: String?, 
-        categoryId: Long?, 
-        muscleGroupId: Long?
-    ): List<ExerciseDTO> = transaction {
-
-        var query = Exercise.selectAll()
-
-        if (!search.isNullOrBlank()) {
-            query = query.andWhere { nameContains(search) }
-        }
-
-        if (categoryId != null) {
-            val ids = findExerciseIdsByCategoryId(categoryId)
-            if (ids.isEmpty()) return@transaction emptyList()
-            query = query.andWhere { Exercise.id inList ids }
-        }
-
-        if (muscleGroupId != null) {
-            val ids = findExerciseIdsByMuscleGroupId(muscleGroupId)
-            if (ids.isEmpty()) return@transaction emptyList()
-            query = query.andWhere { Exercise.id inList ids }
-        }
-
-        query.map { it.toExerciseDTO() }
-    }
+   // Query helpers for other routes
 
     fun findExerciseDetailById(id: Long): ExerciseDetailDTO? = transaction {
         val baseInfo = Exercise.selectAll()
@@ -105,5 +90,125 @@ object ExerciseService {
         Exercise
             .selectAll().where { Exercise.id eq exerciseId }
             .singleOrNull()
+    }
+
+    // Query helpers
+
+    fun findExercises(
+        search: String?, 
+        categoryId: Long?, 
+        muscleGroupId: Long?
+    ): List<ExerciseFullDTO> = transaction {
+
+        var query = Exercise.selectAll()
+
+        if (!search.isNullOrBlank()) {
+            query = query.andWhere { nameContains(search) }
+        }
+
+        if (categoryId != null) {
+            val ids = findExerciseIdsByCategoryId(categoryId)
+            if (ids.isEmpty()) return@transaction emptyList()
+            query = query.andWhere { Exercise.id inList ids }
+        }
+
+        if (muscleGroupId != null) {
+            val ids = findExerciseIdsByMuscleGroupId(muscleGroupId)
+            if (ids.isEmpty()) return@transaction emptyList()
+            query = query.andWhere { Exercise.id inList ids }
+        }
+
+        val exercises = query.map { it.toExerciseDTO() }
+
+        exercises.mapNotNull { exercise ->
+
+            val exerciseId = exercise.id ?: return@mapNotNull null
+
+            val categories = (ExerciseCategory innerJoin Category)
+                .selectAll()
+                .where { ExerciseCategory.exerciseId eq exerciseId }
+                .map {
+                    ExerciseCategoryDTO(
+                        id = it[Category.id],
+                        name = it[Category.name] ?: ""
+                    )
+                }
+
+            val muscleGroups = (ExerciseMuscleGroup innerJoin MuscleGroup)
+                .selectAll()
+                .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
+                .map {
+                    ExerciseMuscleGroupDTO(
+                        id = it[MuscleGroup.id],
+                        name = it[MuscleGroup.name] ?: ""
+                    )
+                }
+
+            ExerciseFullDTO(
+                exercise = exercise,
+                categories = categories,
+                muscleGroups = muscleGroups
+            )
+        }
+    }
+
+    fun findExerciseFullById(exerciseId: Long): ExerciseFullDTO? = transaction {
+        val exerciseRow = Exercise
+            .selectAll()
+            .where { Exercise.id eq exerciseId }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val exercise = exerciseRow.toExerciseDTO()
+
+        val categories = (ExerciseCategory innerJoin Category)
+            .selectAll()
+            .where { ExerciseCategory.exerciseId eq exerciseId }
+            .map {
+                ExerciseCategoryDTO(
+                    id = it[Category.id],
+                    name = it[Category.name] ?: ""
+                )
+            }
+
+        val muscleGroups = (ExerciseMuscleGroup innerJoin MuscleGroup)
+            .selectAll()
+            .where { ExerciseMuscleGroup.exerciseId eq exerciseId }
+            .map {
+                ExerciseMuscleGroupDTO(
+                    id = it[MuscleGroup.id],
+                    name = it[MuscleGroup.name] ?: ""
+                )
+            }
+
+        ExerciseFullDTO(
+            exercise = exercise,
+            categories = categories,
+            muscleGroups = muscleGroups
+        )
+    }
+
+    fun findMetricsForExercise(exerciseId: Long): ExerciseWithMetricsDTO? = transaction {
+
+        val rows = (ExerciseMetricTypes innerJoin MetricType innerJoin Exercise)
+            .selectAll()
+            .where { Exercise.id eq exerciseId }
+            .toList()
+
+        if (rows.isEmpty()) return@transaction null
+
+        val first = rows.first()
+
+        ExerciseWithMetricsDTO(
+            exerciseId = exerciseId,
+            exerciseName = first[Exercise.name] ?: "",
+            metrics = rows.map {
+                MetricTypeDTO(
+                    id = it[MetricType.id],
+                    name = it[MetricType.name],
+                    unit = it[MetricType.unit]
+                )
+            }
+        )
     }
 }

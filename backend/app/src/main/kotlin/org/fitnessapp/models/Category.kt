@@ -16,3 +16,9 @@ data class CategoryDTO(
     val name: String?,
     val image: String?
 )
+
+@Serializable
+data class ExerciseCategoryDTO(
+    val id: Long,
+    val name: String
+)

@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function AppNavbar() {
+export default function PrimaryNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
 

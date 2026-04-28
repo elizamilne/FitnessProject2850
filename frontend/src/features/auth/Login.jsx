@@ -5,6 +5,7 @@ import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profile";
 import AuthInput from "../../common/ui/auth/AuthInput";
+import PublicNavbar from "../../common/layout/PublicNavbar";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -44,7 +45,8 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-
+      <PublicNavbar/>
+      
       {/* Background video */}
       <BackgroundVideo />
 

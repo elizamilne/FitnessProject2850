@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
-import Navbar from "../../common/layout/HS_NavBar";
 import BackgroundVideo from "../../common/ui/BackgroundVideo";
+import PublicNavbar from "../../common/layout/PublicNavbar";
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -10,12 +10,12 @@ const HomeScreen = () => {
   return (
     <div className="relative w-full h-screen overflow-hidden font-sans">
       {/* Navbar */}
-      <Navbar />
+      <PublicNavbar />
 
       {/* Background video */}
       <BackgroundVideo />
 
-      {/* 🔥 Overlay stack (THIS is the key) */}
+      {/* Overlay stack */}
       <div className="absolute inset-0 z-0">
         {/* Subtle dark tint */}
         <div className="absolute inset-0 bg-black/30" />
@@ -48,10 +48,10 @@ const HomeScreen = () => {
         {/* Headline */}
         <h1
           className="
-    text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight
-    bg-gradient-to-r from-white via-indigo-300 to-purple-400
-    bg-clip-text text-transparent
-  "
+            text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight
+            bg-gradient-to-r from-white via-indigo-300 to-purple-400
+            bg-clip-text text-transparent
+          "
         >
           Train smarter. Perform better.
         </h1>

@@ -4,6 +4,7 @@ import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import BackgroundVideo from "../../common/ui/BackgroundVideo";
 import AuthInput from "../../common/ui/auth/AuthInput";
+import PublicNavbar from "../../common/layout/PublicNavbar";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -65,7 +66,8 @@ const Signup = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-
+      <PublicNavbar/>
+      
       {/* Background video */}
       <BackgroundVideo />
 

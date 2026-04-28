@@ -1,4 +1,4 @@
-import AppNavbar from "../../common/layout/PrimaryNavbar";
+import PrimaryNavbar from "../../common/layout/PrimaryNavbar";
 import ActivitiesHistory from "./components/ActivitiesHistory";
 import ActivitiesPrograms from "./programs";
 import ActivitiesRaces from "./races";
@@ -6,7 +6,7 @@ import ActivitiesRaces from "./races";
 const ActivitiesPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
-      <AppNavbar />
+      <PrimaryNavbar />
 
       <div className="w-[92%] lg:w-[70%] mx-auto py-12 space-y-16">
         {/* Header */}

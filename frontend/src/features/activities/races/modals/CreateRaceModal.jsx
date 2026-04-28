@@ -51,17 +51,26 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      header={<h3 className="text-lg font-semibold">Create Race</h3>}
+      header={
+        <h3 className="text-xl font-semibold text-gray-900">Create Race</h3>
+      }
       body={
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500">Create The Race</p>
+        <div className="space-y-5">
+          <p className="text-sm text-gray-500">
+            Add a new race to your schedule
+          </p>
 
           <input
             type="text"
             placeholder="Race title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
+            className="
+              w-full px-4 py-3 rounded-xl
+              bg-white/70 backdrop-blur border border-gray-200
+              text-gray-800 placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+            "
           />
 
           <input
@@ -69,22 +78,38 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
             placeholder="Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
+            className="
+              w-full px-4 py-3 rounded-xl
+              bg-white/70 backdrop-blur border border-gray-200
+              text-gray-800 placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+            "
           />
 
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
+            className="
+              w-full px-4 py-3 rounded-xl
+              bg-white/70 backdrop-blur border border-gray-200
+              text-gray-700
+              focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+            "
           />
 
+          {/* Action */}
           <button
             onClick={handleCreate}
             disabled={!isValid || loading}
-            className="w-full py-2 bg-blue-600 disabled:bg-gray-400 text-white rounded-lg"
+            className="
+          w-full py-3 rounded-xl text-sm font-semibold
+          bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+          hover:opacity-90 active:scale-[0.98] transition
+          disabled:opacity-40 disabled:cursor-not-allowed
+        "
           >
-            {loading ? "Creating..." : "Create"}
+            {loading ? "Creating..." : "Create Race"}
           </button>
         </div>
       }

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { profileService } from "../../services/profile";
 import { useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
 
 const quiz = [
   {
@@ -53,13 +54,28 @@ const quiz = [
 const Questions = () => {
   const navigate = useNavigate();
 
+  const contentRef = useRef(null);
+  const progressRef = useRef(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState({});
   const [error, setError] = useState("");
 
+  const videoRef = useRef(null);
+
   const currentQuestion = quiz[currentIndex];
-  
+  const progress = ((currentIndex + 1) / quiz.length) * 100;
+
+  // Animate progress on change
+  useEffect(() => {
+    gsap.to(progressRef.current, {
+      width: `${progress}%`,
+      duration: 0.4,
+      ease: "power3.out",
+    });
+  }, [progress]);
+
   const getUserId = () => {
     const id = sessionStorage.getItem("userId");
     if (!id) throw new Error("No userId found");
@@ -74,7 +90,6 @@ const Questions = () => {
 
   const buildPayload = (answers) => {
     const userId = getUserId();
-
     return {
       userId,
       ...answers,
@@ -90,7 +105,6 @@ const Questions = () => {
   const handleNext = async (e) => {
     e.preventDefault();
 
-    // Validation
     if (!answer) {
       setError("Please provide an answer");
       return;
@@ -120,19 +134,37 @@ const Questions = () => {
     setAnswers(updatedAnswers);
     setAnswer("");
 
+    // GSAP forward animation
     if (currentIndex + 1 < quiz.length) {
-      setCurrentIndex((prev) => prev + 1);
+      gsap.to(contentRef.current, {
+        y: -40,
+        opacity: 0,
+        duration: 0.25,
+        ease: "power2.out",
+        onComplete: () => {
+          setCurrentIndex((prev) => prev + 1);
+
+          gsap.fromTo(
+            contentRef.current,
+            { y: 40, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.35,
+              ease: "power3.out",
+            },
+          );
+        },
+      });
       return;
     }
 
     try {
       const payload = buildPayload(updatedAnswers);
-
       const res = await profileService.createProfile(payload);
       const profile = res?.data || res;
 
       saveProfile(profile);
-
       navigate("/training-page");
     } catch (err) {
       console.error("Profile creation failed:", err);
@@ -143,90 +175,182 @@ const Questions = () => {
     if (currentIndex === 0) return;
 
     const prevIndex = currentIndex - 1;
-    setCurrentIndex(prevIndex);
 
-    const prevQuestion = quiz[prevIndex];
-    setAnswer(answers[prevQuestion.key] || "");
+    gsap.to(contentRef.current, {
+      y: 40,
+      opacity: 0,
+      duration: 0.25,
+      ease: "power2.out",
+      onComplete: () => {
+        setCurrentIndex(prevIndex);
+
+        const prevQuestion = quiz[prevIndex];
+        setAnswer(answers[prevQuestion.key] || "");
+
+        gsap.fromTo(
+          contentRef.current,
+          { y: -40, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.35,
+            ease: "power3.out",
+          },
+        );
+      },
+    });
   };
 
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    video.src = currentQuestion.video;
+    video.load();
+    video.play();
+  }, [currentQuestion.video]);
+
+  
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Background Video */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         className="absolute w-full h-full object-cover"
-      >
-        <source src={currentQuestion.video} type="video/mp4" />
-      </video>
+        src={currentQuestion.video}
+      />
 
-      <div className="absolute inset-0 bg-black/60"></div>
+      {/* Overlay */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]" />
+      </div>
 
-      <div className="relative z-10 flex items-center justify-center h-screen text-white px-4">
+      {/* Content */}
+      <div className="relative z-10 flex items-center justify-center h-screen px-4 text-white">
         <form
           onSubmit={handleNext}
-          className="bg-black/50 p-8 rounded-xl w-full max-w-md text-center"
+          className="
+            relative w-full max-w-md text-center
+            p-8 rounded-3xl
+            bg-white/10 backdrop-blur-xl
+            border border-white/10
+            shadow-[0_10px_40px_rgba(0,0,0,0.4)]
+          "
         >
-          <h2 className="text-2xl font-bold mb-6">
-            {currentQuestion.question}
-          </h2>
+          {/* Glow */}
+          <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
-          {/* Choice */}
-          {currentQuestion.type === "choice" && (
-            <div className="flex flex-col gap-4">
-              {currentQuestion.options.map((option) => (
-                <label
-                  key={option}
-                  className={`p-3 rounded border cursor-pointer ${
-                    answer === option ? "bg-blue-600" : "bg-white/10"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="answer"
-                    value={option}
-                    checked={answer === option}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    className="hidden"
-                  />
-                  {option}
-                </label>
-              ))}
+          <div ref={contentRef} className="relative z-10">
+            {/* Progress */}
+            <div className="mb-6 space-y-2">
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>
+                  Step {currentIndex + 1} of {quiz.length}
+                </span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  ref={progressRef}
+                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
             </div>
-          )}
 
-          {/* Input */}
-          {currentQuestion.type === "input" && (
-            <input
-              type={currentQuestion.inputType || "text"}
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder={currentQuestion.placeholder}
-              className="w-full p-3 mb-4 rounded bg-white/20 text-white placeholder-white focus:outline-none"
-            />
-          )}
+            {/* Question */}
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6">
+              {currentQuestion.question}
+            </h2>
 
-          {/* Error */}
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+            {/* Choices */}
+            {currentQuestion.type === "choice" && (
+              <div className="flex flex-col gap-3">
+                {currentQuestion.options.map((option) => {
+                  const isSelected = answer === option;
 
-          {/* Buttons */}
-          <div className="flex gap-3 mt-6">
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={currentIndex === 0}
-              className="w-1/2 py-3 bg-gray-600 rounded font-bold hover:bg-gray-700 disabled:opacity-50"
-            >
-              Back
-            </button>
+                  return (
+                    <label
+                      key={option}
+                      className={`
+                        px-4 py-3 rounded-xl cursor-pointer
+                        border transition-all
+                        ${
+                          isSelected
+                            ? "bg-white/20 border-indigo-400 shadow-[0_4px_20px_rgba(99,102,241,0.25)]"
+                            : "bg-white/10 border-white/10 hover:bg-white/20"
+                        }
+                      `}
+                    >
+                      <input
+                        type="radio"
+                        value={option}
+                        checked={isSelected}
+                        onChange={(e) => setAnswer(e.target.value)}
+                        className="hidden"
+                      />
+                      {option}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
 
-            <button
-              type="submit"
-              className="w-1/2 py-3 bg-blue-600 rounded font-bold hover:bg-blue-700"
-            >
-              {currentIndex + 1 < quiz.length ? "Next" : "Finish"}
-            </button>
+            {/* Input */}
+            {currentQuestion.type === "input" && (
+              <input
+                type={currentQuestion.inputType || "text"}
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder={currentQuestion.placeholder}
+                className="
+                  w-full mt-2 p-3 rounded-xl
+                  bg-white/10 border border-white/10
+                  text-white placeholder-gray-400
+                  outline-none
+                  focus:border-indigo-400/50
+                "
+              />
+            )}
+
+            {/* Error */}
+            {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
+
+            {/* Buttons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                type="button"
+                onClick={handleBack}
+                disabled={currentIndex === 0}
+                className="
+                  w-1/2 py-3 rounded-xl
+                  bg-white/10 border border-white/10
+                  hover:bg-white/20
+                  disabled:opacity-40
+                "
+              >
+                Back
+              </button>
+
+              <button
+                type="submit"
+                className="
+                  w-1/2 py-3 rounded-xl font-semibold
+                  bg-gradient-to-r from-indigo-500 to-purple-500
+                  hover:opacity-90
+                  shadow-[0_6px_25px_rgba(99,102,241,0.4)]
+                "
+              >
+                {currentIndex + 1 < quiz.length ? "Next" : "Finish"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

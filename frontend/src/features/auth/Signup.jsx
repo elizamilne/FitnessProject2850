@@ -3,6 +3,7 @@ import { User, UserCheck, Mail, Lock, KeyRound } from "lucide-react";
 import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import BackgroundVideo from "../../common/ui/BackgroundVideo";
+import AuthInput from "../../common/ui/auth/AuthInput";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -63,98 +64,127 @@ const Signup = () => {
   };
 
   return (
-    <div className="relative z-10 flex items-center justify-center min-h-screen px-4 bg-gray-400">
+    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+
+      {/* Background video */}
       <BackgroundVideo />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]" />
+      </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-black/40 backdrop-blur-md p-8 rounded-2xl shadow-xl w-full max-w-md text-white"
+        className="
+          relative z-10 w-full max-w-md
+          p-8 rounded-3xl
+          bg-white/10 backdrop-blur-xl
+          border border-white/10
+          shadow-[0_10px_40px_rgba(0,0,0,0.4)]
+          text-white
+        "
       >
-        <h2 className="text-3xl font-bold mb-6 text-center">Create Account</h2>
+        {/* Glow */}
+        <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
-        {/* First + Last Name */}
-        <div className="flex flex-col md:flex-row gap-3 mb-4">
-          {/* First Name */}
-          <div className="flex items-center bg-white/10 rounded-lg px-3 w-full">
-            <User className="text-gray-300 mr-2" size={18} />
-            <input
-              type="text"
+        <div className="relative z-10">
+          <h2 className="text-3xl font-bold mb-6 text-center">
+            Create Account
+          </h2>
+
+          {/* First + Last Name */}
+          <div className="flex flex-col md:flex-row gap-3 mb-4">
+            <AuthInput
+              icon={<User size={18} />}
               name="firstName"
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
-              className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
               required
             />
-          </div>
 
-          {/* Last Name */}
-          <div className="flex items-center bg-white/10 rounded-lg px-3 w-full">
-            <UserCheck className="text-gray-300 mr-2" size={18} />
-            <input
-              type="text"
+            <AuthInput
+              icon={<UserCheck size={18} />}
               name="lastName"
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
-              className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
               required
             />
           </div>
+
+          {/* Email */}
+          <div className="mb-4">
+            <AuthInput
+              icon={<Mail size={18} />}
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div className="mb-4">
+            <AuthInput
+              icon={<Lock size={18} />}
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Re-enter Password */}
+          <div className="mb-4">
+            <AuthInput
+              icon={<KeyRound size={18} />}
+              type="password"
+              name="rePassword"
+              placeholder="Re-enter Password"
+              value={formData.rePassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          {/* Error */}
+          {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+
+          {/* Button */}
+          <button
+            type="submit"
+            className="
+              w-full py-3 mt-2 rounded-xl font-semibold
+              bg-gradient-to-r from-indigo-500 to-purple-500
+              text-white
+              hover:opacity-90
+              active:scale-95
+              transition-all duration-200
+              shadow-[0_6px_25px_rgba(99,102,241,0.4)]
+            "
+          >
+            Sign Up
+          </button>
+
+          {/* Login link */}
+          <p className="text-sm text-gray-400 text-center mt-4">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/login")}
+              className="text-indigo-300 cursor-pointer hover:underline"
+            >
+              Login
+            </span>
+          </p>
         </div>
-
-        {/* Email */}
-        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
-          <Mail className="text-gray-300 mr-2" size={18} />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
-            required
-          />
-        </div>
-
-        {/* Password */}
-        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
-          <Lock className="text-gray-300 mr-2" size={18} />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
-            required
-          />
-        </div>
-
-        {/* Re-enter Password */}
-        <div className="flex items-center bg-white/10 rounded-lg px-3 mb-4">
-          <KeyRound className="text-gray-300 mr-2" size={18} />
-          <input
-            type="password"
-            name="rePassword"
-            placeholder="Re-enter Password"
-            value={formData.rePassword}
-            onChange={handleChange}
-            className="w-full p-3 bg-transparent focus:outline-none placeholder-gray-300"
-            required
-          />
-        </div>
-
-        {/* Error */}
-        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-
-        {/* Button */}
-        <button
-          type="submit"
-          className="w-full py-3 mt-2 bg-gradient-to-r from-gray-800 to-black hover:from-gray-600 hover:to-gray-900 rounded-xl font-bold transition duration-300"
-        >
-          Sign Up
-        </button>
       </form>
     </div>
   );

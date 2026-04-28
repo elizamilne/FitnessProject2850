@@ -53,98 +53,140 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
       isOpen={isOpen}
       onClose={onClose}
       header={
-        <h3 className="text-lg font-semibold">
-          {isEditing ? "Edit Race" : "View Race"}
+        <h3 classNamme="text-xl font-semibold text-gray-900">
+          {isEditing ? "Edit Race" : "Race Details"}
         </h3>
       }
       body={
-        <div className="space-y-4">
-          <img
-            src={form.bannerUrl || "https://via.placeholder.com/300x200"}
-            alt={form.title}
-            className="w-full h-40 object-cover rounded-lg"
-          />
-
-          {/* TITLE */}
-          {isEditing ? (
-            <input
-              type="text"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg"
+        <div className="space-y-6">
+          {/* Image Header */}
+          <div className="relative">
+            <img
+              src={form.bannerUrl || "https://via.placeholder.com/300x200"}
+              alt={form.title}
+              className="w-full h-48 object-cover rounded-2xl"
             />
-          ) : (
-            <h4 className="text-lg font-semibold">{form.title}</h4>
-          )}
 
-          {isEditing && (
-            <input
-              type="text"
-              placeholder="Banner image URL"
-              value={form.bannerUrl}
-              onChange={(e) => setForm({ ...form, bannerUrl: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-          )}
+            {/* subtle overlay */}
+            <div className="absolute inset-0 rounded-2xl bg-black/20" />
+          </div>
 
-          {/* LOCATION + DATE */}
-          {isEditing ? (
-            <>
+          {/* Content */}
+          <div className="space-y-4">
+            {/* Title */}
+            {isEditing ? (
               <input
                 type="text"
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl
+              bg-white/70 backdrop-blur border border-gray-200
+              text-gray-800 placeholder-gray-400
+              focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
               />
+            ) : (
+              <h4 className="text-2xl font-semibold text-gray-900">
+                {form.title}
+              </h4>
+            )}
 
-              <input
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
-            </>
-          ) : (
-            <p className="text-sm text-gray-500">
-              {new Date(form.date).toLocaleDateString()} • {form.location}
-            </p>
-          )}
+            {/* Meta */}
+            {!isEditing && (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <span>{new Date(form.date).toLocaleDateString()}</span>
+                <span className="text-gray-300">•</span>
+                <span>{form.location}</span>
+              </div>
+            )}
 
-          {/* ACTION BUTTONS */}
-          {isEditing ? (
-            <div className="flex gap-2">
-              <button
-                onClick={handleUpdate}
-                disabled={!isValid}
-                className="flex-1 py-2 bg-green-600 disabled:bg-gray-400 text-white rounded-lg"
-              >
-                Save
-              </button>
+            {/* Edit Fields */}
+            {isEditing && (
+              <div className="grid grid-cols-1 gap-3">
+                <input
+                  type="text"
+                  placeholder="Banner image URL"
+                  value={form.bannerUrl}
+                  onChange={(e) =>
+                    setForm({ ...form, bannerUrl: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur border border-gray-200
+                text-gray-700 placeholder-gray-400
+                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                />
 
-              <button
-                onClick={() => setIsEditing(false)}
-                className="flex-1 py-2 bg-gray-300 rounded-lg"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex-1 py-2 bg-blue-600 text-white rounded-lg"
-              >
-                Edit
-              </button>
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={form.location}
+                  onChange={(e) =>
+                    setForm({ ...form, location: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur border border-gray-200
+                text-gray-700
+                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                />
 
-              <button
-                onClick={handleComplete}
-                className="flex-1 py-2 bg-purple-600 text-white rounded-lg"
-              >
-                {race.completed ? "Upcoming" : "Completed"}
-              </button>
-            </div>
-          )}
+                <input
+                  type="date"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl
+                bg-white/70 backdrop-blur border border-gray-200
+                text-gray-700
+                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleUpdate}
+                  disabled={!isValid}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold
+                bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                hover:opacity-90 active:scale-[0.98] transition
+                disabled:opacity-40"
+                >
+                  Save Changes
+                </button>
+
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 py-3 rounded-xl text-sm font-medium
+                bg-gray-100 text-gray-700
+                hover:bg-gray-200 transition"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex-1 py-3 rounded-xl text-sm font-medium
+                bg-gray-100 text-gray-700
+                hover:bg-gray-200 transition"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={handleComplete}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold
+                bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                hover:opacity-90 active:scale-[0.98] transition"
+                >
+                  {race.completed ? "Mark as Upcoming" : "Mark as Completed"}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       }
     />

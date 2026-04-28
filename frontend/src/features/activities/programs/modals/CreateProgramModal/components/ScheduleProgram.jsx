@@ -1,4 +1,5 @@
 import React from "react";
+import { gsap } from "gsap";
 
 const DAYS = [
   "Monday",
@@ -10,11 +11,11 @@ const DAYS = [
   "Sunday",
 ];
 
-const ScheduleProgram = ({ 
-  selectedDays = [], 
-  onChange, 
+const ScheduleProgram = ({
+  selectedDays = [],
+  onChange,
   title = "",
-  onTitleChange, 
+  onTitleChange,
 }) => {
   const toggleDay = (day) => {
     const updated = selectedDays.includes(day)
@@ -24,10 +25,25 @@ const ScheduleProgram = ({
     onChange?.(updated);
   };
 
+  const handlePress = (el) => {
+    gsap.fromTo(
+      el,
+      { scale: 1 },
+      {
+        scale: 0.92,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1,
+        ease: "power2.out",
+      },
+    );
+  };
+
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="text-sm text-gray-500">
+    <div className="space-y-6">
+      {/* TITLE */}
+      <div className="space-y-1.5">
+        <label className="text-sm font-medium text-gray-600">
           Program title
         </label>
 
@@ -35,33 +51,61 @@ const ScheduleProgram = ({
           type="text"
           value={title}
           onChange={(e) => onTitleChange?.(e.target.value)}
-          placeholder="e.g. Push/Pull/Legs"
-          className="w-full border rounded px-3 py-2 mt-1"
+          placeholder="e.g. Push / Pull / Legs"
+          className="w-full px-4 py-3 rounded-xl
+            bg-white/70 backdrop-blur border border-gray-200
+            text-gray-800 placeholder-gray-400
+            focus:outline-none
+            focus:ring-2 focus:ring-indigo-400/40"
         />
       </div>
 
-      <p className="text-sm text-gray-500">
-        Select training days
-      </p>
+      {/* DAYS */}
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-gray-600">
+          Select training days
+        </p>
 
-      <div className="flex flex-wrap gap-2">
-        {DAYS.map((day) => {
-          const isSelected = selectedDays.includes(day);
+        <div className="flex flex-wrap gap-2">
+          {DAYS.map((day) => {
+            const isSelected = selectedDays.includes(day);
 
-          return (
-            <button
-              key={day}
-              onClick={() => toggleDay(day)}
-              className={`px-4 py-2 rounded-lg border transition ${
-                isSelected
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white hover:bg-gray-100"
-              }`}
-            >
-              {day}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={day}
+                onClick={(e) => {
+                  handlePress(e.currentTarget);
+                  toggleDay(day);
+                }}
+                className={`
+                  px-4 py-2.5 rounded-xl text-sm font-medium
+                  transition-all duration-300 ease-out
+                  border
+
+                  ${
+                    isSelected
+                      ? `
+                        bg-gradient-to-r from-indigo-500 to-purple-500
+                        text-white
+                        border-transparent
+                        shadow-[0_4px_15px_rgba(99,102,241,0.25)]
+                      `
+                      : `
+                        bg-white/60 backdrop-blur
+                        border-white/50
+                        text-gray-700
+                        hover:bg-gradient-to-r 
+                        hover:from-indigo-500/5 hover:to-purple-500/5
+                        hover:border-indigo-200/60
+                      `
+                  }
+                `}
+              >
+                {day}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

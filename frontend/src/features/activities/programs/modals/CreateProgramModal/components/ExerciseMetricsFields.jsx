@@ -26,9 +26,7 @@ const ExerciseMetricsFields = ({
 
     const fetchMetrics = async () => {
       const results = await Promise.allSettled(
-        selectedExercises.map((e) =>
-          exerciseService.getMetrics(e.exercise.id)
-        )
+        selectedExercises.map((e) => exerciseService.getMetrics(e.exercise.id)),
       );
 
       const map = {};
@@ -50,26 +48,26 @@ const ExerciseMetricsFields = ({
   }, [selectedExercises]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {selectedExercises.map((e) => {
         const id = e.exercise.id;
         const exerciseValues = values[id] || {};
         const exerciseMetrics = metricsMap[id] || [];
 
         return (
-          <div key={id} className="space-y-2">
+          <div key={id} className="space-y-3">
+            {/* Exercise */}
             <ExerciseCard exerciseData={e} />
 
-            <div className="pl-4 flex gap-3 flex-wrap">
+            {/* Metrics */}
+            <div className="pl-6 flex flex-wrap gap-4">
               {exerciseMetrics.length === 0 && (
-                <p className="text-xs text-gray-400">
-                  No metrics available
-                </p>
+                <p className="text-sm text-gray-400">No metrics available</p>
               )}
 
               {exerciseMetrics.map((m) => (
-                <div key={m.id} className="flex flex-col">
-                  <label className="text-xs text-gray-500">
+                <div key={m.id} className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-gray-500">
                     {m.name}
                   </label>
 
@@ -77,13 +75,19 @@ const ExerciseMetricsFields = ({
                     type="number"
                     value={exerciseValues[m.id] || ""}
                     onChange={(ev) =>
-                      handleChange(
-                        id,
-                        m.id,
-                        Number(ev.target.value)
-                      )
+                      handleChange(id, m.id, Number(ev.target.value))
                     }
-                    className="border rounded px-2 py-1 w-24"
+                    className="
+                    w-24 px-3 py-2 rounded-lg
+                    bg-white/70 backdrop-blur
+                    border border-gray-200
+                    text-sm text-gray-800
+                    placeholder-gray-400
+
+                    focus:outline-none
+                    focus:ring-2 focus:ring-indigo-400/40
+                    focus:border-indigo-300
+                  "
                   />
                 </div>
               ))}

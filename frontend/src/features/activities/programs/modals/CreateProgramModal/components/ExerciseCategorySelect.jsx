@@ -19,35 +19,71 @@ const ExerciseCategorySelect = ({ onSelect, onNext, selectedCategory }) => {
   };
 
   return (
-    <div>
-      <h3>Exercise Category Select</h3>
+    <div className="space-y-3">
+      {/* HEADER */}
+      <h3 className="text-xl font-semibold text-gray-900">Select Category</h3>
 
+      {/* LIST */}
       <div className="space-y-2">
-        {categories.map((c) => (
-          <div
-            key={c.id}
-            onClick={() => handleClick(c)}
-            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition hover:bg-gray-100 ${
-              selectedCategory?.id === c.id ? "bg-gray-100" : ""
-            }`}
-          >
-            <img
-              src={c.img || "https://via.placeholder.com/60"}
-              alt={c.name}
-              className="w-12 h-12 rounded-md object-cover"
-            />
+        {categories.map((c) => {
+          const isSelected = selectedCategory?.id === c.id;
 
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{c.name}</p>
-              {/* optional subtitle */}
-              <p className="text-xs text-gray-500 truncate">
-                {c.description || "Category"}
-              </p>
+          return (
+            <div
+              key={c.id}
+              onClick={() => handleClick(c)}
+              className={`
+            group flex items-center gap-4 px-4 py-3 rounded-xl
+            cursor-pointer transition-all duration-200
+
+            bg-white/60 backdrop-blur-md border border-white/50
+
+            ${
+              isSelected
+                ? `
+                  bg-gradient-to-r from-indigo-500/10 to-purple-500/10
+                  border-indigo-200
+                `
+                : `
+                  hover:bg-gradient-to-r 
+                  hover:from-indigo-500/5 hover:to-purple-500/5
+                  hover:border-indigo-200/60
+                `
+            }
+          `}
+            >
+              {/* IMAGE */}
+              <img
+                src={c.image || "https://via.placeholder.com/60"}
+                alt={c.name}
+                className="w-14 h-14 rounded-lg object-cover"
+              />
+
+              {/* TEXT */}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-gray-900 truncate">{c.name}</p>
+
+                <p className="text-sm text-gray-500 truncate">
+                  {c.description || "Category"}
+                </p>
+              </div>
+
+              {/* ARROW */}
+              <span
+                className={`
+              text-sm transition-all duration-200
+              ${
+                isSelected
+                  ? "text-indigo-600"
+                  : "text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1"
+              }
+            `}
+              >
+                →
+              </span>
             </div>
-
-            <span className="text-xs text-gray-400">→</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

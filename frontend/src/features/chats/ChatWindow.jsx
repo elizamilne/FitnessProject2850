@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { chatService } from "../../services/chat";
 import { messageService } from "../../services/message";
 
-const Chat = ({ conversationId }) => {
+const ChatWindow = ({ conversationId }) => {
   const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
 
-  // 🟢 1. Load messages (REST)
+  // 1. Load messages (REST)
   useEffect(() => {
     if (!conversationId) return;
 
@@ -31,17 +31,17 @@ const Chat = ({ conversationId }) => {
     };
   }, [conversationId]);
 
-  // 🟢 2. WebSocket connection
+  // 2. WebSocket connection
   useEffect(() => {
     if (!conversationId) return;
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const socket = chatService.connect(
       conversationId,
       token,
       (msg) => {
-        // ✅ SAFE state update (no warning)
+        //  SAFE state update (no warning)
         setMessages((prev) => [...prev, msg]);
       }
     );
@@ -53,7 +53,7 @@ const Chat = ({ conversationId }) => {
     };
   }, [conversationId]);
 
-  // 🟢 3. Send message
+  // 3. Send message
   const sendMessage = (text) => {
     if (!text || !socketRef.current) return;
 
@@ -79,4 +79,4 @@ const Chat = ({ conversationId }) => {
   );
 }
 
-export default Chat;
+export default ChatWindow;

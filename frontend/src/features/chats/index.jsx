@@ -1,18 +1,19 @@
 import { useState } from "react";
-import Chat from "./chat";
 import { conversationService } from "../../services/conversation";
+import Chat from "./ChatWindow";
 
 export default function ChatPage() {
   const [conversationId, setConversationId] = useState(null);
 
   // nitialize directly (no useEffect)
+
   const [conversations] = useState([
-    { id: 1, name: "User 1" },
-    { id: 2, name: "User 2" },
+    { id: 5, name: "Conversation 5" },
+    // { id: 2, name: "User 2" },
   ]);
 
   const startChat = async () => {
-    const { data } = await conversationService.startPrivate(1, 2);
+    const { data } = await conversationService.startPrivate(5, 6);
     setConversationId(data.conversationId);
   };
 

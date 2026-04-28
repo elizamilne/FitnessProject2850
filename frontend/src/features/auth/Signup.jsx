@@ -36,11 +36,14 @@ const Signup = () => {
 
     try {
       const user = await userService.register(dataWithoutRePass);
-      const userId = user?.data.id;
+      const userToken = user?.data["token"]
+      const userData = user?.data["user"]
+      const userId = userData.id;
 
       if (!userId) throw new Error("User ID not returned from server");
 
       sessionStorage.setItem("userId", userId);
+      sessionStorage.setItem("token", userToken)
 
       setFormData({
         firstName: "",

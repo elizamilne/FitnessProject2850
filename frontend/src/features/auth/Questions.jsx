@@ -98,7 +98,7 @@ const Questions = () => {
       level: calculateLevel(answers.workoutFrequency),
     };
   };
-
+  
   const saveProfile = (profile) => {
     sessionStorage.removeItem("userId");
     sessionStorage.setItem("profile", JSON.stringify(profile));

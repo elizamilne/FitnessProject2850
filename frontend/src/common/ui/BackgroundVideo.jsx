@@ -1,5 +1,5 @@
 const BackgroundVideo = ({
-  src = "https://www.pexels.com/download/video/8691954/"
+  src = "/home-video.mp4"
 }) => {
   return (
     <>

@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Mail, Lock } from "lucide-react";
-import BackgroundVideo from "../../common/ui/BackgroundVideo";
 import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profile";
 import AuthInput from "../../common/ui/auth/AuthInput";
-import PublicNavbar from "../../common/layout/PublicNavbar";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -44,19 +42,8 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-      <PublicNavbar/>
+    <div className="min-h-screen flex items-center justify-center px-4">
       
-      {/* Background video */}
-      <BackgroundVideo />
-
-      {/* Overlay (same as everywhere else) */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]" />
-      </div>
-
       {/* Form */}
       <div className="relative z-10 w-full max-w-md">
         <form

@@ -2,9 +2,7 @@ import { useState } from "react";
 import { User, UserCheck, Mail, Lock, KeyRound } from "lucide-react";
 import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
-import BackgroundVideo from "../../common/ui/BackgroundVideo";
 import AuthInput from "../../common/ui/auth/AuthInput";
-import PublicNavbar from "../../common/layout/PublicNavbar";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -38,12 +36,9 @@ const Signup = () => {
 
     try {
       const user = await userService.register(dataWithoutRePass);
-
       const userId = user?.data.id;
 
-      if (!userId) {
-        throw new Error("User ID not returned from server");
-      }
+      if (!userId) throw new Error("User ID not returned from server");
 
       sessionStorage.setItem("userId", userId);
 
@@ -56,7 +51,6 @@ const Signup = () => {
       });
 
       setError("");
-
       navigate("/questions");
     } catch (err) {
       setError("Registration failed");
@@ -65,19 +59,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-      <PublicNavbar/>
-      
-      {/* Background video */}
-      <BackgroundVideo />
-
-      {/* Overlay */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
         className="
@@ -107,7 +89,6 @@ const Signup = () => {
               onChange={handleChange}
               required
             />
-
             <AuthInput
               icon={<UserCheck size={18} />}
               name="lastName"

@@ -4,25 +4,33 @@ import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profile";
 import AuthInput from "../../common/ui/auth/AuthInput";
+import AnimatedError from "../../common/ui/auth/AnimatedError";
+import { validateLogin } from "./utils/loginValidation";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const newErrors = validateLogin(email, password);
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
     try {
       const res = await userService.login({ email, password });
-      
-      const userToken = res?.data["token"]
-      sessionStorage.setItem("token", userToken)
 
-      const userData = res?.data["user"]
+      const userToken = res?.data["token"];
+      sessionStorage.setItem("token", userToken);
+
+      const userData = res?.data["user"];
       const userId = userData.id || userData.userId;
-      
+
       if (!userId) throw new Error("No userId returned");
 
       try {
@@ -32,23 +40,23 @@ export default function Login() {
         sessionStorage.setItem("profile", JSON.stringify(profile));
         navigate("/dashboard");
       } catch (profileErr) {
-        console.error("No profile found: ", profileErr);
-        
+        console.error("No profile found:", profileErr);
+
         sessionStorage.setItem("userId", userId);
         navigate("/questions");
       }
 
       setEmail("");
       setPassword("");
+      setErrors({});
     } catch (err) {
       console.error("Login failed:", err);
+      setErrors({ api: "Invalid email or password" });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      
-      {/* Form */}
       <div className="relative z-10 w-full max-w-md">
         <form
           onSubmit={handleSubmit}
@@ -60,13 +68,18 @@ export default function Login() {
             text-white
           "
         >
-          {/* Glow */}
           <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
           <div className="relative z-10">
             <h2 className="text-3xl font-bold mb-6 text-center">
               Welcome Back
             </h2>
+
+            {/* API Error */}
+            <AnimatedError
+              message={errors.api}
+              className="text-center mb-4"
+            />
 
             {/* Email */}
             <div className="mb-4">
@@ -76,8 +89,9 @@ export default function Login() {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
+
+              <AnimatedError message={errors.email} />
             </div>
 
             {/* Password */}
@@ -88,8 +102,9 @@ export default function Login() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
+
+              <AnimatedError message={errors.password} />
             </div>
 
             {/* Button */}
@@ -108,7 +123,6 @@ export default function Login() {
               Login
             </button>
 
-            {/* Link */}
             <p className="text-sm text-gray-400 text-center mt-4">
               Don’t have an account?{" "}
               <span

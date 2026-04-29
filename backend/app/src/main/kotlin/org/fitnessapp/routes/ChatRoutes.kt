@@ -6,11 +6,15 @@ import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-import org.fitnessapp.services.MessageService
 import org.fitnessapp.security.JWTService
+
+import org.fitnessapp.models.ChatMessageDTO
+
 import org.fitnessapp.services.ConversationParticipantService
 import org.fitnessapp.services.ProfileService
-import org.fitnessapp.models.ChatMessageDTO
+import org.fitnessapp.services.UserService
+import org.fitnessapp.services.MessageService
+
 
 val rooms = mutableMapOf<Long, MutableList<DefaultWebSocketServerSession>>()
 
@@ -116,12 +120,21 @@ fun Route.chatRoutes() {
                         text
                     )
 
+                    val user = UserService.findUserById(profile.userId)
+
+                    val senderName = if (user != null) {
+                        "${user.firstName} ${user.lastName}"
+                    } else {
+                        "Unknown"
+                    }
+
                     // 8. Build DTO with createdAt
                     val messageDTO = ChatMessageDTO(
                         content = savedMessage.content,
                         profileId = savedMessage.profileId,
                         conversationId = conversationId,
-                        createdAt = savedMessage.createdAt.toString()
+                        createdAt = savedMessage.createdAt,
+                        senderName = senderName
                     )
 
                     val json = Json.encodeToString(messageDTO)

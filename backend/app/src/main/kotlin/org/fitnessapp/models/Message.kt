@@ -32,5 +32,6 @@ data class ChatMessageDTO(
     val content: String,
     val profileId: Long,
     val conversationId: Long,
-    val createdAt: String
+    val createdAt: String,
+    val senderName: String
 )

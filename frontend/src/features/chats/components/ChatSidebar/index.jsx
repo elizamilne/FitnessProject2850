@@ -13,8 +13,10 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const { results, loading, setResults, setLoading } =
-    useSearchProfiles(search, profileId);
+  const { results, loading, setResults, setLoading } = useSearchProfiles(
+    search,
+    profileId,
+  );
 
   const { conversations, setConversations } = useConversations(
     profileId,
@@ -35,16 +37,14 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
       selectedUser.profileId,
     );
 
-    const newConversationId = data.conversationId;
+    setConversationId(data.conversationId);
 
-    setConversations((prev) => {
-      if (prev.some((c) => c.conversationId === newConversationId)) {
-        return prev;
-      }
-      return [{ conversationId: newConversationId }, ...prev];
-    });
+    // refresh list of conversations
+    const { data: updated } =
+      await conversationService.getUserConversations(profileId);
 
-    setConversationId(newConversationId);
+    setSearch("")
+    setConversations(updated);
   };
 
   return (

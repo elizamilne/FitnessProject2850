@@ -14,30 +14,31 @@ const ChatWindow = ({ profileId, conversationId }) => {
   const [input, setInput] = useState("");
 
   // ✅ FIX: replace temp message instead of duplicating
-  const handleMessage = useCallback((msg) => {
-    setMessages((prev) => {
-      const isDuplicate = prev.some(
-        (m) =>
-          m.temp &&
-          m.profileId === msg.profileId &&
-          m.content === msg.content &&
-          Math.abs(new Date(m.createdAt) - new Date(msg.createdAt)) < 3000
-      );
-
-      if (isDuplicate) {
-        // replace temp message with real one
-        return prev.map((m) =>
-          m.temp &&
-          m.profileId === msg.profileId &&
-          m.content === msg.content
-            ? msg
-            : m
+  const handleMessage = useCallback(
+    (msg) => {
+      setMessages((prev) => {
+        const isDuplicate = prev.some(
+          (m) =>
+            m.temp &&
+            m.profileId === msg.profileId &&
+            m.content === msg.content &&
+            Math.abs(new Date(m.createdAt) - new Date(msg.createdAt)) < 3000,
         );
-      }
 
-      return [...prev, msg];
-    });
-  }, [setMessages]);
+        if (isDuplicate) {
+          // replace temp message with real one
+          return prev.map((m) =>
+            m.temp && m.profileId === msg.profileId && m.content === msg.content
+              ? msg
+              : m,
+          );
+        }
+
+        return [...prev, msg];
+      });
+    },
+    [setMessages],
+  );
 
   const socketRef = useChatSocket(conversationId, handleMessage);
 
@@ -64,12 +65,10 @@ const ChatWindow = ({ profileId, conversationId }) => {
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
-
       {/* Header */}
       <div className="pt-4">
         <div className="max-w-2xl mx-auto px-4">
           <div className="relative px-4 py-3 rounded-2xl backdrop-blur-xl border border-white/20 flex items-center gap-3 overflow-hidden">
-
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/15 to-purple-500/15 pointer-events-none" />
 
             <div className="relative flex items-center gap-3">
@@ -88,22 +87,57 @@ const ChatWindow = ({ profileId, conversationId }) => {
                 </span>
               </div>
             </div>
-
           </div>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto py-6">
-        <div className="max-w-2xl mx-auto flex flex-col gap-3 px-4">
-          {messages.map((msg, i) => (
-            <MessageCard
-              key={msg.id || `${msg.createdAt}-${i}`}
-              message={msg}
-              isMine={msg.profileId === profileId}
-            />
-          ))}
-          <div ref={bottomRef} />
+        <div className="max-w-2xl mx-auto flex flex-col gap-3 px-4 h-full">
+          {messages.length === 0 ? (
+            <div className="flex flex-1 items-center justify-center px-6">
+              <div
+                className="
+                  flex flex-col items-center gap-4
+                  text-center
+                "
+              >
+                {/* Optional subtle illustration */}
+                <img
+                  src="/watch.svg"
+                  alt="No messages"
+                  className="w-48 opacity-60"
+                />
+
+                {/* Glass card */}
+                <div
+                  className="
+                    px-6 py-5 rounded-2xl
+                    bg-white/80 backdrop-blur-xl
+                    border border-white/60
+                    shadow-[0_10px_30px_rgba(0,0,0,0.08)]
+                  "
+                >
+                  <p className="text-sm text-gray-500">No messages yet</p>
+
+                  <p className="mt-1 text-base font-semibold text-gray-900">
+                    Say hello 👋
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {messages.map((msg, i) => (
+                <MessageCard
+                  key={msg.id || `${msg.createdAt}-${i}`}
+                  message={msg}
+                  isMine={msg.profileId === profileId}
+                />
+              ))}
+              <div ref={bottomRef} />
+            </>
+          )}
         </div>
       </div>
 
@@ -111,7 +145,6 @@ const ChatWindow = ({ profileId, conversationId }) => {
       <div className="py-4">
         <div className="max-w-2xl mx-auto px-4">
           <div className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/80 border border-white/60 shadow-[0_4px_15px_rgba(0,0,0,0.05)]">
-
             <input
               type="text"
               value={input}
@@ -132,11 +165,9 @@ const ChatWindow = ({ profileId, conversationId }) => {
             >
               <Send size={16} />
             </button>
-
           </div>
         </div>
       </div>
-
     </div>
   );
 };

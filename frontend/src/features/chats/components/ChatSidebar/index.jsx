@@ -7,14 +7,14 @@ import { useGroupCreation } from "./hooks/useGroupCreation";
 import { useSearchProfiles } from "./hooks/useSearchProfiles";
 import { useConversations } from "./hooks/useConversations";
 import { useState } from "react";
+import { Users } from "lucide-react";
 
 const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // Hooks
   const { results, loading, setResults, setLoading } =
-    useSearchProfiles(search);
+    useSearchProfiles(search, profileId);
 
   const { conversations, setConversations } = useConversations(
     profileId,
@@ -29,7 +29,6 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
     cancelGroup,
   } = useGroupCreation(profileId, setConversations, setConversationId);
 
-  // Start private chat
   const startPrivateChat = async (selectedUser) => {
     const { data } = await conversationService.startPrivate(
       profileId,
@@ -42,7 +41,6 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
       if (prev.some((c) => c.conversationId === newConversationId)) {
         return prev;
       }
-
       return [{ conversationId: newConversationId }, ...prev];
     });
 
@@ -50,33 +48,53 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
   };
 
   return (
-    <div className="w-full md:w-72 border-r border-gray-300 p-4 flex flex-col gap-4 bg-white">
-      <div className="flex flex-col">
+    <div
+      className="
+        w-full md:w-72 h-full
+        p-4 flex flex-col gap-4
+      "
+    >
+      {/* Create group */}
+      <div className="flex flex-col gap-1">
         <button
           onClick={createGroup}
           disabled={isCreatingGroup && selectedUsers.length === 0}
-          className={`rounded py-2 text-white transition ${
-            isCreatingGroup
-              ? selectedUsers.length === 0
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-              : "bg-indigo-600 hover:bg-indigo-700"
-          }`}
+          className={`
+            flex items-center justify-center gap-2
+            rounded-xl py-2.5 text-sm font-semibold
+            transition-all duration-200
+
+            ${
+              isCreatingGroup
+                ? selectedUsers.length === 0
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md hover:opacity-90 active:scale-95"
+                : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:opacity-90 active:scale-95"
+            }
+          `}
         >
+          <Users size={16} />
           {isCreatingGroup
-            ? `Create Group (${selectedUsers.length})`
-            : "+ Create Group"}
+            ? `Create (${selectedUsers.length})`
+            : "Create Group"}
         </button>
 
         {isCreatingGroup && (
-          <button onClick={cancelGroup} className="text-sm text-gray-500 mt-1">
+          <button
+            onClick={cancelGroup}
+            className="text-xs text-gray-500 hover:text-gray-700 transition"
+          >
             Cancel
           </button>
         )}
       </div>
 
+      {/* Divider */}
+      <div className="h-px bg-white/20" />
+
       {/* Search */}
       <SearchInput
+        profileId={profileId}
         label="Search People"
         placeholder="Search..."
         value={search}
@@ -89,6 +107,9 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
 
       {/* Filter */}
       <FilterTabs value={filter} onChange={setFilter} />
+
+      {/* Divider */}
+      <div className="h-px bg-white/20" />
 
       {/* List */}
       <ConversationsList
@@ -103,8 +124,6 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
         isCreatingGroup={isCreatingGroup}
         selectedUsers={selectedUsers}
         onToggleUser={toggleUser}
-        onCreateGroup={createGroup}
-        onCancelGroup={cancelGroup}
       />
     </div>
   );

@@ -7,6 +7,6 @@ export const profileService = {
     createProfile: (profileData) => 
         api.post("/profiles", profileData),
 
-    searchProfiles: (query) =>
-        api.get(`/profiles/search?query=${query}`)
+    searchProfiles: (query, profileId) =>
+        api.get(`/profiles/search?query=${query}&profileId=${profileId}`)
 }

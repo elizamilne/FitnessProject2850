@@ -25,7 +25,6 @@ export const useGroupCreation = (profileId, setConversations, setConversationId)
       profileId,
       ...selectedUsers.map((u) => u.profileId),
     ];
-    console.log(participants)
 
     const { data } = await conversationService.createGroup(participants);
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { profileService } from "../../../../../services/profile";
 
-export const useSearchProfiles = (search) => {
+export const useSearchProfiles = (search, profileId) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +17,7 @@ export const useSearchProfiles = (search) => {
 
     const timeout = setTimeout(async () => {
       try {
-        const { data } = await profileService.searchProfiles(search);
+        const { data } = await profileService.searchProfiles(search, profileId);
 
         if (isCurrent) {
           setResults(data);
@@ -33,7 +33,7 @@ export const useSearchProfiles = (search) => {
       isCurrent = false;
       clearTimeout(timeout);
     };
-  }, [search]);
+  }, [profileId, search]);
 
   return { results, loading, setResults, setLoading };
 };

@@ -6,6 +6,9 @@ export default function PrimaryNavbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile?.id;
+
   return (
     <nav className="sticky top-0 z-50 bg-white">
       <div className="w-[92%] lg:w-[70%] mx-auto flex items-center justify-between py-6">
@@ -62,6 +65,14 @@ export default function PrimaryNavbar() {
           </button>
         </div>
 
+        <span>
+          {profileId == 5
+            ? "Pesho Maratonkata"
+            : profileId == 6
+              ? "Gosho Sopola"
+              : "Unknown"}
+        </span>
+        
         {/* Right */}
         <div className="w-12" />
       </div>

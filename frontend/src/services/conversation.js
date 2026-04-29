@@ -6,6 +6,11 @@ export const conversationService = {
       params: type ? { type } : {}
     }),
 
+  getConversation: (conversationId, profileId) =>
+    api.get(`/conversation/${conversationId}`, {
+      params: { profileId }
+    }),
+
   startPrivate: (profile1Id, profile2Id) =>
     api.post("/conversation/private", {
       user1: profile1Id,

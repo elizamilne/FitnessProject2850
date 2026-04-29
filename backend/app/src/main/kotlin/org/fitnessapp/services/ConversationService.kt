@@ -9,6 +9,8 @@ import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.fitnessapp.models.ConversationDTO
 
+import org.fitnessapp.services.UserService
+
 object ConversationService {
     fun getUserConversations(profileId: Long, type: String?): List<ConversationDTO> {
         return transaction {
@@ -20,13 +22,44 @@ object ConversationService {
             val filteredQuery = when (type) {
                 "group" -> baseQuery.andWhere { Conversation.isGroup eq true }
                 "chat"  -> baseQuery.andWhere { Conversation.isGroup eq false }
-                else    -> baseQuery 
+                else    -> baseQuery
             }
 
-            filteredQuery.map {
+            filteredQuery.map { row ->
+                val conversationId = row[Conversation.id]
+                val isGroup = row[Conversation.isGroup]
+
+               val name = if (isGroup) {
+                    "Group #$conversationId"
+               } else {
+                    val participants = ConversationParticipant
+                        .selectAll()
+                        .where { ConversationParticipant.conversationId eq conversationId }
+                        .map { it[ConversationParticipant.profileId] }
+
+                    val otherProfileId = participants.first { it != profileId }
+
+                    val otherProfile = ProfileService.getProfileById(otherProfileId)
+                        ?: return@map ConversationDTO(
+                            conversationId = conversationId,
+                            name = "Unknown user",
+                            isGroup = isGroup
+                        )
+
+                    val user = UserService.findUserById(otherProfile.userId)
+                        ?: return@map ConversationDTO(
+                            conversationId = conversationId,
+                            name = "Unknown user",
+                            isGroup = isGroup
+                        )
+
+                    "${user.firstName} ${user.lastName}"
+                }
+
                 ConversationDTO(
-                    conversationId = it[Conversation.id],
-                    isGroup = it[Conversation.isGroup]
+                    conversationId = conversationId,
+                    name = name,
+                    isGroup = isGroup
                 )
             }
         }

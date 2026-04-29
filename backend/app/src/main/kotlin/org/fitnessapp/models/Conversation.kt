@@ -23,5 +23,6 @@ data class CreateGroupRequest(
 @Serializable
 data class ConversationDTO(
     val conversationId: Long,
+    val name: String,
     val isGroup: Boolean
 )

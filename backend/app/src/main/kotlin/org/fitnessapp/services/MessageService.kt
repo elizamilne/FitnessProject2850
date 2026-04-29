@@ -8,14 +8,31 @@ import org.fitnessapp.models.Message
 import org.fitnessapp.models.MessageDTO
 
 object MessageService {
-
-    fun saveMessage(profileId: Long, conversationId: Long, content: String) {
-        transaction {
-            Message.insert {
+    fun saveMessage(
+        profileId: Long,
+        conversationId: Long,
+        content: String
+    ): MessageDTO {
+        return transaction {
+            val inserted = Message.insert {
                 it[Message.profileId] = profileId
                 it[Message.conversationId] = conversationId
                 it[Message.content] = content
             }
+
+            val id = inserted[Message.id]
+
+            val row = Message
+                .selectAll()
+                .where { Message.id eq id }
+                .single()
+
+            MessageDTO(
+                id = row[Message.id],
+                content = row[Message.content],
+                profileId = row[Message.profileId],
+                createdAt = row[Message.createdAt].toString()
+            )
         }
     }
 

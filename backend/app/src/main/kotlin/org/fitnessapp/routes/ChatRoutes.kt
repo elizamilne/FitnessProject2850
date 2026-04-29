@@ -3,7 +3,6 @@ package org.fitnessapp.routes
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -11,20 +10,14 @@ import org.fitnessapp.services.MessageService
 import org.fitnessapp.security.JWTService
 import org.fitnessapp.services.ConversationParticipantService
 import org.fitnessapp.services.ProfileService
+import org.fitnessapp.models.ChatMessageDTO
 
 val rooms = mutableMapOf<Long, MutableList<DefaultWebSocketServerSession>>()
-
-@Serializable
-data class ChatMessage(
-    val content: String,
-    val profileId: Long,
-    val conversationId: Long
-)
 
 fun Route.chatRoutes() {
 
     webSocket("/chat") {
-        // ConversationId (safe)
+        // 1. Get conversationId
         val conversationId =
             call.request.queryParameters["conversationId"]?.toLongOrNull()
                 ?: run {
@@ -36,8 +29,8 @@ fun Route.chatRoutes() {
                     )
                     return@webSocket
                 }
-        
-        // Token
+
+        // 2. Get token
         val token =
             call.request.queryParameters["token"]
                 ?: run {
@@ -49,8 +42,8 @@ fun Route.chatRoutes() {
                     )
                     return@webSocket
                 }
-            
-        // Extract userId from JWT
+
+        // 3. Verify token → get userId
         val userId =
             JWTService.verifyToken(token)
                 ?: run {
@@ -63,22 +56,35 @@ fun Route.chatRoutes() {
                     return@webSocket
                 }
 
+        // 4. Get profile
         val profile = ProfileService.getProfileByUserId(userId)
             ?: run {
-                close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Profile not found"))
+                close(
+                    CloseReason(
+                        CloseReason.Codes.CANNOT_ACCEPT,
+                        "Profile not found"
+                    )
+                )
                 return@webSocket
             }
 
         val profileId = profile.id
             ?: run {
-                close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Invalid profile"))
+                close(
+                    CloseReason(
+                        CloseReason.Codes.CANNOT_ACCEPT,
+                        "Invalid profile"
+                    )
+                )
                 return@webSocket
             }
-        
-        // Check if user belongs to conversation
 
+        // 5. Check if user belongs to conversation
         val isParticipant =
-            ConversationParticipantService.isUserInConversation(profileId, conversationId)
+            ConversationParticipantService.isUserInConversation(
+                profileId,
+                conversationId
+            )
 
         if (!isParticipant) {
             close(
@@ -89,8 +95,8 @@ fun Route.chatRoutes() {
             )
             return@webSocket
         }
-        
-        // Join room
+
+        // 6. Join room
         val sessionList =
             rooms.getOrPut(conversationId) { mutableListOf() }
 
@@ -103,31 +109,36 @@ fun Route.chatRoutes() {
 
                     val text = frame.readText()
 
-                    // Save message
-                    MessageService.saveMessage(
+                    // 7. Save message AND get saved entity
+                    val savedMessage = MessageService.saveMessage(
                         profileId,
                         conversationId,
                         text
                     )
 
-                    // Build message DTO
-                    val message = ChatMessage(
-                        content = text,
-                        profileId = profileId,
-                        conversationId = conversationId
+                    // 8. Build DTO with createdAt
+                    val messageDTO = ChatMessageDTO(
+                        content = savedMessage.content,
+                        profileId = savedMessage.profileId,
+                        conversationId = conversationId,
+                        createdAt = savedMessage.createdAt.toString()
                     )
 
-                    val json = Json.encodeToString(message)
+                    val json = Json.encodeToString(messageDTO)
 
-                    // Broadcast to all users in room
+                    // 9. Broadcast safely
                     sessionList.forEach {
-                        it.send(Frame.Text(json))
+                        try {
+                            it.send(Frame.Text(json))
+                        } catch (e: Exception) {
+                            println("Failed to send message: ${e.message}")
+                        }
                     }
                 }
             }
         } finally {
 
-            // Remove session on disconnect
+            // 10. Cleanup on disconnect
             sessionList.remove(this)
 
             if (sessionList.isEmpty()) {

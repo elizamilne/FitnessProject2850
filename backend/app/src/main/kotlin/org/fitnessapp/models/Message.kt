@@ -26,3 +26,11 @@ data class MessageDTO(
     val profileId: Long,
     val createdAt: String
 )
+
+@Serializable
+data class ChatMessageDTO(
+    val content: String,
+    val profileId: Long,
+    val conversationId: Long,
+    val createdAt: String
+)

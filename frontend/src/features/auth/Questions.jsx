@@ -98,7 +98,7 @@ const Questions = () => {
       level: calculateLevel(answers.workoutFrequency),
     };
   };
-  
+
   const saveProfile = (profile) => {
     sessionStorage.removeItem("userId");
     sessionStorage.setItem("profile", JSON.stringify(profile));
@@ -221,7 +221,7 @@ const Questions = () => {
 
       setIsAActive((prev) => !prev);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestion.video]);
 
   return (
@@ -373,6 +373,26 @@ const Questions = () => {
             </div>
           </div>
         </form>
+      </div>
+
+      {/* Exit / Logout */}
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          onClick={() => {
+            sessionStorage.clear();
+            navigate("/login");
+          }}
+          className="
+            text-sm text-white/70
+            hover:text-white
+            transition
+            backdrop-blur-md
+            bg-white/10 px-3 py-1.5 rounded-lg
+            border border-white/10
+          "
+        >
+          Logout
+        </button>
       </div>
     </div>
   );

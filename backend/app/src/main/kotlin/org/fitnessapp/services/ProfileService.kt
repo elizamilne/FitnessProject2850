@@ -64,17 +64,19 @@ object ProfileService {
         Profile.selectAll().map { it.toProfileDTO() }
     }
 
-    
-    fun searchProfiles(query: String): List<ProfileSearchDTO> {
+    fun searchProfiles(query: String, currentProfileId: Long): List<ProfileSearchDTO> {
         return transaction {
             val q = "%$query%"
 
             (Profile innerJoin User)
                 .selectAll()
                 .where {
-                    (User.firstName like q) or
-                    (User.lastName like q) or
-                    (User.email like q)
+                    (
+                        (User.firstName like q) or
+                        (User.lastName like q) or
+                        (User.email like q)
+                    ) and
+                    (Profile.id neq currentProfileId)
                 }
                 .map {
                     ProfileSearchDTO(

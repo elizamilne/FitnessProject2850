@@ -106,28 +106,43 @@ object ConversationService {
             )
         }
     }
-
+    
     fun findPrivateConversation(user1: Long, user2: Long): Long? {
         return transaction {
-            val rows = ConversationParticipant
+
+            // Step 1: find conversations where BOTH users exist
+            val candidateConversationIds = ConversationParticipant
                 .selectAll()
                 .where {
                     (ConversationParticipant.profileId eq user1) or
                     (ConversationParticipant.profileId eq user2)
                 }
-                .toList()
+                .groupBy { it[ConversationParticipant.conversationId] }
+                .filter { entry ->
+                    val users = entry.value.map { it[ConversationParticipant.profileId] }.toSet()
+                    users.containsAll(listOf(user1, user2))
+                }
+                .keys
 
-            val grouped = rows.groupBy {
-                it[ConversationParticipant.conversationId] 
+            // Step 2: verify each is truly a private chat
+            candidateConversationIds.firstOrNull { conversationId ->
+
+                val participants = ConversationParticipant
+                    .selectAll()
+                    .where { ConversationParticipant.conversationId eq conversationId }
+                    .map { it[ConversationParticipant.profileId] }
+                    .toSet()
+
+                val isGroup = Conversation
+                    .selectAll()
+                    .where { Conversation.id eq conversationId }
+                    .single()[Conversation.isGroup]
+
+                // must be exactly 2 users and not a group
+                !isGroup && participants.size == 2 &&
+                participants.containsAll(listOf(user1, user2))
+
             }
-
-            grouped.entries.firstOrNull { entry ->
-                val users = entry.value.map {
-                    it[ConversationParticipant.profileId] 
-                }.toSet()
-
-                users.containsAll(listOf(user1, user2))
-            }?.key
         }
     }
 

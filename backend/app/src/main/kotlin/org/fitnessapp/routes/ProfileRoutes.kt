@@ -28,15 +28,16 @@ fun Route.profileRoutes() {
             call.respond(HttpStatusCode.OK, profiles)
         }
 
-        get("/search") {
+       get("/search") {
             val query = call.request.queryParameters["query"]
+            val profileId = call.request.queryParameters["profileId"]?.toLongOrNull()
 
-            if (query.isNullOrBlank()) {
-                call.respond(HttpStatusCode.BadRequest, "Query is required")
+            if (query.isNullOrBlank() || profileId == null) {
+                call.respond(HttpStatusCode.BadRequest, "Query and profileId are required")
                 return@get
             }
 
-            val results = ProfileService.searchProfiles(query)
+            val results = ProfileService.searchProfiles(query, profileId)
 
             call.respond(HttpStatusCode.OK, results)
         }

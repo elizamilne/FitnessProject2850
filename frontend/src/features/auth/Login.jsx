@@ -16,10 +16,13 @@ export default function Login() {
 
     try {
       const res = await userService.login({ email, password });
+      
+      const userToken = res?.data["token"]
+      sessionStorage.setItem("token", userToken)
 
-      const user = res?.data || res;
-      const userId = user?.id || user?.userId;
-
+      const userData = res?.data["user"]
+      const userId = userData.id || userData.userId;
+      
       if (!userId) throw new Error("No userId returned");
 
       try {
@@ -30,6 +33,7 @@ export default function Login() {
         navigate("/dashboard");
       } catch (profileErr) {
         console.error("No profile found: ", profileErr);
+        
         sessionStorage.setItem("userId", userId);
         navigate("/questions");
       }

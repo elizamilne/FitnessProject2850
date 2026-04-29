@@ -1,5 +1,7 @@
 package org.fitnessapp
 
+import kotlinx.serialization.json.Json
+
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -8,7 +10,12 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.json.Json
+import io.ktor.server.websocket.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 
 import org.fitnessapp.routes.userRoutes
 import org.fitnessapp.routes.profileRoutes
@@ -23,6 +30,9 @@ import org.fitnessapp.routes.exerciseRoutes
 import org.fitnessapp.routes.muscleGroupRoutes
 import org.fitnessapp.routes.categoryRoutes
 import org.fitnessapp.routes.raceRoutes
+import org.fitnessapp.routes.conversationRoutes
+import org.fitnessapp.routes.messageRoutes
+import org.fitnessapp.routes.chatRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -66,6 +76,28 @@ fun Application.module() {
         }
     }
 
+    install(Authentication) {
+        jwt("auth-jwt") {
+            realm = "fitnessapp"
+
+            verifier(
+                JWT
+                    .require(Algorithm.HMAC256("secret"))
+                    .build()
+            )
+
+            validate { credential ->
+                if (credential.payload.getClaim("userId").asLong() != null) {
+                    JWTPrincipal(credential.payload)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
+    install(WebSockets)
+
     routing {
         userRoutes()
         profileRoutes()
@@ -84,6 +116,10 @@ fun Application.module() {
         categoryRoutes()
 
         raceRoutes()
+
+        conversationRoutes()
+        messageRoutes()
+        chatRoutes()
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()

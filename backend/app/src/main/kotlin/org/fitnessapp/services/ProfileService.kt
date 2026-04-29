@@ -7,12 +7,17 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.or
 
 import java.math.BigDecimal
 
 import org.fitnessapp.models.Profile
 import org.fitnessapp.models.ProfileDTO
 import org.fitnessapp.models.CreateProfileRequest
+import org.fitnessapp.models.User
+import org.fitnessapp.models.ProfileSearchDTO
 
 fun ResultRow.toProfileDTO() = ProfileDTO(
     id = this[Profile.id],
@@ -57,6 +62,32 @@ object ProfileService {
 
     fun getAllProfiles(): List<ProfileDTO> = transaction {
         Profile.selectAll().map { it.toProfileDTO() }
+    }
+
+    fun searchProfiles(query: String, currentProfileId: Long): List<ProfileSearchDTO> {
+        return transaction {
+            val q = "%$query%"
+
+            (Profile innerJoin User)
+                .selectAll()
+                .where {
+                    (
+                        (User.firstName like q) or
+                        (User.lastName like q) or
+                        (User.email like q)
+                    ) and
+                    (Profile.id neq currentProfileId)
+                }
+                .map {
+                    ProfileSearchDTO(
+                        profileId = it[Profile.id],
+                        userId = it[Profile.userId],
+                        firstName = it[User.firstName],
+                        lastName = it[User.lastName],
+                        email = it[User.email]
+                    )
+                }
+        }
     }
 
     fun getProfileById(id: Long): ProfileDTO? = transaction {

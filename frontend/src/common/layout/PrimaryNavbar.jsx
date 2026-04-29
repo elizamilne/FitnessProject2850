@@ -46,6 +46,20 @@ export default function PrimaryNavbar() {
           >
             Activities
           </button>
+
+          <button
+            onClick={() => navigate("/chats")}
+            className={`
+          text-base font-medium transition
+          ${
+            isActive("/chats")
+              ? "text-gray-900"
+              : "text-gray-500 hover:text-gray-800"
+          }
+        `}
+          >
+            Chats
+          </button>
         </div>
 
         {/* Right */}

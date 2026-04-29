@@ -1,52 +1,65 @@
 import { useState } from "react";
-import { conversationService } from "../../services/conversation";
-import Chat from "./ChatWindow";
+import ChatWindow from "./components/ChatWindow";
+import PrimaryNavbar from "../../common/layout/PrimaryNavbar";
+import ChatSidebar from "./components/ChatSidebar";
 
 export default function ChatPage() {
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile.id;
+
   const [conversationId, setConversationId] = useState(null);
 
-  // nitialize directly (no useEffect)
-
-  const [conversations] = useState([
-    { id: 5, name: "Conversation 5" },
-    // { id: 2, name: "User 2" },
-  ]);
-
-  const startChat = async () => {
-    const { data } = await conversationService.startPrivate(5, 6);
-    setConversationId(data.conversationId);
-  };
-
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <div
-        style={{
-          width: "250px",
-          borderRight: "1px solid #ccc",
-          padding: "10px",
-        }}
-      >
-        <h3>Chats</h3>
+    <div className="h-screen flex flex-col">
+      {/* Navbar */}
+      <PrimaryNavbar />
 
-        {conversations.map((conv) => (
-          <div
-            key={conv.id}
-            onClick={() => setConversationId(conv.id)}
-            style={{ cursor: "pointer", marginBottom: "10px" }}
-          >
-            {conv.name}
-          </div>
-        ))}
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden border-t-2 border-orange-200">
+        {/* Sidebar */}
+        <div
+          className={`
+            ${conversationId ? "hidden md:flex" : "flex"}
+            w-full md:w-72 flex-col border-r
+          `}
+        >
+          <ChatSidebar
+            profileId={profileId}
+            conversationId={conversationId}
+            setConversationId={setConversationId}
+          />
+        </div>
 
-        <button onClick={startChat}>Start Chat</button>
-      </div>
+        {/* Chat Area */}
+        <div
+          className={`
+            ${!conversationId ? "hidden md:flex" : "flex"}
+            flex-1 flex-col bg-gray-50
+          `}
+        >
+          {conversationId ? (
+            <>
+              {/* Mobile back button */}
+              <div className="md:hidden p-2 border-b bg-white">
+                <button
+                  onClick={() => setConversationId(null)}
+                  className="text-indigo-600 font-medium"
+                >
+                  ← Back
+                </button>
+              </div>
 
-      <div style={{ flex: 1, padding: "10px" }}>
-        {conversationId ? (
-          <Chat conversationId={conversationId} />
-        ) : (
-          <p>Select a chat</p>
-        )}
+              <ChatWindow
+                profileId={profileId}
+                conversationId={conversationId}
+              />
+            </>
+          ) : (
+            <div className="hidden md:flex items-center justify-center h-full text-gray-500">
+              Select a chat to start messaging
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

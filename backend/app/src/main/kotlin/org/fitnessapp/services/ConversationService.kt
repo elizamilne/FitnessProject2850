@@ -65,6 +65,48 @@ object ConversationService {
         }
     }
 
+    fun getUserConversation(profileId: Long, conversationId: Long): ConversationDTO {
+        return transaction {
+
+            val row = (Conversation innerJoin ConversationParticipant)
+                .selectAll()
+                .where {
+                    (ConversationParticipant.profileId eq profileId) and
+                    (Conversation.id eq conversationId)
+                }
+                .singleOrNull()
+                ?: throw IllegalArgumentException("Conversation not found or not accessible")
+
+            val isGroup = row[Conversation.isGroup]
+
+            val name = if (isGroup) {
+                "Group #$conversationId"
+            } else {
+                val participants = ConversationParticipant
+                    .selectAll()
+                    .where { ConversationParticipant.conversationId eq conversationId }
+                    .map { it[ConversationParticipant.profileId] }
+
+                val otherProfileId = participants.firstOrNull { it != profileId }
+
+                if (otherProfileId == null) {
+                    "Unknown user"
+                } else {
+                    val otherProfile = ProfileService.getProfileById(otherProfileId)
+                    val user = otherProfile?.let { UserService.findUserById(it.userId) }
+
+                    user?.let { "${it.firstName} ${it.lastName}" } ?: "Unknown user"
+                }
+            }
+
+            ConversationDTO(
+                conversationId = conversationId,
+                name = name,
+                isGroup = isGroup
+            )
+        }
+    }
+
     fun findPrivateConversation(user1: Long, user2: Long): Long? {
         return transaction {
             val rows = ConversationParticipant

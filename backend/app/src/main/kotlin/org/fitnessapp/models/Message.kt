@@ -24,7 +24,8 @@ data class MessageDTO(
     val id: Long,
     val content: String,
     val profileId: Long,
-    val createdAt: String
+    val createdAt: String,
+    val senderName: String,
 )
 
 @Serializable

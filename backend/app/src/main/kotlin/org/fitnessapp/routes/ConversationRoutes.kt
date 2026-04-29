@@ -29,6 +29,30 @@ fun Route.conversationRoutes() {
             call.respond(HttpStatusCode.OK, conversations)
         }
 
+        get("/{conversationId}") {
+            val conversationId = call.parameters["conversationId"]?.toLongOrNull()
+                ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf("error" to "Invalid conversationId")
+                )
+
+            val profileId = call.request.queryParameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf("error" to "Missing profileId")
+                )
+
+            try {
+                val conversation = ConversationService.getUserConversation(profileId, conversationId)
+                call.respond(HttpStatusCode.OK, conversation)
+            } catch (e: IllegalArgumentException) {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    mapOf("error" to e.message)
+                )
+            }
+        }
+
         post("/private") {
 
             val request = call.receive<StartChatRequest>()

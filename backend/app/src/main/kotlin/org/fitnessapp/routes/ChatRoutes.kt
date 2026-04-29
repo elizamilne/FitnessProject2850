@@ -80,8 +80,6 @@ fun Route.chatRoutes() {
         val isParticipant =
             ConversationParticipantService.isUserInConversation(profileId, conversationId)
 
-        println("🔍 isParticipant: $isParticipant")
-
         if (!isParticipant) {
             close(
                 CloseReason(
@@ -97,8 +95,6 @@ fun Route.chatRoutes() {
             rooms.getOrPut(conversationId) { mutableListOf() }
 
         sessionList.add(this)
-
-        println("👥 Users in room: ${sessionList.size}")
 
         try {
             for (frame in incoming) {

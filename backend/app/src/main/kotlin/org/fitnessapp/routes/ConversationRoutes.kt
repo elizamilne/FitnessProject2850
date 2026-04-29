@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.request.receive
+import io.ktor.http.HttpStatusCode
 
 import org.fitnessapp.services.ConversationService
 import org.fitnessapp.services.ConversationParticipantService
@@ -14,6 +15,19 @@ import org.fitnessapp.models.CreateGroupRequest
 fun Route.conversationRoutes() {
 
     route("/conversation") {
+        get("/user/{profileId}") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf("error" to "Invalid profileId")
+                )
+
+            val type = call.request.queryParameters["type"] // nullable
+
+            val conversations = ConversationService.getUserConversations(profileId, type)
+
+            call.respond(HttpStatusCode.OK, conversations)
+        }
 
         post("/private") {
 

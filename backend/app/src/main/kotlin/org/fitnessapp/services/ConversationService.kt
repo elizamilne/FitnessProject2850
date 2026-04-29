@@ -7,8 +7,31 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.fitnessapp.models.ConversationDTO
 
 object ConversationService {
+    fun getUserConversations(profileId: Long, type: String?): List<ConversationDTO> {
+        return transaction {
+
+            val baseQuery = (Conversation innerJoin ConversationParticipant)
+                .selectAll()
+                .where { ConversationParticipant.profileId eq profileId }
+
+            val filteredQuery = when (type) {
+                "group" -> baseQuery.andWhere { Conversation.isGroup eq true }
+                "chat"  -> baseQuery.andWhere { Conversation.isGroup eq false }
+                else    -> baseQuery 
+            }
+
+            filteredQuery.map {
+                ConversationDTO(
+                    conversationId = it[Conversation.id],
+                    isGroup = it[Conversation.isGroup]
+                )
+            }
+        }
+    }
+
     fun findPrivateConversation(user1: Long, user2: Long): Long? {
         return transaction {
             val rows = ConversationParticipant

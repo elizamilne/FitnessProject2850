@@ -19,3 +19,9 @@ object Conversation : Table("conversation") {
 data class CreateGroupRequest(
     val participants: List<Long>
 )
+
+@Serializable
+data class ConversationDTO(
+    val conversationId: Long,
+    val isGroup: Boolean
+)

@@ -1,5 +1,12 @@
-import { useCallback, useState } from "react";
+import {
+  useCallback,
+  useState,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+} from "react";
 import { Send } from "lucide-react";
+import { gsap } from "gsap";
 
 import MessageCard from "./components/MessageCard";
 import { useMessages } from "./hooks/useMessages";
@@ -13,7 +20,52 @@ const ChatWindow = ({ profileId, conversationId }) => {
 
   const [input, setInput] = useState("");
 
-  // Replace temp message instead of duplicating
+  const containerRef = useRef(null);
+  const messagesRef = useRef(null);
+
+  // Animate ONLY header text on conversation change
+  useLayoutEffect(() => {
+    if (!conversationId) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".chat-header-text > *",
+        { y: 6, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.3,
+          stagger: 0.05,
+          ease: "power2.out",
+        }
+      );
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [conversationId]);
+
+  // Animate only new messages
+  useEffect(() => {
+    if (!messagesRef.current) return;
+
+    const items = messagesRef.current.querySelectorAll(".message-item");
+    if (!items.length) return;
+
+    const last = items[items.length - 1];
+
+    gsap.fromTo(
+      last,
+      { opacity: 0, y: 8 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.25,
+        ease: "power2.out",
+      }
+    );
+  }, [messages]);
+
+
   const handleMessage = useCallback(
     (msg) => {
       setMessages((prev) => {
@@ -22,26 +74,24 @@ const ChatWindow = ({ profileId, conversationId }) => {
             m.temp &&
             m.profileId === msg.profileId &&
             m.content === msg.content &&
-            Math.abs(new Date(m.createdAt) - new Date(msg.createdAt)) < 3000,
+            Math.abs(new Date(m.createdAt) - new Date(msg.createdAt)) < 3000
         );
 
         if (isDuplicate) {
-          // replace temp message with real one
           return prev.map((m) =>
             m.temp && m.profileId === msg.profileId && m.content === msg.content
               ? msg
-              : m,
+              : m
           );
         }
 
         return [...prev, msg];
       });
     },
-    [setMessages],
+    [setMessages]
   );
 
   const socketRef = useChatSocket(conversationId, handleMessage);
-
   const bottomRef = useAutoScroll(messages);
 
   const sendMessage = () => {
@@ -59,12 +109,14 @@ const ChatWindow = ({ profileId, conversationId }) => {
     setMessages((prev) => [...prev, tempMessage]);
 
     socketRef.current.send(input);
-
     setInput("");
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+    <div
+      ref={containerRef}
+      className="flex flex-col h-full min-h-0 bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]"
+    >
       {/* Header */}
       <div className="pt-4">
         <div className="max-w-2xl mx-auto px-4">
@@ -72,11 +124,13 @@ const ChatWindow = ({ profileId, conversationId }) => {
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/15 to-purple-500/15 pointer-events-none" />
 
             <div className="relative flex items-center gap-3">
+              {/* Avatar (NO animation) */}
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-sm font-semibold text-white">
                 {conversation?.name?.[0] || "?"}
               </div>
 
-              <div className="flex flex-col leading-tight">
+              {/* Animated text ONLY */}
+              <div className="flex flex-col leading-tight chat-header-text">
                 <span className="text-sm font-semibold text-gray-900">
                   {conversation?.name || "Loading..."}
                 </span>
@@ -93,26 +147,22 @@ const ChatWindow = ({ profileId, conversationId }) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto py-6">
-        <div className="max-w-2xl mx-auto flex flex-col gap-3 px-4 h-full">
+        <div
+          ref={messagesRef}
+          className="max-w-2xl mx-auto flex flex-col gap-3 px-4 h-full"
+        >
           {messages.length === 0 ? (
             <div className="flex flex-1 items-center justify-center px-6">
-              <div
-                className="
-                  flex flex-col items-center gap-4
-                  text-center
-                "
-              >
-                {/* Optional subtle illustration */}
+              <div className="flex flex-col items-center gap-4 text-center w-full">
                 <img
                   src="/watch.svg"
                   alt="No messages"
                   className="w-48 opacity-60"
                 />
 
-                {/* Glass card */}
                 <div
                   className="
-                    px-6 py-5 rounded-2xl
+                    w-full max-w-xs px-6 py-5 rounded-2xl
                     bg-white/80 backdrop-blur-xl
                     border border-white/60
                     shadow-[0_10px_30px_rgba(0,0,0,0.08)]
@@ -129,12 +179,17 @@ const ChatWindow = ({ profileId, conversationId }) => {
           ) : (
             <>
               {messages.map((msg, i) => (
-                <MessageCard
+                <div
                   key={msg.id || `${msg.createdAt}-${i}`}
-                  message={msg}
-                  isMine={msg.profileId === profileId}
-                />
+                  className="message-item"
+                >
+                  <MessageCard
+                    message={msg}
+                    isMine={msg.profileId === profileId}
+                  />
+                </div>
               ))}
+
               <div ref={bottomRef} />
             </>
           )}

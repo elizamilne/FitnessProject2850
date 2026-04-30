@@ -1,9 +1,81 @@
 exerciseName,metricTypeName
-Bench Press,weight
-Bench Press,reps
-Squat,weight
-Squat,reps
-Running,distance
-Running,time
-Plank,time
-Pull Up,reps
+Parallel Bar Dips,reps
+Parallel Bar Dips,sets
+Leg Press,weight
+Leg Press,reps
+Leg Press,sets
+Seated Leg Press,weight
+Seated Leg Press,reps
+Seated Leg Press,sets
+Barbell Bench Press,weight
+Barbell Bench Press,reps
+Barbell Bench Press,sets
+Cable Triceps Pushdown,weight
+Cable Triceps Pushdown,reps
+Cable Triceps Pushdown,sets
+Dumbbell Front Raise,weight
+Dumbbell Front Raise,reps
+Dumbbell Front Raise,sets
+Incline Dumbbell Curl,weight
+Incline Dumbbell Curl,reps
+Incline Dumbbell Curl,sets
+Concentration Curl,weight
+Concentration Curl,reps
+Concentration Curl,sets
+Barbell Curl,weight
+Barbell Curl,reps
+Barbell Curl,sets
+Kettlebell Goblet Squat,weight
+Kettlebell Goblet Squat,reps
+Kettlebell Goblet Squat,sets
+Overhead Squat,weight
+Overhead Squat,reps
+Overhead Squat,sets
+Smith Machine Bench Press,weight
+Smith Machine Bench Press,reps
+Smith Machine Bench Press,sets
+Barbell Standing Calf Raise,weight
+Barbell Standing Calf Raise,reps
+Barbell Standing Calf Raise,sets
+Incline Dumbbell Triceps Extension,weight
+Incline Dumbbell Triceps Extension,reps
+Incline Dumbbell Triceps Extension,sets
+Dumbbell Side Bend,weight
+Dumbbell Side Bend,reps
+Dumbbell Side Bend,sets
+Dumbbell Upright Row,weight
+Dumbbell Upright Row,reps
+Dumbbell Upright Row,sets
+Barbell Preacher Curl,weight
+Barbell Preacher Curl,reps
+Barbell Preacher Curl,sets
+Reverse Crunch,reps
+Reverse Crunch,sets
+Machine Lat Pulldown,weight
+Machine Lat Pulldown,reps
+Machine Lat Pulldown,sets
+Seated Row (Machine),weight
+Seated Row (Machine),reps
+Seated Row (Machine),sets
+Dumbbell Bent Over Row (Single Arm),weight
+Dumbbell Bent Over Row (Single Arm),reps
+Dumbbell Bent Over Row (Single Arm),sets
+Incline Cable Chest Press,weight
+Incline Cable Chest Press,reps
+Incline Cable Chest Press,sets
+Hack Squat (Machine),weight
+Hack Squat (Machine),reps
+Hack Squat (Machine),sets
+Hanging Leg Raise,reps
+Hanging Leg Raise,sets
+Incline Dumbbell Press,weight
+Incline Dumbbell Press,reps
+Incline Dumbbell Press,sets
+Seated Cable Curl,weight
+Seated Cable Curl,reps
+Seated Cable Curl,sets
+Stability Ball Back Extension,reps
+Stability Ball Back Extension,sets
+Cable Crunch,weight
+Cable Crunch,reps
+Cable Crunch,sets

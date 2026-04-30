@@ -1,20 +1,55 @@
 exercise_name,muscle_group_name
-Bench Press,Chest
-Bench Press,Triceps
-Bench Press,Shoulders
-Squat,Quadriceps
-Squat,Glutes
-Deadlift,Back
-Deadlift,Hamstrings
-Pull Up,Back
-Pull Up,Biceps
-Bicep Curl,Biceps
-Shoulder Press,Shoulders
-Lunge,Quadriceps
-Lunge,Glutes
-Leg Curl,Hamstrings
-Plank,Core
-Crunches,Core
-Lat Pulldown,Back
-Tricep Dip,Triceps
-Chest Fly,Chest
+Parallel Bar Dips,Chest
+Parallel Bar Dips,Triceps
+Parallel Bar Dips,Front Delts
+Leg Press,Quadriceps
+Leg Press,Glutes
+Seated Leg Press,Quadriceps
+Seated Leg Press,Glutes
+Barbell Bench Press,Chest
+Barbell Bench Press,Triceps
+Barbell Bench Press,Front Delts
+Cable Triceps Pushdown,Triceps
+Dumbbell Front Raise,Front Delts
+Incline Dumbbell Curl,Biceps
+Concentration Curl,Biceps
+Barbell Curl,Biceps
+Barbell Curl,Forearms
+Kettlebell Goblet Squat,Quadriceps
+Kettlebell Goblet Squat,Glutes
+Overhead Squat,Quadriceps
+Overhead Squat,Glutes
+Overhead Squat,Shoulders
+Overhead Squat,Core
+Smith Machine Bench Press,Chest
+Smith Machine Bench Press,Triceps
+Smith Machine Bench Press,Front Delts
+Barbell Standing Calf Raise,Calves
+Incline Dumbbell Triceps Extension,Triceps
+Dumbbell Side Bend,Obliques
+Dumbbell Upright Row,Side Delts
+Dumbbell Upright Row,Traps
+Barbell Preacher Curl,Biceps
+Reverse Crunch,Lower Abs
+Machine Lat Pulldown,Lats
+Machine Lat Pulldown,Biceps
+Seated Row (Machine),Upper Back
+Seated Row (Machine),Rhomboids
+Seated Row (Machine),Biceps
+Dumbbell Bent Over Row (Single Arm),Lats
+Dumbbell Bent Over Row (Single Arm),Upper Back
+Dumbbell Bent Over Row (Single Arm),Biceps
+Incline Cable Chest Press,Upper Chest
+Incline Cable Chest Press,Triceps
+Incline Cable Chest Press,Front Delts
+Hack Squat (Machine),Quadriceps
+Hack Squat (Machine),Glutes
+Hanging Leg Raise,Lower Abs
+Hanging Leg Raise,Core
+Incline Dumbbell Press,Upper Chest
+Incline Dumbbell Press,Triceps
+Incline Dumbbell Press,Front Delts
+Seated Cable Curl,Biceps
+Stability Ball Back Extension,Lower Back
+Stability Ball Back Extension,Glutes
+Cable Crunch,Abs

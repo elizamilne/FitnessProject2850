@@ -88,7 +88,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
 
       // Create Schedule for the Program
       createProgramSchedule(programId);
-
+      console.log(program)
       
       onCreate?.(program);
       onClose();

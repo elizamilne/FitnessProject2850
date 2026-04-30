@@ -15,7 +15,7 @@ export const programService = {
     getArchived: (profileId) =>
         api.get(`/programs/profile/${profileId}/archived`),
 
-     toggleArchive: (id) =>
+    toggleArchive: (id) =>
         api.post(`/programs/${id}/archive`),
      
     createProgram: (programData) => 

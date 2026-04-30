@@ -1,4 +1,4 @@
-import TrainingCalendar from "./components/TrainingCalendar";
+import TrainingCalendar from "./components/TrainingCalendar/index";
 import TrainingContentList from "./components/TrainingContentList";
 import TrainingOverviewRow from "./components/TrainingOverviewRow";
 import TrainingStatistics from "./components/TrainingStatistics";
@@ -49,7 +49,7 @@ const TrainingPage = () => {
     loadPrograms();
   }, [selectedDate]);
 
-  // ✅ Stable GSAP animation (no glitches)
+  // Stable GSAP animation (no glitches)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(".animate-section", {
@@ -65,7 +65,7 @@ const TrainingPage = () => {
     return () => ctx.revert();
   }, []);
 
-  // 🔥 Animate workouts content when program changes (no glitch)
+  // Animate workouts content when program changes (no glitch)
   useEffect(() => {
     if (!selectedProgram) return;
 

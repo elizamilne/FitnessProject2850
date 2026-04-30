@@ -16,19 +16,25 @@ fun ResultRow.toActivityDTO(
     id = this[Activity.id],
     date = this[Activity.date].toString(),
     profileId = this[Activity.profileId],
-    exerciseId = this[Activity.exerciseId],
+
+    // 🔥 FIX
+    programExerciseId = this[Activity.programExerciseId],
+
     exerciseName = this[Exercise.name],
     metrics = metrics
 )
 
 object ActivityService {
+
     fun createActivity(
         builder: InsertStatement<*>,
         request: CreateActivityRequest
     ) {
         builder[Activity.date] = LocalDate.parse(request.date)
         builder[Activity.profileId] = request.profileId
-        builder[Activity.exerciseId] = request.exerciseId
+
+        // 🔥 FIX
+        builder[Activity.programExerciseId] = request.programExerciseId
     }
 
     fun createActivityMetric(
@@ -49,6 +55,7 @@ object ActivityService {
         sort: String? = "desc",
         search: String? = null
     ): PaginatedResponse<ActivityDTO> = transaction {
+
         var condition: Op<Boolean> = Activity.profileId eq profileId
 
         if (date != null) {
@@ -59,12 +66,17 @@ object ActivityService {
             condition = condition and (Exercise.name.lowerCase() like "%$search%")
         }
 
-        val total = (Activity innerJoin Exercise)
+        // 🔥 FIXED JOIN
+        val baseQuery = Activity
+            .innerJoin(ProgramExercise)
+            .innerJoin(Exercise)
+
+        val total = baseQuery
             .selectAll()
             .where { condition }
             .count()
 
-        var query = (Activity innerJoin Exercise)
+        var query = baseQuery
             .selectAll()
             .where { condition }
 
@@ -100,7 +112,10 @@ object ActivityService {
     }
 
     fun findActivityById(id: Long): ActivityDTO? = transaction {
-        (Activity innerJoin Exercise)
+
+        (Activity
+            .innerJoin(ProgramExercise)
+            .innerJoin(Exercise))
             .selectAll()
             .where { Activity.id eq id }
             .singleOrNull()
@@ -123,30 +138,31 @@ object ActivityService {
             }
     }
 
-    fun getCompletedExerciseIds(
+    // 🔥 FIXED
+    fun getCompletedProgramExerciseIds(
         profileId: Long,
         date: LocalDate
     ): List<Long> = transaction {
         Activity
-            .select(Activity.exerciseId)
+            .select(Activity.programExerciseId)
             .where {
                 (Activity.profileId eq profileId) and
                 (Activity.date eq date)
             }
-            .map { it[Activity.exerciseId] }
+            .map { it[Activity.programExerciseId] }
             .distinct()
     }
 
     fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {
         val bestValue = ActivityMetric.value.max().alias("best_value")
 
-        return (Activity 
+        return (Activity
             .innerJoin(ActivityMetric)
+            .innerJoin(ProgramExercise)
             .innerJoin(Exercise)
-            .innerJoin(MetricType)
-        )
+            .innerJoin(MetricType))
             .select(
-                Activity.exerciseId,
+                Activity.programExerciseId,
                 Exercise.name,
                 ActivityMetric.metricTypeId,
                 MetricType.name,
@@ -154,13 +170,12 @@ object ActivityService {
                 bestValue
             )
             .where { Activity.profileId eq profileId }
-            .groupBy(Activity.exerciseId, ActivityMetric.metricTypeId)
-            .map { row -> 
+            .groupBy(Activity.programExerciseId, ActivityMetric.metricTypeId)
+            .map { row ->
                 BestMetricDTO(
-                    exerciseId = row[Activity.exerciseId],
+                    programExerciseId = row[Activity.programExerciseId],
                     exerciseName = row[Exercise.name],
-                    metricTypeId = row[ActivityMetric.metricTypeId]
-                        ?: error("metricTypeId is null"),
+                    metricTypeId = row[ActivityMetric.metricTypeId],
                     metricName = row[MetricType.name],
                     metricUnit = row[MetricType.unit],
                     bestValue = row[bestValue]?.toDouble()
@@ -181,7 +196,7 @@ object ActivityService {
         metric: CreateActivityMetricRequest
     ) {
         if (MetricTypeService.metricTypeExists(metric.metricTypeId)) {
-            ActivityMetric.insert { builder -> 
+            ActivityMetric.insert { builder ->
                 createActivityMetric(builder, activityId, metric)
             }
         }
@@ -199,6 +214,16 @@ object ActivityService {
     fun deleteActivityById(id: Long): Int = transaction {
         Activity.deleteWhere { Activity.id eq id }
     }
+
+    fun deleteByProgramExercise(
+        profileId: Long,
+        programExerciseId: Long,
+        date: LocalDate
+    ): Int = transaction {
+        Activity.deleteWhere {
+            (Activity.profileId eq profileId) and
+            (Activity.programExerciseId eq programExerciseId) and
+            (Activity.date eq date)
+        }
+    }
 }
-
-

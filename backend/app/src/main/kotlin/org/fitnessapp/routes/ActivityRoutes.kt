@@ -9,6 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.request.*
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode
+import java.time.LocalDate
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -50,7 +51,7 @@ fun Route.activityRoutes() {
             call.respond(HttpStatusCode.OK, activities)
         }
 
-        get("/{profileId}/completed") {
+       get("/{profileId}/completed") {
             val profileId = call.parameters["profileId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid profile ID")
 
@@ -60,17 +61,12 @@ fun Route.activityRoutes() {
                 }
             } ?: return@get call.respond(HttpStatusCode.BadRequest, "Date is required")
 
-            val activities = ActivityService.getCompletedExerciseIds(
+            val programExerciseIds = ActivityService.getCompletedProgramExerciseIds(
                 profileId = profileId,
                 date = date
             )
 
-            val exerciseIds = ActivityService.getCompletedExerciseIds(
-                profileId = profileId,
-                date = date
-            )
-
-            call.respond(HttpStatusCode.OK, exerciseIds)
+            call.respond(HttpStatusCode.OK, programExerciseIds)
         }
 
         get("/{profileId}/best") {
@@ -110,6 +106,34 @@ fun Route.activityRoutes() {
 
             if (rowsDeleted == 0) {
                 call.respond(HttpStatusCode.NotFound, "Activity not found")
+            } else {
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }
+
+        delete("/by-program-exercise") {
+            val profileId = call.request.queryParameters["profileId"]?.toLongOrNull()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid profileId")
+
+            val programExerciseId = call.request.queryParameters["programExerciseId"]?.toLongOrNull()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid programExerciseId")
+
+            val date = call.request.queryParameters["date"]?.let {
+                try {
+                    LocalDate.parse(it)
+                } catch (e: Exception) {
+                    return@delete call.respond(HttpStatusCode.BadRequest, "Invalid date")
+                }
+            } ?: return@delete call.respond(HttpStatusCode.BadRequest, "Date required")
+
+            val rowsDeleted = ActivityService.deleteByProgramExercise(
+                profileId,
+                programExerciseId,
+                date
+            )
+
+            if (rowsDeleted == 0) {
+                call.respond(HttpStatusCode.NotFound, "No matching activity")
             } else {
                 call.respond(HttpStatusCode.NoContent)
             }

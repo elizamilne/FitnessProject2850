@@ -5,13 +5,14 @@ import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.javatime.*
 
 object Activity : Table("activity") {
-    
+
     val id = long("id").autoIncrement()
 
     val date = date("date")
-    
+
     val profileId = reference("profile_id", Profile.id)
-    val exerciseId = reference("exercise_id", Exercise.id)
+
+    val programExerciseId = reference("program_exercise_id", ProgramExercise.id)
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -21,7 +22,7 @@ data class ActivityDTO(
     val id: Long? = null,
     val date: String,
     val profileId: Long,
-    val exerciseId: Long,
+    val programExerciseId: Long,
     val exerciseName: String?,
     val metrics: List<ActivityMetricWithTypeDTO>
 )
@@ -36,13 +37,13 @@ data class PaginatedResponse<T>(
 data class CreateActivityRequest(
     val date: String,
     val profileId: Long,
-    val exerciseId: Long,
+    val programExerciseId: Long,
     val metrics: List<CreateActivityMetricRequest>
 )
 
 @Serializable
 data class BestMetricDTO(
-    val exerciseId: Long,
+    val programExerciseId: Long,
     val exerciseName: String?,
     val metricTypeId: Long?,
     val metricName: String?,

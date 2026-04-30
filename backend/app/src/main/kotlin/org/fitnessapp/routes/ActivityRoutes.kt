@@ -50,6 +50,29 @@ fun Route.activityRoutes() {
             call.respond(HttpStatusCode.OK, activities)
         }
 
+        get("/{profileId}/completed") {
+            val profileId = call.parameters["profileId"]?.toLongOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid profile ID")
+
+            val date = call.request.queryParameters["date"]?.let {
+                runCatching { java.time.LocalDate.parse(it) }.getOrElse {
+                    return@get call.respond(HttpStatusCode.BadRequest, "Invalid date format")
+                }
+            } ?: return@get call.respond(HttpStatusCode.BadRequest, "Date is required")
+
+            val activities = ActivityService.getCompletedExerciseIds(
+                profileId = profileId,
+                date = date
+            )
+
+            val exerciseIds = ActivityService.getCompletedExerciseIds(
+                profileId = profileId,
+                date = date
+            )
+
+            call.respond(HttpStatusCode.OK, exerciseIds)
+        }
+
         get("/{profileId}/best") {
             val profileId = call.parameters["profileId"]?.toLongOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid profile ID")

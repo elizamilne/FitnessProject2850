@@ -123,6 +123,20 @@ object ActivityService {
             }
     }
 
+    fun getCompletedExerciseIds(
+        profileId: Long,
+        date: LocalDate
+    ): List<Long> = transaction {
+        Activity
+            .select(Activity.exerciseId)
+            .where {
+                (Activity.profileId eq profileId) and
+                (Activity.date eq date)
+            }
+            .map { it[Activity.exerciseId] }
+            .distinct()
+    }
+
     fun getBestMetricsByProfile(profileId: Long): List<BestMetricDTO> {
         val bestValue = ActivityMetric.value.max().alias("best_value")
 

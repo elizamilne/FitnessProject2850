@@ -8,6 +8,7 @@ import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.plugins.swagger.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -99,6 +100,8 @@ fun Application.module() {
     install(WebSockets)
 
     routing {
+        swaggerUI(path = "swagger", swaggerFile = "openapi.yaml")
+
         userRoutes()
         profileRoutes()
 

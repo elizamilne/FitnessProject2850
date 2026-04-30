@@ -1,0 +1,1056 @@
+openapi: 3.0.3
+info:
+  title: fitness-project
+  version: 1.0.0
+  description: API documentation for the fitness project.
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: User
+  - name: Profile
+  - name: Program
+  - name: Program Exercise
+  - name: Program Exercise Metrics
+  - name: Activity
+  - name: Activity Metrics
+  - name: Exercise
+  - name: Muscle Group
+  - name: Category
+  - name: Race
+  - name: Program Schedule
+  - name: Metric Type
+  - name: Messages
+  - name: Conversations
+
+paths:
+  /user/register:
+    post:
+      tags:
+        - User
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+            example:
+              firstName: Ivan7
+              lastName: Parvanovski
+              email: ivan7@example.com
+              password: mypassword123
+      responses:
+        "200":
+          description: Successful response
+
+  /user/login:
+    post:
+      tags:
+        - User
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            example:
+              email: john@doe.com
+              password: asd123
+      responses:
+        "200":
+          description: Successful response
+
+  /profiles:
+    get:
+      tags:
+        - Profile
+      summary: Get all profiles
+      responses:
+        "200":
+          description: Successful response
+
+    post:
+      tags:
+        - Profile
+      summary: Create profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfileRequest"
+            example:
+              userId: 1
+              goal: Build muscle
+              gender: Male
+              age: 22
+              level: Beginner
+              weight: 75.5
+              height: 180
+              workoutFrequency: 3
+      responses:
+        "200":
+          description: Successful response
+
+  /profiles/user/{userId}:
+    get:
+      tags:
+        - Profile
+      summary: Get profile by user ID
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "200":
+          description: Successful response
+
+  /profiles/search:
+    get:
+      tags:
+        - Profile
+      summary: Search profiles
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+          example: Ivan
+      responses:
+        "200":
+          description: Successful response
+
+  /programs/profile/{profileId}:
+    get:
+      tags:
+        - Program
+      summary: Get programs by profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: "2026-04-20"
+      responses:
+        "200":
+          description: Successful response
+
+  /programs/profile/{profileId}/active:
+    get:
+      tags:
+        - Program
+      summary: Get active programs by profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /programs/profile/{profileId}/archived:
+    get:
+      tags:
+        - Program
+      summary: Get archived programs by profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /programs:
+    post:
+      tags:
+        - Program
+      summary: Create program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramRequest"
+            example:
+              title: Random Day
+              bannerUrl: https://i0.wp.com/post.healthline.com/wp-content/uploads/2020/07/running_at_sunset-1296x728-header.jpg?w=1155&h=1528
+              profileId: 1
+      responses:
+        "200":
+          description: Successful response
+
+  /programs/{programId}/archive:
+    post:
+      tags:
+        - Program
+      summary: Archive program
+      parameters:
+        - $ref: "#/components/parameters/ProgramId"
+      responses:
+        "200":
+          description: Successful response
+
+  /programs/{programId}:
+    delete:
+      tags:
+        - Program
+      summary: Delete program
+      parameters:
+        - $ref: "#/components/parameters/ProgramId"
+      responses:
+        "200":
+          description: Successful response
+
+  /program-exercises/program/{programId}:
+    get:
+      tags:
+        - Program Exercise
+      summary: Get program exercises by program ID
+      parameters:
+        - $ref: "#/components/parameters/ProgramId"
+      responses:
+        "200":
+          description: Successful response
+
+  /program-exercises:
+    post:
+      tags:
+        - Program Exercise
+      summary: Add exercise to program
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramExerciseRequest"
+            example:
+              programId: 1
+              exerciseId: 4
+              metrics:
+                - metricTypeId: 2
+                  value: 6
+                - metricTypeId: 4
+                  value: 99
+      responses:
+        "200":
+          description: Successful response
+
+  /program-exercises/{programExerciseId}:
+    delete:
+      tags:
+        - Program Exercise
+      summary: Delete program exercise
+      parameters:
+        - name: programExerciseId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        "200":
+          description: Successful response
+
+  /program-exercise-metrics/{metricId}:
+    get:
+      tags:
+        - Program Exercise Metrics
+      summary: Get program exercise metric by ID
+      parameters:
+        - $ref: "#/components/parameters/MetricId"
+      responses:
+        "200":
+          description: Successful response
+
+    put:
+      tags:
+        - Program Exercise Metrics
+      summary: Update program exercise metric
+      parameters:
+        - $ref: "#/components/parameters/MetricId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMetricValueRequest"
+            example:
+              value: 80.5
+      responses:
+        "200":
+          description: Successful response
+
+  /activities/{profileId}:
+    get:
+      tags:
+        - Activity
+      summary: Get activities by profile ID
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          example: asc
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          example: squat
+      responses:
+        "200":
+          description: Successful response
+
+    delete:
+      tags:
+        - Activity
+      summary: Delete activity
+      parameters:
+        - name: activityId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Successful response
+
+  /activities/{profileId}/best:
+    get:
+      tags:
+        - Activity
+      summary: Get best activities by profile ID
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /activities:
+    post:
+      tags:
+        - Activity
+      summary: Create activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateActivityRequest"
+            example:
+              date: "2026-04-20"
+              profileId: 1
+              exerciseId: 5
+      responses:
+        "200":
+          description: Successful response
+
+  /activity-metrics/{metricId}:
+    get:
+      tags:
+        - Activity Metrics
+      summary: Get activity metric by ID
+      parameters:
+        - $ref: "#/components/parameters/MetricId"
+      responses:
+        "200":
+          description: Successful response
+
+    put:
+      tags:
+        - Activity Metrics
+      summary: Update activity metric
+      parameters:
+        - $ref: "#/components/parameters/MetricId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMetricValueRequest"
+            example:
+              value: 12.3
+      responses:
+        "200":
+          description: Successful response
+
+  /exercises:
+    get:
+      tags:
+        - Exercise
+      summary: Get all exercises
+      responses:
+        "200":
+          description: Successful response
+
+  /exercises/{exerciseId}:
+    get:
+      tags:
+        - Exercise
+      summary: Get exercise by ID
+      parameters:
+        - $ref: "#/components/parameters/ExerciseId"
+      responses:
+        "200":
+          description: Successful response
+
+  /exercises/{exerciseId}/full:
+    get:
+      tags:
+        - Exercise
+      summary: Get full exercise details
+      parameters:
+        - $ref: "#/components/parameters/ExerciseId"
+      responses:
+        "200":
+          description: Successful response
+
+  /exercises/{exerciseId}/metrics:
+    get:
+      tags:
+        - Exercise
+      summary: Get metrics for an exercise
+      parameters:
+        - $ref: "#/components/parameters/ExerciseId"
+      responses:
+        "200":
+          description: Successful response
+
+  /muscle-groups:
+    get:
+      tags:
+        - Muscle Group
+      summary: Get all muscle groups
+      responses:
+        "200":
+          description: Successful response
+
+  /muscle-groups/{muscleGroupId}:
+    get:
+      tags:
+        - Muscle Group
+      summary: Get muscle group by ID
+      parameters:
+        - name: muscleGroupId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Successful response
+
+  /categories:
+    get:
+      tags:
+        - Category
+      summary: Get all categories
+      responses:
+        "200":
+          description: Successful response
+
+  /categories/{categoryId}:
+    get:
+      tags:
+        - Category
+      summary: Get category by ID
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Successful response
+
+  /races:
+    get:
+      tags:
+        - Race
+      summary: Get all races
+      responses:
+        "200":
+          description: Successful response
+
+    post:
+      tags:
+        - Race
+      summary: Create race
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRaceRequest"
+            example:
+              profileId: 1
+              title: Midnight Desert Sprint
+              location: Moab, Utah
+              date: "2026-11-12"
+              bannerUrl: https://cdn.example.com/assets/race_banner_01.jpg
+      responses:
+        "200":
+          description: Successful response
+
+  /races/{raceId}:
+    get:
+      tags:
+        - Race
+      summary: Get race by ID
+      parameters:
+        - $ref: "#/components/parameters/RaceId"
+      responses:
+        "200":
+          description: Successful response
+
+    put:
+      tags:
+        - Race
+      summary: Update race
+      parameters:
+        - $ref: "#/components/parameters/RaceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRaceRequest"
+            example:
+              title: Alpine Peak Challenge (Updated)
+              location: Zermatt, Switzerland
+              date: "2026-07-22"
+              bannerUrl: https://images.site.com/updated-banner.png
+      responses:
+        "200":
+          description: Successful response
+
+    delete:
+      tags:
+        - Race
+      summary: Delete race
+      parameters:
+        - $ref: "#/components/parameters/RaceId"
+      responses:
+        "200":
+          description: Successful response
+
+  /races/next-race/{profileId}:
+    get:
+      tags:
+        - Race
+      summary: Get next race for profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /races/profile/{profileId}/completed:
+    get:
+      tags:
+        - Race
+      summary: Get completed races by profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /races/profile/{profileId}/upcoming:
+    get:
+      tags:
+        - Race
+      summary: Get upcoming races by profile
+      parameters:
+        - $ref: "#/components/parameters/ProfileId"
+      responses:
+        "200":
+          description: Successful response
+
+  /races/{raceId}/complete:
+    post:
+      tags:
+        - Race
+      summary: Mark race as complete
+      parameters:
+        - $ref: "#/components/parameters/RaceId"
+      responses:
+        "200":
+          description: Successful response
+
+  /program-schedules/{programScheduleId}:
+    get:
+      tags:
+        - Program Schedule
+      summary: Get program schedule by ID
+      parameters:
+        - name: programScheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Successful response
+
+    delete:
+      tags:
+        - Program Schedule
+      summary: Delete program schedule
+      parameters:
+        - name: programScheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Successful response
+
+  /program-schedules:
+    post:
+      tags:
+        - Program Schedule
+      summary: Create program schedule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramScheduleRequest"
+            example:
+              programId: 8
+              day: Saturday
+      responses:
+        "200":
+          description: Successful response
+
+  /metrics:
+    get:
+      tags:
+        - Metric Type
+      summary: Get all metric types
+      responses:
+        "200":
+          description: Successful response
+
+  /metrics/{metricId}:
+    get:
+      tags:
+        - Metric Type
+      summary: Get metric type by ID
+      parameters:
+        - $ref: "#/components/parameters/MetricId"
+      responses:
+        "200":
+          description: Successful response
+
+  /messages/{messageId}:
+    get:
+      tags:
+        - Messages
+      summary: Get message by ID
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 3
+      responses:
+        "200":
+          description: Successful response
+
+  /conversation/user/{userId}:
+    get:
+      tags:
+        - Conversations
+      summary: Get conversations by user ID
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - chat
+              - group
+          example: chat
+      responses:
+        "200":
+          description: Successful response
+
+  /conversation/{conversationId}:
+    get:
+      tags:
+        - Conversations
+      summary: Get conversation by ID
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 8
+        - name: profileId
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 6
+      responses:
+        "200":
+          description: Successful response
+
+  /conversation/private:
+    post:
+      tags:
+        - Conversations
+      summary: Create private conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePrivateConversationRequest"
+            example:
+              user1: 1
+              user2: 2
+      responses:
+        "200":
+          description: Successful response
+
+  /conversation/group:
+    post:
+      tags:
+        - Conversations
+      summary: Create group conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGroupConversationRequest"
+            example:
+              participants:
+                - 1
+                - 2
+                - 3
+      responses:
+        "200":
+          description: Successful response
+
+components:
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    ProfileId:
+      name: profileId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    ProgramId:
+      name: programId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    ExerciseId:
+      name: exerciseId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    MetricId:
+      name: metricId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    RaceId:
+      name: raceId
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+          example: Ivan7
+        lastName:
+          type: string
+          example: Parvanovski
+        email:
+          type: string
+          format: email
+          example: ivan7@example.com
+        password:
+          type: string
+          example: mypassword123
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@doe.com
+        password:
+          type: string
+          example: asd123
+
+    CreateProfileRequest:
+      type: object
+      required:
+        - userId
+        - goal
+        - gender
+        - age
+        - level
+        - weight
+        - height
+        - workoutFrequency
+      properties:
+        userId:
+          type: integer
+          example: 1
+        goal:
+          type: string
+          example: Build muscle
+        gender:
+          type: string
+          example: Male
+        age:
+          type: integer
+          example: 22
+        level:
+          type: string
+          example: Beginner
+        weight:
+          type: number
+          format: double
+          example: 75.5
+        height:
+          type: number
+          format: double
+          example: 180
+        workoutFrequency:
+          type: integer
+          example: 3
+
+    CreateProgramRequest:
+      type: object
+      required:
+        - title
+        - bannerUrl
+        - profileId
+      properties:
+        title:
+          type: string
+          example: Random Day
+        bannerUrl:
+          type: string
+          format: uri
+          example: https://example.com/banner.jpg
+        profileId:
+          type: integer
+          example: 1
+
+    CreateProgramExerciseRequest:
+      type: object
+      required:
+        - programId
+        - exerciseId
+        - metrics
+      properties:
+        programId:
+          type: integer
+          example: 1
+        exerciseId:
+          type: integer
+          example: 4
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetricInput"
+
+    MetricInput:
+      type: object
+      required:
+        - metricTypeId
+        - value
+      properties:
+        metricTypeId:
+          type: integer
+          example: 2
+        value:
+          type: number
+          format: double
+          example: 6
+
+    UpdateMetricValueRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: number
+          format: double
+          example: 80.5
+
+    CreateActivityRequest:
+      type: object
+      required:
+        - date
+        - profileId
+        - exerciseId
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2026-04-20"
+        profileId:
+          type: integer
+          example: 1
+        exerciseId:
+          type: integer
+          example: 5
+
+    CreateRaceRequest:
+      type: object
+      required:
+        - profileId
+        - title
+        - location
+        - date
+        - bannerUrl
+      properties:
+        profileId:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Midnight Desert Sprint
+        location:
+          type: string
+          example: Moab, Utah
+        date:
+          type: string
+          format: date
+          example: "2026-11-12"
+        bannerUrl:
+          type: string
+          format: uri
+          example: https://cdn.example.com/assets/race_banner_01.jpg
+
+    UpdateRaceRequest:
+      type: object
+      required:
+        - title
+        - location
+        - date
+        - bannerUrl
+      properties:
+        title:
+          type: string
+          example: Alpine Peak Challenge Updated
+        location:
+          type: string
+          example: Zermatt, Switzerland
+        date:
+          type: string
+          format: date
+          example: "2026-07-22"
+        bannerUrl:
+          type: string
+          format: uri
+          example: https://images.site.com/updated-banner.png
+
+    CreateProgramScheduleRequest:
+      type: object
+      required:
+        - programId
+        - day
+      properties:
+        programId:
+          type: integer
+          example: 8
+        day:
+          type: string
+          example: Saturday
+
+    CreatePrivateConversationRequest:
+      type: object
+      required:
+        - user1
+        - user2
+      properties:
+        user1:
+          type: integer
+          example: 1
+        user2:
+          type: integer
+          example: 2
+
+    CreateGroupConversationRequest:
+      type: object
+      required:
+        - participants
+      properties:
+        participants:
+          type: array
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3

@@ -13,14 +13,21 @@ const ActivitiesPage = () => {
   // Smooth, non-glitch animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".animate-section", {
-        y: 20,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.12,
-        ease: "power2.out",
-        clearProps: "all",
-      });
+      gsap.fromTo(
+        ".animate-section",
+        {
+          y: 12,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          stagger: 0.015,
+          overwrite: "auto",
+        }
+      );
     }, pageRef);
 
     return () => ctx.revert();
@@ -58,7 +65,7 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesPrograms 
+            <ActivitiesPrograms
               profileId={profileId}
             />
 
@@ -77,7 +84,7 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesRaces 
+            <ActivitiesRaces
               profileId={profileId}
             />
 
@@ -96,7 +103,7 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesHistory 
+            <ActivitiesHistory
               profileId={profileId}
             />
 

@@ -13,8 +13,7 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const handleCreate = async () => {
     if (!isValid) return;
 
-    const defaultBannerUrl =
-      "https://images.pexels.com/photos/34688570/pexels-photo-34688570.jpeg";
+    const defaultBannerUrl = "/defaults/race-banner1.jpeg";
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile["id"];
     const payload = {

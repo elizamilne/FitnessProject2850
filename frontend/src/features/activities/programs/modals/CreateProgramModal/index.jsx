@@ -23,7 +23,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
 
   const createProgram = async () => {
     const defaultBannerUrl =
-      "https://images.pexels.com/photos/5038854/pexels-photo-5038854.jpeg";
+      "/defaults/program-banner1.jpeg";
 
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;

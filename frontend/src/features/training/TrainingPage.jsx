@@ -56,14 +56,21 @@ const TrainingPage = () => {
   // Stable GSAP animation (no glitches)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".animate-section", {
-        y: 20,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.12,
-        ease: "power2.out",
-        clearProps: "all",
-      });
+      gsap.fromTo(
+        ".animate-section",
+        {
+          y: 12,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          stagger: 0.015,
+          overwrite: "auto",
+        }
+      );
     }, pageRef);
 
     return () => ctx.revert();
@@ -95,10 +102,10 @@ const TrainingPage = () => {
             <h1 className="text-base text-gray-500 font-medium">
               {selectedDate
                 ? new Date(selectedDate).toLocaleDateString("en-GB", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                  })
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })
                 : "Select a date"}
             </h1>
 
@@ -127,7 +134,7 @@ const TrainingPage = () => {
           <h3 className="text-xl font-semibold text-gray-800">Workouts</h3>
 
           <div className="relative p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-            
+
             {selectedDate && (
               <TrainingProgramSelector
                 programs={programs}
@@ -155,7 +162,7 @@ const TrainingPage = () => {
           <h3 className="text-xl font-semibold text-gray-800">Statistics</h3>
 
           <TrainingStatistics
-            profileId={profileId} 
+            profileId={profileId}
           />
         </div>
 
@@ -163,7 +170,7 @@ const TrainingPage = () => {
         <div className="animate-section space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Overview</h3>
 
-          <TrainingOverviewRow 
+          <TrainingOverviewRow
             profileId={profileId}
           />
         </div>

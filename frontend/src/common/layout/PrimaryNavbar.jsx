@@ -69,21 +69,29 @@ export default function PrimaryNavbar() {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("profile");
+
+    navigate("/login");
+  };
+
   return (
     <>
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-white">
-        <div className="w-[92%] lg:w-[70%] mx-auto flex items-center justify-between py-6">
-          {/* Logo */}
+        <div className="w-[92%] lg:w-[70%] mx-auto flex items-center justify-between py-6 relative">
+
+          {/* LEFT: Logo */}
           <div
             onClick={() => navigate("/training-page")}
-            className="text-xl font-semibold text-gray-900 cursor-pointer"
+            className="text-xl font-semibold text-gray-900 cursor-pointer z-10"
           >
             SILA
           </div>
 
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center gap-12">
+          {/* CENTER: Navigation */}
+          <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-12">
             <button
               onClick={() => navigate("/training-page")}
               className={`text-base font-medium transition ${isActive("/training-page")
@@ -115,24 +123,30 @@ export default function PrimaryNavbar() {
             </button>
           </div>
 
-          {/* Burger (mobile only) */}
+          {/* RIGHT: Logout */}
+          <div className="hidden md:flex items-center gap-4 z-10">
+            <button
+              onClick={handleLogout}
+              className="
+        text-base font-medium
+        text-gray-500 hover:text-gray-800
+        transition
+        relative
+        after:absolute after:left-0 after:-bottom-1
+        after:h-[2px] after:w-0
+        after:bg-gradient-to-r after:from-indigo-500 after:to-purple-500
+        after:transition-all after:duration-300
+        hover:after:w-full
+      "
+            >
+              Logout
+            </button>
+          </div>
+
+          {/* Burger */}
           <button
             onClick={() => setOpen(true)}
-            className="
-              md:hidden w-10 h-10 flex items-center justify-center
-              rounded-xl
-
-              bg-white/90 backdrop-blur-xl
-              border border-indigo-100
-              shadow-[0_6px_20px_rgba(0,0,0,0.08)]
-
-              text-gray-800
-
-              hover:bg-white
-              hover:text-gray-900
-
-              transition-colors duration-200
-            "
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-white/90 backdrop-blur-xl border border-indigo-100 shadow-[0_6px_20px_rgba(0,0,0,0.08)] text-gray-800 hover:bg-white hover:text-gray-900 transition-colors duration-200"
           >
             <Menu size={20} />
           </button>
@@ -178,12 +192,29 @@ export default function PrimaryNavbar() {
                 {item.label}
               </button>
             ))}
+
           </div>
 
           {/* Bottom */}
-          <div className="text-sm text-gray-300">
-            © 2025 SILA
+          <div className="flex flex-col gap-6 text-gray-300">
+
+            <button
+              onClick={() => {
+                handleLogout();
+                setOpen(false);
+              }}
+              className="
+                menu-link text-left
+                text-2xl font-semibold
+                text-red-400 hover:text-red-300
+              "
+            >
+              Logout
+            </button>
+
+            <div className="text-sm">© 2025 SILA</div>
           </div>
+
         </div>
       )}
     </>

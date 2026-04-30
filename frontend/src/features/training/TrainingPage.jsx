@@ -12,19 +12,19 @@ const TrainingPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  // Updates the currently selected date
+  // Updates selected date
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedProgram(null);
     setPrograms([]);
   };
 
-  // Updates the currently selected program
+  // Updates selected program
   const handleProgramChange = (program) => {
     setSelectedProgram(program);
   };
 
-  // Loads programs when selectedDate changes
+  // Load programs when date changes
   useEffect(() => {
     if (!selectedDate) return;
 
@@ -33,7 +33,7 @@ const TrainingPage = () => {
         const profileId = 1;
         const { data } = await programService.getByProfileAndDate(
           profileId,
-          selectedDate,
+          selectedDate
         );
 
         setPrograms(data);
@@ -65,8 +65,8 @@ const TrainingPage = () => {
 
             <h1
               className="inline-block text-5xl font-bold tracking-tight leading-tight
-             bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600
-             bg-clip-text text-transparent"
+              bg-gradient-to-r from-gray-900 via-indigo-600 to-purple-600
+              bg-clip-text text-transparent"
             >
               Training
             </h1>
@@ -88,16 +88,23 @@ const TrainingPage = () => {
           <h3 className="text-xl font-semibold text-gray-800">Workouts</h3>
 
           <div className="relative p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-            <TrainingProgramSelector
-              programs={programs}
-              selectedProgram={selectedProgram}
-              onProgramChange={handleProgramChange}
-            />
+            
+            {/* Only show selector when date is selected */}
+            {selectedDate && (
+              <TrainingProgramSelector
+                programs={programs}
+                selectedProgram={selectedProgram}
+                onProgramChange={handleProgramChange}
+              />
+            )}
 
-            <TrainingContentList
-              program={selectedProgram}
-              date={selectedDate}
-            />
+            {/* Only show content when a program is selected */}
+            {selectedProgram && (
+              <TrainingContentList
+                program={selectedProgram}
+                date={selectedDate}
+              />
+            )}
 
             {/* subtle glow */}
             <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5" />

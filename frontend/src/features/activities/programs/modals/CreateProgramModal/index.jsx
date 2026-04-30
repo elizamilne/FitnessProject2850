@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Modal from "../../../../../common/ui/Modal";
 import ExerciseCategorySelect from "./components/ExerciseCategorySelect";
 import ExerciseSelect from "./components/ExerciseSelect";
@@ -19,9 +19,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const [selectedDays, setSelectedDays] = useState([]);
   const [title, setTitle] = useState("");
 
-  useEffect(() => {
-    console.log(title);
-  }, [title]);
+  
 
   const currentStep = steps[stepIndex];
 

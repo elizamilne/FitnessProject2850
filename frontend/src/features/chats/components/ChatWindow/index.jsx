@@ -13,7 +13,7 @@ const ChatWindow = ({ profileId, conversationId }) => {
 
   const [input, setInput] = useState("");
 
-  // ✅ FIX: replace temp message instead of duplicating
+  // Replace temp message instead of duplicating
   const handleMessage = useCallback(
     (msg) => {
       setMessages((prev) => {

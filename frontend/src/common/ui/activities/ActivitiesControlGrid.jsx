@@ -7,8 +7,20 @@ const ActivitiesControlGrid = ({
   placeholderText = "Item",
   renderSubtitle,
 }) => {
+  // Empty state
   if (!items.length) {
-    return <p className="text-gray-500 text-sm">{emptyText}</p>;
+    return (
+      <div className="w-full flex items-center justify-center py-4">
+        <div className="text-center text-gray-400 max-w-sm space-y-2">
+          <p className="text-base font-semibold text-gray-500">
+             {emptyText}
+          </p>
+          <p className="text-sm leading-relaxed">
+            Try adjusting your filters or adding new items
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

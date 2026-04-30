@@ -7,7 +7,7 @@ export function useChatSocket(conversationId, onMessage) {
   useEffect(() => {
     if (!conversationId) return;
 
-    console.log(conversationId)
+    // console.log(conversationId)
 
     const token = sessionStorage.getItem("token");
 

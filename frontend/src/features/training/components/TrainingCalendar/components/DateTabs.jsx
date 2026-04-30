@@ -25,22 +25,29 @@ const DateTabs = ({ dates, currentDate, onDateChange, formatDate, containerRef }
                     ring-1 ring-indigo-100
                   `
                   : `
-                    text-gray-500 hover:text-gray-700 hover:bg-white/60
+                    text-gray-500
+                    hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18
                   `
               }
             `}
           >
-            <span className="text-xs sm:text-sm">
+            {/* Text */}
+            <span className="relative z-10 text-xs sm:text-sm">
               {date.toLocaleDateString("en-GB", { weekday: "short" })}
             </span>
 
-            <span className="font-semibold text-sm sm:text-base">
+            <span className="relative z-10 font-semibold text-sm sm:text-base">
               {date.getDate()}
             </span>
 
+            {/* Gradient */}
             {isSelected && (
-              <div className="absolute inset-0 rounded-xl pointer-events-none 
-                              bg-gradient-to-r from-indigo-500/5 to-purple-500/5" />
+              <div
+                className="
+                  absolute inset-0 rounded-xl pointer-events-none z-0
+                  bg-gradient-to-br from-indigo-500/32 via-indigo-400/24 to-indigo-500/32
+                "
+              />
             )}
           </div>
         );

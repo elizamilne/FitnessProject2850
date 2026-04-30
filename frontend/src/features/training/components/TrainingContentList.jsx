@@ -8,8 +8,6 @@ import { useMetrics } from "./hooks/useMetrics";
 import { useCompletedExercises } from "./hooks/useCompletedExercises";
 
 const TrainingContentList = ({ program, date }) => {
-  const progress = 66;
-
   const { exercises } = useExercises(program);
   const { metricMap } = useMetrics();
 
@@ -18,6 +16,19 @@ const TrainingContentList = ({ program, date }) => {
     initialCompleted,
     toggleExercise,
   } = useCompletedExercises(program, date);
+
+  const progress = exercises.length
+    ? Math.min(
+        100,
+        Math.round(
+          ([...new Set(completed)].filter((id) =>
+            exercises.some((ex) => ex.programExerciseId === id)
+          ).length /
+            exercises.length) *
+            100
+        )
+      )
+    : 0;
 
   // Pagination
   const [page, setPage] = useState(1);
@@ -60,7 +71,7 @@ const TrainingContentList = ({ program, date }) => {
         (id) => !completed.includes(id)
       );
 
-      // CREATE
+      // Create
       await Promise.all(
         toCreate.map(async (programExerciseId) => {
           const res =
@@ -86,7 +97,7 @@ const TrainingContentList = ({ program, date }) => {
         })
       );
 
-      // DELETE
+      // Delete
       await Promise.all(
         toDelete.map((programExerciseId) =>
           activityService.deleteByProgramExercise(
@@ -170,9 +181,9 @@ const TrainingContentList = ({ program, date }) => {
           <div className="space-y-2">
             {paginatedExercises.map((exercise) => {
               const id = exercise.programExerciseId;
-              const programId = program.id
+              const programId = program.id;
 
-              const uniqueKey = `${programId}-${id}`
+              const uniqueKey = `${programId}-${id}`;
 
               const isCompleted = completed.includes(
                 exercise.programExerciseId

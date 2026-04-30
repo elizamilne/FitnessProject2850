@@ -3,6 +3,8 @@ import { User, UserCheck, Mail, Lock, KeyRound } from "lucide-react";
 import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import AuthInput from "../../common/ui/auth/AuthInput";
+import AnimatedError from "../../common/ui/auth/AnimatedError";
+import { validateRegister } from "./utils/registerValidation";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const Signup = () => {
     rePassword: "",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -27,23 +29,24 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.rePassword) {
-      setError("Passwords do not match");
-      return;
-    }
+    const newErrors = validateRegister(formData);
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
 
     const { _, ...dataWithoutRePass } = formData;
 
     try {
       const user = await userService.register(dataWithoutRePass);
-      const userToken = user?.data["token"]
-      const userData = user?.data["user"]
+
+      const userToken = user?.data["token"];
+      const userData = user?.data["user"];
       const userId = userData.id;
 
       if (!userId) throw new Error("User ID not returned from server");
 
       sessionStorage.setItem("userId", userId);
-      sessionStorage.setItem("token", userToken)
+      sessionStorage.setItem("token", userToken);
 
       setFormData({
         firstName: "",
@@ -53,11 +56,11 @@ const Signup = () => {
         rePassword: "",
       });
 
-      setError("");
+      setErrors({});
       navigate("/questions");
     } catch (err) {
-      setError("Registration failed");
       console.error(err);
+      setErrors({ api: "Registration failed" });
     }
   };
 
@@ -74,7 +77,6 @@ const Signup = () => {
           text-white
         "
       >
-        {/* Glow */}
         <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
         <div className="relative z-10">
@@ -82,24 +84,35 @@ const Signup = () => {
             Create Account
           </h2>
 
+          {/* API Error */}
+          <AnimatedError
+            message={errors.api}
+            className="text-center mb-4"
+          />
+
           {/* First + Last Name */}
           <div className="flex flex-col md:flex-row gap-3 mb-4">
-            <AuthInput
-              icon={<User size={18} />}
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-            <AuthInput
-              icon={<UserCheck size={18} />}
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
+            <div className="flex-1">
+              <AuthInput
+                icon={<User size={18} />}
+                name="firstName"
+                placeholder="First Name"
+                value={formData.firstName}
+                onChange={handleChange}
+              />
+              <AnimatedError message={errors.firstName} />
+            </div>
+
+            <div className="flex-1">
+              <AuthInput
+                icon={<UserCheck size={18} />}
+                name="lastName"
+                placeholder="Last Name"
+                value={formData.lastName}
+                onChange={handleChange}
+              />
+              <AnimatedError message={errors.lastName} />
+            </div>
           </div>
 
           {/* Email */}
@@ -111,8 +124,8 @@ const Signup = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              required
             />
+            <AnimatedError message={errors.email} />
           </div>
 
           {/* Password */}
@@ -124,8 +137,8 @@ const Signup = () => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              required
             />
+            <AnimatedError message={errors.password} />
           </div>
 
           {/* Re-enter Password */}
@@ -137,12 +150,9 @@ const Signup = () => {
               placeholder="Re-enter Password"
               value={formData.rePassword}
               onChange={handleChange}
-              required
             />
+            <AnimatedError message={errors.rePassword} />
           </div>
-
-          {/* Error */}
-          {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
           {/* Button */}
           <button
@@ -160,7 +170,6 @@ const Signup = () => {
             Sign Up
           </button>
 
-          {/* Login link */}
           <p className="text-sm text-gray-400 text-center mt-4">
             Already have an account?{" "}
             <span

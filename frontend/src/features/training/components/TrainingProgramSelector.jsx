@@ -2,24 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { gsap } from "gsap";
 
-// const programsData = [
-//   "Program 1",
-//   "Program 2",
-//   "Program 3",
-//   "Program 4",
-//   "Program 5",
-//   "Program 6",
-//   "Program 7",
-//   "Program 8",
-// ];
-
-// same pattern as calendar
 const getItemsFromWidth = () => {
   const width = window.innerWidth;
 
-  if (width < 640) return 1; // mobile
-  if (width < 1024) return 3; // tablet
-  return 4; // desktop
+  if (width < 640) return 1;
+  if (width < 1024) return 3;
+  return 4;
 };
 
 const TrainingProgramSelector = ({
@@ -32,7 +20,6 @@ const TrainingProgramSelector = ({
   const containerRef = useRef(null);
   const isAnimating = useRef(false);
 
-  // Update items count based on screen size
   useEffect(() => {
     const updateItems = () => {
       const newValue = getItemsFromWidth();
@@ -43,18 +30,19 @@ const TrainingProgramSelector = ({
     return () => window.removeEventListener("resize", updateItems);
   }, []);
 
-  // Select a default program on page load
   useEffect(() => {
     if (!selectedProgram && programs.length > 0) {
       onProgramChange?.(programs[0]);
     }
   }, [programs, selectedProgram, onProgramChange]);
 
-  // Handles carousel navigation with animation
+  const maxIndex = programs.length - itemsToShow;
+  const isStart = startIndex === 0;
+  const isEnd = startIndex >= maxIndex;
+
   const shiftPrograms = (direction) => {
-    if ((direction === -1 && isStart) || (direction === 1 && isEnd)) {
-      return;
-    }
+    if ((direction === -1 && isStart) || (direction === 1 && isEnd)) return;
+
     isAnimating.current = true;
 
     gsap.to(containerRef.current, {
@@ -84,50 +72,45 @@ const TrainingProgramSelector = ({
     });
   };
 
-  const maxIndex = programs.length - itemsToShow;
+  const visiblePrograms = programs.slice(
+    startIndex,
+    startIndex + itemsToShow
+  );
 
-  const isStart = startIndex === 0;
-  const isEnd = startIndex >= maxIndex;
-
-  const visiblePrograms = programs.slice(startIndex, startIndex + itemsToShow);
+  // Empty state
+  if (!programs || programs.length === 0) {
+    return (
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="text-center text-gray-400 max-w-sm space-y-2">
+          <p className="text-base font-semibold text-gray-500">
+            No programs yet
+          </p>
+          <p className="text-sm leading-relaxed">
+            Create a program to start planning your training
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-[60%] mx-auto mb-6 space-y-3">
-      {/* status */}
+    <div className="w-full mb-6 space-y-3">
+      {/* Status */}
       <div className="text-sm text-gray-600 font-medium">
-        {programs?.length ? `${programs.length} programs` : "No programs"}
+        {programs.length} programs
       </div>
 
-      {/* row */}
+      {/* Row */}
       <div className="flex items-center gap-3">
         {/* Left */}
         <button
           onClick={() => shiftPrograms(-1)}
           disabled={isStart}
-          className={`
-            w-11 h-11 flex items-center justify-center rounded-full
-            transition-all duration-200
-
-            ${
-              isStart
-                ? `
-                  bg-gray-100 text-gray-300 cursor-not-allowed
-                `
-                : `
-                  bg-white/80 backdrop-blur-md
-                  text-gray-700
-
-                  border border-white/60
-                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
-
-                  hover:bg-white
-                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
-                  hover:text-gray-900
-
-                  active:scale-95
-                `
-            }
-          `}
+          className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 ${
+            isStart
+              ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+              : "bg-white/80 backdrop-blur-md text-gray-700 border border-white/60 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:bg-white hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)] hover:text-gray-900 active:scale-95"
+          }`}
         >
           <ChevronLeft size={20} />
         </button>
@@ -144,21 +127,11 @@ const TrainingProgramSelector = ({
                   if (isAnimating.current) return;
                   onProgramChange?.(program);
                 }}
-                className={`
-                  flex-1 min-w-0 px-5 py-3 text-center cursor-pointer
-                  rounded-xl transition-all duration-200
-
-                  ${
-                    isSelected
-                      ? `
-                        bg-indigo-100 text-indigo-600
-                      `
-                      : `
-                        bg-white text-gray-500
-                        hover:bg-gray-100 hover:text-gray-600
-                      `
-                  }
-                `}
+                className={`flex-1 min-w-0 px-5 py-3 text-center cursor-pointer rounded-xl transition-all duration-200 ${
+                  isSelected
+                    ? "bg-indigo-100 text-indigo-600"
+                    : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-600"
+                }`}
               >
                 <span className="block truncate text-base font-semibold">
                   {program.title}
@@ -172,30 +145,11 @@ const TrainingProgramSelector = ({
         <button
           onClick={() => shiftPrograms(1)}
           disabled={isEnd}
-          className={`
-            w-11 h-11 flex items-center justify-center rounded-full
-            transition-all duration-200
-
-            ${
-              isEnd
-                ? `
-                  bg-gray-100 text-gray-300 cursor-not-allowed
-                `
-                : `
-                  bg-white/80 backdrop-blur-md
-                  text-gray-700
-
-                  border border-white/60
-                  shadow-[0_4px_12px_rgba(0,0,0,0.05)]
-
-                  hover:bg-white
-                  hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)]
-                  hover:text-gray-900
-
-                  active:scale-95
-                `
-            }
-          `}
+          className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-200 ${
+            isEnd
+              ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+              : "bg-white/80 backdrop-blur-md text-gray-700 border border-white/60 shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:bg-white hover:shadow-[0_6px_18px_rgba(99,102,241,0.12)] hover:text-gray-900 active:scale-95"
+          }`}
         >
           <ChevronRight size={20} />
         </button>

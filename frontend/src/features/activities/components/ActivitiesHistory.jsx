@@ -39,6 +39,8 @@ const ActivitiesHistory = () => {
     fetchActivities();
   }, [search, date, sort, page]);
 
+  const isEmpty = activities.length === 0;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -51,9 +53,8 @@ const ActivitiesHistory = () => {
 
       {/* Controls */}
       <div className="flex flex-col md:flex-row md:items-center gap-4">
-        {/* Search */}
         <div className="w-full md:flex-1 relative">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+          <div className="absolute inset-y-0 left-4 flex items-center text-gray-400">
             🔍
           </div>
 
@@ -62,71 +63,60 @@ const ActivitiesHistory = () => {
             placeholder="Search activities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="
-              w-full pl-11 pr-4 py-3 rounded-xl
-              bg-white/60 backdrop-blur-md border border-white/50
-              text-gray-700 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-indigo-400/40
-            "
+            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/60 backdrop-blur-md border border-white/50 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
           />
         </div>
 
-        {/* Filters */}
         <div className="flex items-center gap-2 md:ml-auto flex-wrap">
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="
-              px-4 py-2.5 rounded-xl text-sm
-              bg-white/60 backdrop-blur-md border border-white/50
-              text-gray-700
-              focus:outline-none
-            "
+            className="px-4 py-2.5 rounded-xl text-sm bg-white/60 backdrop-blur-md border border-white/50 text-gray-700 focus:outline-none"
           />
 
           <button
             onClick={() => setSort((prev) => (prev === "asc" ? "desc" : "asc"))}
-            className="
-              px-4 py-2.5 rounded-xl text-sm font-medium
-              bg-white/60 backdrop-blur-md border border-white/50
-              text-gray-700 hover:text-gray-900
-              transition
-            "
+            className="px-4 py-2.5 rounded-xl text-sm font-medium bg-white/60 backdrop-blur-md border border-white/50 text-gray-700 hover:text-gray-900 transition"
           >
             {sort === "asc" ? "Oldest" : "Newest"}
           </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div
-        className="overflow-hidden rounded-2xl
-                      bg-white/60 backdrop-blur-xl border border-white/50"
-      >
-        <table className="min-w-full text-sm">
-          <thead className="text-gray-500 text-xs uppercase tracking-wide">
-            <tr>
-              <th className="px-5 py-3 text-left">Date</th>
-              <th className="px-5 py-3 text-left">Activity</th>
-              <th className="px-5 py-3 text-left">Metrics</th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-200/60">
-            {activities.length === 0 ? (
+      {/* Table or Empty */}
+      <div className="overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl border border-white/50">
+        {isEmpty ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center text-gray-400 max-w-sm space-y-2">
+              <p className="text-base font-semibold text-gray-500">
+                No activities found
+              </p>
+              <p className="text-sm leading-relaxed">
+                Start training to see your activity history here
+              </p>
+            </div>
+          </div>
+        ) : (
+          <table className="min-w-full text-sm">
+            <thead className="text-gray-500 text-xs uppercase tracking-wide">
               <tr>
-                <td colSpan="3" className="text-center py-6 text-gray-400">
-                  No activities found
-                </td>
+                <th className="px-5 py-3 text-left">Date</th>
+                <th className="px-5 py-3 text-left">Activity</th>
+                <th className="px-5 py-3 text-left">Metrics</th>
               </tr>
-            ) : (
-              activities.map((activity) => (
+            </thead>
+
+            <tbody className="divide-y divide-gray-200/60">
+              {activities.map((activity) => (
                 <tr key={activity.id} className="hover:bg-white/50 transition">
-                  <td className="px-5 py-4 text-gray-600">{activity.date}</td>
+                  <td className="px-5 py-4 text-gray-600">
+                    {activity.date}
+                  </td>
 
                   <td className="px-5 py-4 text-gray-900 font-medium">
-                    {activity.exerciseName || `Exercise ${activity.exerciseId}`}
+                    {activity.exerciseName ||
+                      `Exercise ${activity.exerciseId}`}
                   </td>
 
                   <td className="px-5 py-4 text-gray-600">
@@ -137,44 +127,36 @@ const ActivitiesHistory = () => {
                       : "No metrics"}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-center gap-8">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-          className="
-      px-4 py-2.5 rounded-xl text-sm font-medium
-      bg-gray-200 text-gray-800
-      hover:bg-gray-300
-      active:scale-95 transition
-      disabled:opacity-40 disabled:cursor-not-allowed
-    "
-        >
-          Prev
-        </button>
+      {!isEmpty && (
+        <div className="flex items-center justify-center gap-8">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Prev
+          </button>
 
-        <span className="text-sm text-gray-600 font-medium">Page {page}</span>
+          <span className="text-sm text-gray-600 font-medium">
+            Page {page}
+          </span>
 
-        <button
-          onClick={() => setPage((prev) => prev + 1)}
-          disabled={!hasNext}
-          className="
-      px-4 py-2.5 rounded-xl text-sm font-medium
-      bg-gray-200 text-gray-800
-      hover:bg-gray-300
-      active:scale-95 transition
-      disabled:opacity-40 disabled:cursor-not-allowed
-    "
-        >
-          Next
-        </button>
-      </div>
+          <button
+            onClick={() => setPage((prev) => prev + 1)}
+            disabled={!hasNext}
+            className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

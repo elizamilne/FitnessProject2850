@@ -17,7 +17,7 @@ const ActivitiesViewAllModal = ({
       body={
         <div className="space-y-2">
           {!items.length ? (
-            <div className="text-center py-10 text-sm text-gray-500">
+            <div className="text-center py-10 text-md text-gray-500">
               {emptyText}
             </div>
           ) : (

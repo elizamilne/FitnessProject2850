@@ -27,7 +27,6 @@ const TrainingOverviewRow = () => {
     const loadPersonalBest = async () => {
       try {
         const profileId = 1;
-
         const { data } = await activityService.getBestActivity(profileId);
 
         const top5 = data.slice(0, 5);
@@ -44,10 +43,8 @@ const TrainingOverviewRow = () => {
 
   const formatRaceDate = (dateString) => {
     const date = new Date(dateString);
-
     const day = date.getDate();
 
-    // ordinal suffix
     const getSuffix = (d) => {
       if (d > 3 && d < 21) return "th";
       switch (d % 10) {
@@ -69,38 +66,48 @@ const TrainingOverviewRow = () => {
 
   return (
     <div className="w-[100%] mx-auto space-y-6">
-      {/* Row */}
       <div className="flex flex-col sm:flex-row gap-5">
-        {/* 🔹 Next Race */}
-        {nextRace && (
-          <div
-            className="relative flex-1 p-6 rounded-3xl
-               bg-white/70 backdrop-blur-xl border border-white/50
-               shadow-[0_10px_40px_rgba(0,0,0,0.06)]
-               flex items-center gap-6"
-          >
-            {/* Icon side */}
-            <div className="flex-1 flex items-center justify-center">
-              <CalendarDays size={80} className="text-indigo-500/70" />
-            </div>
+        {/* Next Race (always visible) */}
+        <div
+          className="relative flex-1 p-6 rounded-3xl
+             bg-white/70 backdrop-blur-xl border border-white/50
+             shadow-[0_10px_40px_rgba(0,0,0,0.06)]
+             flex items-center gap-6"
+        >
+          {/* Icon */}
+          <div className="flex-1 flex items-center justify-center">
+            {/* <CalendarDays size={80} className="text-indigo-500/70" /> */}
+            <img src="/calendar-icon.svg" alt="" />
+          </div>
 
-            {/* Content side */}
-            <div className="flex-1">
-              <h4 className="text-sm text-gray-500 mb-2">Next Race</h4>
+          {/* Content */}
+          <div className="flex-1 text-center sm:text-left">
+            <h4 className="text-sm text-gray-500 mb-2">Next Race</h4>
 
+            {nextRace ? (
               <p className="text-2xl font-semibold text-gray-900 tracking-tight">
                 {formatRaceDate(nextRace.date)}
               </p>
-            </div>
-
-            {/* subtle glow */}
-            <div
-              className="absolute inset-0 rounded-3xl pointer-events-none 
-                 bg-gradient-to-br from-indigo-500/5 to-purple-500/5"
-            />
+            ) : (
+              <div className="space-y-1">
+                <p className="text-base font-semibold text-gray-500">
+                  No race scheduled
+                </p>
+                <p className="text-sm text-gray-400">
+                  Add a race to stay motivated
+                </p>
+              </div>
+            )}
           </div>
-        )}
-        {/* Personal records */}
+
+          {/* glow */}
+          <div
+            className="absolute inset-0 rounded-3xl pointer-events-none 
+               bg-gradient-to-br from-indigo-500/5 to-purple-500/5"
+          />
+        </div>
+
+        {/* Personal Records */}
         <div
           className="relative flex-1 p-6 rounded-3xl
                       bg-white/70 backdrop-blur-xl border border-white/50
@@ -110,7 +117,9 @@ const TrainingOverviewRow = () => {
 
           <ul className="space-y-2 text-sm">
             {personalBests.length === 0 ? (
-              <li className="text-gray-400">No records yet</li>
+              <li className="text-gray-400 text-center py-6">
+                No records yet. Start training to track your best results.
+              </li>
             ) : (
               personalBests.map((item, index) => (
                 <li
@@ -118,8 +127,11 @@ const TrainingOverviewRow = () => {
                   className={`
                     flex items-center justify-between
                     py-3 transition
-
-                    ${index !== personalBests.length - 1 ? "border-b border-gray-200/60" : ""}
+                    ${
+                      index !== personalBests.length - 1
+                        ? "border-b border-gray-200/60"
+                        : ""
+                    }
                   `}
                 >
                   <span className="text-gray-700 truncate">
@@ -137,7 +149,7 @@ const TrainingOverviewRow = () => {
             )}
           </ul>
 
-          {/* subtle glow */}
+          {/* glow */}
           <div
             className="absolute inset-0 rounded-3xl pointer-events-none 
                         bg-gradient-to-br from-indigo-500/5 to-purple-500/5"

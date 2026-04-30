@@ -3,14 +3,15 @@ import { raceService } from "../../../services/race";
 import { activityService } from "../../../services/activity";
 import { CalendarDays } from "lucide-react";
 
-const TrainingOverviewRow = () => {
+const TrainingOverviewRow = ({ profileId }) => {
   const [nextRace, setNextRace] = useState(null);
   const [personalBests, setPersonalBests] = useState([]);
 
   useEffect(() => {
     const loadNextRace = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return; 
+
         const { data } = await raceService.getNextRace(profileId);
         setNextRace(data);
       } catch (error) {
@@ -21,12 +22,13 @@ const TrainingOverviewRow = () => {
     };
 
     loadNextRace();
-  }, []);
+  }, [profileId]);
 
   useEffect(() => {
     const loadPersonalBest = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
+
         const { data } = await activityService.getBestActivity(profileId);
 
         const top5 = data.slice(0, 5);
@@ -39,7 +41,7 @@ const TrainingOverviewRow = () => {
     };
 
     loadPersonalBest();
-  }, []);
+  }, [profileId]);
 
   const formatRaceDate = (dateString) => {
     const date = new Date(dateString);

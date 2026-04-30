@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { programService } from "../../../../services/program";
 
-const usePrograms = () => {
+const usePrograms = (profileId) => {
   const [programs, setPrograms] = useState([]);
 
   const [visibleProgramsMap, setVisibleProgramsMap] = useState({
@@ -19,7 +19,7 @@ const usePrograms = () => {
   useEffect(() => {
     const loadPrograms = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
 
         const response =
           activeTab === "active"
@@ -46,7 +46,7 @@ const usePrograms = () => {
     };
 
     loadPrograms();
-  }, [activeTab]);
+  }, [activeTab, profileId]);
 
   const handleSelectProgram = (program) => {
     setSelectedProgram(program);
@@ -64,6 +64,15 @@ const usePrograms = () => {
     });
   };
 
+  const handleCreateProgram = (newProgram) => {
+    setPrograms((prev) => [newProgram, ...prev]);
+
+    setVisibleProgramsMap((prev) => ({
+      ...prev,
+      [activeTab]: [newProgram, ...(prev[activeTab] || [])].slice(0, 3),
+    }));
+  };
+
   return {
     // Data
     programs,
@@ -75,9 +84,6 @@ const usePrograms = () => {
     setActiveTab,
     setSelectedProgram,
 
-    // Actions
-    handleSelectProgram,
-
     // Modal state
     isViewModalOpen,
     isCreateModalOpen,
@@ -87,6 +93,10 @@ const usePrograms = () => {
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
+
+    // Actions
+    handleSelectProgram,
+    handleCreateProgram
   };
 };
 

@@ -6,40 +6,44 @@ import RacesGrid from "./components/RacesGrid";
 import RacesFooter from "./components/RacesFooter";
 import useRaces from "./hooks/useRaces";
 
-const ActivitiesRaces = () => {
+const ActivitiesRaces = ({ profileId }) => {
   const {
-    // Data state
-    visisbleRacesMap,
     races,
+    visisbleRacesMap,
     selectedRace,
-    // Tab state
     activeTab,
-    // Modal state
+
+    setActiveTab,
+    setSelectedRace,
+
     isViewModalOpen,
     isCreateModalOpen,
     isDetailModalOpen,
-    // State setters
-    setActiveTab,
-    setSelectedRace,
-    // Modals setters
+
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
-    // Actions
+
     handleSelectRace,
-  } = useRaces();
+    handleCreateRace
+  } = useRaces(profileId);
+
+  const visibleRaces = visisbleRacesMap[activeTab] || [];
 
   return (
     <div className="space-y-6">
       <RacesHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <RacesGrid
-        races={visisbleRacesMap[activeTab]}
-        onSelect={(race) => {
-          setSelectedRace(race)
-          setIsDetailModalOpen(true)
-        }}
-      />
+      {/* prevent layout jump */}
+      <div className="min-h-[140px]">
+        <RacesGrid
+          races={visibleRaces}
+          onSelect={(race) => {
+            setSelectedRace(race);
+            setIsDetailModalOpen(true);
+          }}
+        />
+      </div>
 
       <RacesFooter
         setIsCreateModalOpen={setIsCreateModalOpen}
@@ -50,17 +54,13 @@ const ActivitiesRaces = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         races={races}
-        onSelect={(race) => {
-          handleSelectRace(race);
-        }}
+        onSelect={handleSelectRace}
       />
 
       <CreateRaceModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreate={() => {
-          console.log("Create race clicked");
-        }}
+        onCreate={handleCreateRace}
       />
 
       <DetailRaceModal

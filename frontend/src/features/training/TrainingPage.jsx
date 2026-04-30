@@ -13,7 +13,10 @@ const TrainingPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  // 🔹 Root ref for GSAP scope
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile?.id;
+
+  // Root ref for GSAP scope
   const pageRef = useRef(null);
 
   // Updates selected date
@@ -34,7 +37,8 @@ const TrainingPage = () => {
 
     const loadPrograms = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
+
         const { data } = await programService.getByProfileAndDate(
           profileId,
           selectedDate
@@ -47,7 +51,7 @@ const TrainingPage = () => {
     };
 
     loadPrograms();
-  }, [selectedDate]);
+  }, [selectedDate, profileId]);
 
   // Stable GSAP animation (no glitches)
   useLayoutEffect(() => {
@@ -150,14 +154,18 @@ const TrainingPage = () => {
         <div className="animate-section space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Statistics</h3>
 
-          <TrainingStatistics />
+          <TrainingStatistics
+            profileId={profileId} 
+          />
         </div>
 
         {/* Overview */}
         <div className="animate-section space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Overview</h3>
 
-          <TrainingOverviewRow />
+          <TrainingOverviewRow 
+            profileId={profileId}
+          />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { raceService } from "../../../../services/race";
 
-const useRaces = () => {
+const useRaces = (profileId) => {
   const [races, setRaces] = useState([]);
 
   const [visisbleRacesMap, setVisibleRacesMap] = useState({
@@ -19,7 +19,7 @@ const useRaces = () => {
   useEffect(() => {
     const loadRaces = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
 
         const response =
           activeTab === "upcoming"
@@ -46,7 +46,16 @@ const useRaces = () => {
     };
 
     loadRaces();
-  }, [activeTab]);
+  }, [activeTab, profileId]);
+
+  const handleCreateRace = (newRace) => {
+    setRaces((prev) => [newRace, ...prev]);
+
+    setVisibleRacesMap((prev) => ({
+      ...prev,
+      [activeTab]: [newRace, ...(prev[activeTab] || [])].slice(0, 3),
+    }));
+  };
 
   const handleSelectRace = (race) => {
     setSelectedRace(race);
@@ -70,15 +79,14 @@ const useRaces = () => {
     // Data
     races,
     visisbleRacesMap,
-    activeTab,
     selectedRace,
+
+    // Tab state
+    activeTab,
 
     // Tab control
     setActiveTab,
     setSelectedRace,
-
-    // Actions 
-    handleSelectRace,
     
     // Modal state
     isViewModalOpen,
@@ -89,6 +97,10 @@ const useRaces = () => {
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
+
+    // Actions 
+    handleSelectRace,
+    handleCreateRace
   };
 };
 

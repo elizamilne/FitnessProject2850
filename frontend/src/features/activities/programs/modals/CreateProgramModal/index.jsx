@@ -19,8 +19,6 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const [selectedDays, setSelectedDays] = useState([]);
   const [title, setTitle] = useState("");
 
-  
-
   const currentStep = steps[stepIndex];
 
   const createProgram = async () => {
@@ -38,7 +36,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
 
     const res = await programService.createProgram(programData);
 
-    return res.data.id;
+    return res.data;
   };
 
   const createProgramExercisesAndMetrics = async (programId) => {
@@ -82,7 +80,8 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
       setStepIndex((prev) => prev + 1);
     } else {
       // Create Program
-      const programId = await createProgram();
+      const program = await createProgram();
+      const programId = program.id
 
       // Create Exercises with Metrics
       createProgramExercisesAndMetrics(programId);
@@ -90,7 +89,8 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
       // Create Schedule for the Program
       createProgramSchedule(programId);
 
-      onCreate?.("hi");
+      
+      onCreate?.(program);
       onClose();
     }
   };
@@ -182,7 +182,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
               Previous
             </button>
 
-            {/* NEXT */}
+            {/* Next */}
             <button
               onClick={next}
               disabled={

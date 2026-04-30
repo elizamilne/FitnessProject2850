@@ -8,43 +8,44 @@ import ProgramsHeader from "./components/ProgramsHeader";
 import ProgramsGrid from "./components/ProgramsGrid";
 import ProgramsFooter from "./components/ProgramsFooter";
 
-const ActivitiesPrograms = () => {
+const ActivitiesPrograms = ({ profileId }) => {
   const {
-    // Data
     programs,
     visibleProgramsMap,
     activeTab,
     selectedProgram,
 
-    // Tab control
     setActiveTab,
     setSelectedProgram,
 
-    // Actions
-    handleSelectProgram,
-
-    // Modal state
     isViewModalOpen,
     isCreateModalOpen,
     isDetailModalOpen,
 
-    // Modal setters
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
-  } = usePrograms();
+
+    handleSelectProgram,
+    handleCreateProgram
+  } = usePrograms(profileId);
+
+  const visiblePrograms = visibleProgramsMap[activeTab] || [];
 
   return (
     <div className="space-y-6">
       <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <ProgramsGrid
-        programs={visibleProgramsMap[activeTab]}
-        onSelect={(program) => {
-          setSelectedProgram(program);
-          setIsDetailModalOpen(true);
-        }}
-      />
+      {/* KEY FIX: prevent layout shift */}
+      <div className="min-h-[140px]">
+        <ProgramsGrid
+          programs={visiblePrograms}
+          onSelect={(program) => {
+            setSelectedProgram(program);
+            setIsDetailModalOpen(true);
+          }}
+        />
+      </div>
 
       <ProgramsFooter
         setIsCreateModalOpen={() => setIsCreateModalOpen(true)}
@@ -61,9 +62,7 @@ const ActivitiesPrograms = () => {
       <CreateProgramModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreate={(program) => {
-          console.log("Create program:", program);
-        }}
+        onCreate={handleCreateProgram}
       />
 
       <DetailProgramModal

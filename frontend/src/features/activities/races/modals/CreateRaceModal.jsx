@@ -31,7 +31,7 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
       const response = await raceService.createRace(payload);
 
       // optional: notify parent AFTER success
-      onCreate?.(response?.data || payload);
+      onCreate?.(response.data);
 
       // reset
       setTitle("");
@@ -103,11 +103,11 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
             onClick={handleCreate}
             disabled={!isValid || loading}
             className="
-          w-full py-3 rounded-xl text-sm font-semibold
-          bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-          hover:opacity-90 active:scale-[0.98] transition
-          disabled:opacity-40 disabled:cursor-not-allowed
-        "
+              w-full py-3 rounded-xl text-sm font-semibold
+              bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+              hover:opacity-90 active:scale-[0.98] transition
+              disabled:opacity-40 disabled:cursor-not-allowed
+            "
           >
             {loading ? "Creating..." : "Create Race"}
           </button>

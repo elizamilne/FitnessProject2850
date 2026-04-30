@@ -7,8 +7,10 @@ import { gsap } from "gsap";
 
 const ActivitiesPage = () => {
   const pageRef = useRef(null);
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile?.id;
 
-  // ✅ Smooth, non-glitch animation
+  // Smooth, non-glitch animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(".animate-section", {
@@ -56,7 +58,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesPrograms />
+            <ActivitiesPrograms 
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"
@@ -73,7 +77,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesRaces />
+            <ActivitiesRaces 
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"
@@ -90,7 +96,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesHistory />
+            <ActivitiesHistory 
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"

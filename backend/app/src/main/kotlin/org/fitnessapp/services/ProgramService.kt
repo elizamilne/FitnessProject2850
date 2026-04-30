@@ -104,6 +104,20 @@ object ProgramService {
             }
     }
 
+    fun getProgramById(programId: Long): ProgramDTO? = transaction {
+        val row = Program
+            .selectAll()
+            .where { Program.id eq programId }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val days = ProgramSchedule.selectAll()
+            .where { ProgramSchedule.programId eq programId }
+            .map { it[ProgramSchedule.day] }
+
+        row.toProgramDTO(days)
+    }
+
     fun toggleArchiveProgram(id: Long): ProgramDTO? = transaction {
         val row = Program
             .selectAll()

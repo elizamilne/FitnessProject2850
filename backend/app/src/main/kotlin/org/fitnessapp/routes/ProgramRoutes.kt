@@ -89,9 +89,11 @@ fun Route.programRoutes() {
 
             val programId = ProgramService.createProgramAndReturnId(request)
 
+            val program = ProgramService.getProgramById(programId)
+
             call.respond(
                 HttpStatusCode.Created,
-                mapOf("id" to programId)
+                program ?: mapOf("id" to programId) 
             )
         }
 

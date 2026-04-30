@@ -35,7 +35,7 @@ const ActivitiesRaces = ({ profileId }) => {
       <RacesHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* prevent layout jump */}
-      <div className="min-h-[140px]">
+      <div>
         <RacesGrid
           races={visibleRaces}
           onSelect={(race) => {

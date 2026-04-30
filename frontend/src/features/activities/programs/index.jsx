@@ -36,8 +36,8 @@ const ActivitiesPrograms = ({ profileId }) => {
     <div className="space-y-6">
       <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* KEY FIX: prevent layout shift */}
-      <div className="min-h-[140px]">
+      {/* prevent layout shift */}
+      <div>
         <ProgramsGrid
           programs={visiblePrograms}
           onSelect={(program) => {

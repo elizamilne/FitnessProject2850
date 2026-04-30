@@ -51,8 +51,14 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
 
   // Animate list updates (search / filter / conversations)
   useEffect(() => {
+    if (!containerRef.current) return;
+
+    const items = containerRef.current.querySelectorAll(".conversation-item");
+
+    if (!items.length) return;
+
     gsap.fromTo(
-      ".conversation-item",
+      items,
       { opacity: 0, y: 6 },
       {
         opacity: 1,
@@ -94,12 +100,11 @@ const ChatSidebar = ({ profileId, conversationId, setConversationId }) => {
             rounded-xl py-2.5 text-sm font-semibold
             transition-all duration-200
 
-            ${
-              isCreatingGroup
-                ? selectedUsers.length === 0
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md hover:opacity-90 active:scale-95"
-                : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:opacity-90 active:scale-95"
+            ${isCreatingGroup
+              ? selectedUsers.length === 0
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-md hover:opacity-90 active:scale-95"
+              : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md hover:opacity-90 active:scale-95"
             }
           `}
         >

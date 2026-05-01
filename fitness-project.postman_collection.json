@@ -1,0 +1,1412 @@
+{
+  "info": {
+    "_postman_id": "f59720c5-e7ba-42e0-aeb1-6ac74ff3d91e",
+    "name": "fitness-project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "10319764"
+  },
+  "item": [
+    {
+      "name": "program",
+      "item": [
+        {
+          "name": "http://localhost:8080/programs/profile/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/profile/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "profile",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs/profile/1?date=2026-04-20",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/profile/1?date=2026-04-20",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "profile",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-04-20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs/profile/1/active",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/profile/1/active",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "profile",
+                "1",
+                "active"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs/profile/1/archived",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/profile/1/archived",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "profile",
+                "1",
+                "archived"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Random Day\",\n  \"bannerUrl\": \"https://i0.wp.com/post.healthline.com/wp-content/uploads/2020/07/running_at_sunset-1296x728-header.jpg?w=1155&h=1528\",\n  \"profileId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/programs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs/1/archive",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/1/archive",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "1",
+                "archive"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/programs/1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/programs/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "programs",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "http://localhost:8080/user/register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Ivan7\",\n  \"lastName\": \"Parvanovski\",\n  \"email\": \"ivan7@example.com\",\n  \"password\": \"mypassword123\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/user/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "user",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/user/login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"john@doe.com\",\n    \"password\": \"asd123\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/user/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "profile",
+      "item": [
+        {
+          "name": "http://localhost:8080/profiles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/profiles",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profiles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/profiles/user/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/profiles/user/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profiles",
+                "user",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/profiles/search?query=Ivan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/profiles/search?query=Ivan",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profiles",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "Ivan"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/profiles",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"goal\": \"Build muscle\",\n  \"gender\": \"Male\",\n  \"age\": 22,\n  \"level\": \"Beginner\",\n  \"weight\": 75.5,\n  \"height\": 180,\n  \"workoutFrequency\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/profiles",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "profiles"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "program-exercise",
+      "item": [
+        {
+          "name": "http://localhost:8080/program-exercises/program/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/program-exercises/program/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-exercises",
+                "program",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/program-exercises",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programId\": 1,\n  \"exerciseId\": 4,\n  \"metrics\": [\n    { \"metricTypeId\": 2, \"value\": 6 },\n    { \"metricTypeId\": 4, \"value\": 99 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/program-exercises",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-exercises"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/program-exercises/1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/program-exercises/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-exercises",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "program-exercise-metrics",
+      "item": [
+        {
+          "name": "http://localhost:8080/program-exercise-metrics/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/program-exercise-metrics/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-exercise-metrics",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/program-exercise-metrics/1",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 80.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/program-exercise-metrics/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-exercise-metrics",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "activity",
+      "item": [
+        {
+          "name": "http://localhost:8080/activities/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1?page=1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1?page=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1?page=2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1?page=2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1?sort=asc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1?sort=asc",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "asc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1?sort=desc",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1?search=squat",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1?search=squat",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "squat"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1/best",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1/best",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1",
+                "best"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-04-20\",\n  \"profileId\": 1,\n  \"exerciseId\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/activities",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activities/1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/activities/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activities",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "activity-metric",
+      "item": [
+        {
+          "name": "http://localhost:8080/activity-metrics/1",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/activity-metrics/1",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"value\": 12.3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/activity-metrics/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "activity-metrics",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "exercise",
+      "item": [
+        {
+          "name": "http://localhost:8080/exercises",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/exercises",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "exercises"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/exercises/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/exercises/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "exercises",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/exercises/2/full",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/exercises/2/full",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "exercises",
+                "2",
+                "full"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/exercises/1/metrics",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/exercises/4/metrics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "exercises",
+                "4",
+                "metrics"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "muscle-group",
+      "item": [
+        {
+          "name": "http://localhost:8080/muscle-groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/muscle-groups",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "muscle-groups"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/muscle-groups/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/muscle-groups/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "muscle-groups",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "category",
+      "item": [
+        {
+          "name": "http://localhost:8080/categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/categories",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/categories/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/categories/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "categories",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "race",
+      "item": [
+        {
+          "name": "http://localhost:8080/races",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/1",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/next-race/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races/next-race/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "next-race",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/profile/1/completed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races/profile/1/completed",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "profile",
+                "1",
+                "completed"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/profile/1/upcoming",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races/profile/1/upcoming",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "profile",
+                "1",
+                "upcoming"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileId\": 1,\n  \"title\": \"Midnight Desert Sprint\",\n  \"location\": \"Moab, Utah\",\n  \"date\": \"2026-11-12\",\n  \"bannerUrl\": \"https://cdn.example.com/assets/race_banner_01.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/races",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/1/complete",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races/1/complete",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "1",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/1",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Alpine Peak Challenge (Updated)\",\n  \"location\": \"Zermatt, Switzerland\",\n  \"date\": \"2026-07-22\",\n  \"bannerUrl\": \"https://images.site.com/updated-banner.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/races/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/races/1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/races/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "races",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "program-schedule",
+      "item": [
+        {
+          "name": "http://localhost:8080/program-schedules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/program-schedules/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-schedules",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/program-schedules",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programId\": 8,\n  \"day\": \"Saturday\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/program-schedules",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-schedules"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/program-schedules/1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"day\": \"Monday\",\n  \"programId\": 1\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/program-schedules/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "program-schedules",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "metric-type",
+      "item": [
+        {
+          "name": "http://localhost:8080/metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/metrics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "metrics"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:8080/metrics/1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/metrics/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "metrics",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "chats",
+      "item": [
+        {
+          "name": "messages",
+          "item": [
+            {
+              "name": "http://localhost:8080/messages/3",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/messages/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "messages",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/messages/5",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/messages/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "messages",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "conversations",
+          "item": [
+            {
+              "name": "http://localhost:8080/conversation/user/1",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/conversation/user/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "conversation",
+                    "user",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/conversation/user/1?type=chat",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/conversation/user/1?type=chat",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "conversation",
+                    "user",
+                    "1"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "chat"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/conversation/user/1?type=group",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8080/conversation/user/1?type=group",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "conversation",
+                    "user",
+                    "1"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "group"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/conversation/8?profileId=6",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/conversation/private",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user1\": 1,\n  \"user2\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8080/conversation/private",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "conversation",
+                    "private"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "http://localhost:8080/conversation/group",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"participants\": [1, 2, 3]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8080/conversation/group",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8080",
+                  "path": [
+                    "conversation",
+                    "group"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

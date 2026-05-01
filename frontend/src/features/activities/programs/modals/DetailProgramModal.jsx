@@ -1,5 +1,5 @@
 import Modal from "../../../../common/ui/Modal";
-import { sortDays } from "../utils/formatters"; 
+import { formatDays } from "../utils/formatters"; 
 
 const DetailProgramModal = ({ isOpen, onClose, program }) => {
   return (
@@ -22,7 +22,7 @@ const DetailProgramModal = ({ isOpen, onClose, program }) => {
             <h4 className="text-lg font-semibold">{program.title}</h4>
 
             <p className="text-sm text-gray-500">
-              {sortDays(program.weeklyFrequency).join(", ") ||
+              {formatDays(program.weeklyFrequency) ||
                 "No schedule"}
             </p>
           </div>

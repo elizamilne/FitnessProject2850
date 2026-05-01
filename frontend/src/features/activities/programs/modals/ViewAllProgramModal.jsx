@@ -1,6 +1,6 @@
 import ActivitiesViewAllModal from "../../../../common/ui/activities/ActivitiesViewAllModal";
 import Modal from "../../../../common/ui/Modal";
-import { sortDays } from "../utils/formatters";
+import { formatDays } from "../utils/formatters";
 
 const ViewAllProgramModal = ({
   isOpen,
@@ -17,7 +17,7 @@ const ViewAllProgramModal = ({
       emptyText="No programs found"
       onSelect={onSelect}
       renderSubtitle={(program) =>
-        sortDays(program.weeklyFrequency).join(", ") || "No schedule"
+        formatDays(program.weeklyFrequency) || "No schedule"
       }
     />
   );

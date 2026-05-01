@@ -1,5 +1,5 @@
 import ActivitiesControlGrid from "../../../../common/ui/activities/ActivitiesControlGrid";
-import { sortDays } from "../utils/formatters";
+import { formatDays } from "../utils/formatters";
 
 const ProgramsGrid = ({ programs, onSelect }) => {
   return (
@@ -9,7 +9,7 @@ const ProgramsGrid = ({ programs, onSelect }) => {
       placeholderText="Program"
       onSelect={onSelect}
       renderSubtitle={(program) =>
-        sortDays(program.weeklyFrequency).join(", ") || "No schedule"
+        formatDays(program.weeklyFrequency) || "No schedule"
       }
     />
   );

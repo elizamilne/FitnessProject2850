@@ -19,21 +19,33 @@ const ActivityCard = ({
           `https://via.placeholder.com/300x200?text=${placeholderText}`
         }
         alt={item.title}
-        className="absolute inset-0 w-full h-full object-cover
-                   transition-transform duration-500 group-hover:scale-105"
+        className="
+          absolute inset-0 w-full h-full object-cover
+          transition-transform duration-500 group-hover:scale-105
+        "
       />
 
-      {/* Light overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/30 to-transparent" />
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
 
       {/* Content */}
       <div className="relative h-full flex items-center px-5">
         <div>
-          <h3 className="text-gray-900 font-semibold text-lg tracking-tight">
+          <h3
+            className="
+              text-white font-semibold text-lg tracking-tight
+              drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]
+            "
+          >
             {item.title}
           </h3>
 
-          <p className="text-sm text-gray-600 mt-1">
+          <p
+            className="
+              text-sm text-white/80 mt-1
+              drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]
+            "
+          >
             {renderSubtitle?.(item)}
           </p>
         </div>
@@ -41,9 +53,11 @@ const ActivityCard = ({
 
       {/* Subtle glow (on hover) */}
       <div
-        className="absolute inset-0 rounded-2xl pointer-events-none
-                   opacity-0 group-hover:opacity-100 transition
-                   bg-gradient-to-r from-indigo-500/10 to-purple-500/10"
+        className="
+          absolute inset-0 rounded-2xl pointer-events-none
+          opacity-0 group-hover:opacity-100 transition
+          bg-gradient-to-r from-indigo-500/10 to-purple-500/10
+        "
       />
     </div>
   );

@@ -32,6 +32,7 @@ const TrainingOverviewRow = ({ profileId }) => {
         const { data } = await activityService.getBestActivity(profileId);
 
         const top5 = data.slice(0, 5);
+
         setPersonalBests(top5);
       } catch (error) {
         if (error.response?.status !== 404) {
@@ -125,7 +126,7 @@ const TrainingOverviewRow = ({ profileId }) => {
             ) : (
               personalBests.map((item, index) => (
                 <li
-                  key={`${item.exerciseId}-${item.metricTypeId}`}
+                  key={`${item.programExerciseId}-${item.metricTypeId}`}
                   className={`
                     flex items-center justify-between
                     py-3 transition

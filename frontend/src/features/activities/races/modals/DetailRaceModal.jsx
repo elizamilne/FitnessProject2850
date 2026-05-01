@@ -69,6 +69,7 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
       const response = await raceService.toggleComplete(race.id);
 
       onUpdate?.(response.data);
+      onClose();
     } catch (err) {
       console.error("Complete failed:", err);
     } finally {

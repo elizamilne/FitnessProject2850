@@ -73,6 +73,59 @@ const usePrograms = (profileId) => {
     }));
   };
 
+  const handleUpdateProgram = (updatedProgram) => {
+    if (updatedProgram.deleted) {
+      setPrograms((prev) =>
+        prev.filter((program) => program.id !== updatedProgram.id)
+      );
+
+      setVisibleProgramsMap((prev) => ({
+        active: prev.active.filter((program) => program.id !== updatedProgram.id),
+        archived: prev.archived.filter(
+          (program) => program.id !== updatedProgram.id
+        ),
+      }));
+
+      setSelectedProgram(null);
+      setIsDetailModalOpen(false);
+      return;
+    }
+
+    setPrograms((prev) => {
+      const exists = prev.some((program) => program.id === updatedProgram.id);
+
+      if (!exists) return prev;
+
+      return prev.map((program) =>
+        program.id === updatedProgram.id ? updatedProgram : program
+      );
+    });
+
+    setVisibleProgramsMap((prev) => {
+      const removeFromActive = prev.active.filter(
+        (program) => program.id !== updatedProgram.id
+      );
+
+      const removeFromArchived = prev.archived.filter(
+        (program) => program.id !== updatedProgram.id
+      );
+
+      if (updatedProgram.archived) {
+        return {
+          active: removeFromActive,
+          archived: [updatedProgram, ...removeFromArchived].slice(0, 3),
+        };
+      }
+
+      return {
+        active: [updatedProgram, ...removeFromActive].slice(0, 3),
+        archived: removeFromArchived,
+      };
+    });
+
+    setSelectedProgram(updatedProgram);
+  };
+
   return {
     // Data
     programs,
@@ -96,7 +149,8 @@ const usePrograms = (profileId) => {
 
     // Actions
     handleSelectProgram,
-    handleCreateProgram
+    handleCreateProgram,
+    handleUpdateProgram
   };
 };
 

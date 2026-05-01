@@ -27,7 +27,8 @@ const ActivitiesPrograms = ({ profileId }) => {
     setIsDetailModalOpen,
 
     handleSelectProgram,
-    handleCreateProgram
+    handleCreateProgram,
+    handleUpdateProgram,
   } = usePrograms(profileId);
 
   const visiblePrograms = visibleProgramsMap[activeTab] || [];
@@ -36,7 +37,6 @@ const ActivitiesPrograms = ({ profileId }) => {
     <div className="space-y-6">
       <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* prevent layout shift */}
       <div>
         <ProgramsGrid
           programs={visiblePrograms}
@@ -69,6 +69,7 @@ const ActivitiesPrograms = ({ profileId }) => {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         program={selectedProgram}
+        onUpdate={handleUpdateProgram}
       />
     </div>
   );

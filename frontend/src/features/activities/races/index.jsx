@@ -25,7 +25,8 @@ const ActivitiesRaces = ({ profileId }) => {
     setIsDetailModalOpen,
 
     handleSelectRace,
-    handleCreateRace
+    handleCreateRace,
+    handleUpdateRace
   } = useRaces(profileId);
 
   const visibleRaces = visisbleRacesMap[activeTab] || [];
@@ -66,6 +67,7 @@ const ActivitiesRaces = ({ profileId }) => {
       <DetailRaceModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
+        onUpdate={handleUpdateRace}
         race={selectedRace}
       />
     </div>

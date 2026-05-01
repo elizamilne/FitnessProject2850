@@ -4,7 +4,7 @@ import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profile";
 import AuthInput from "../../common/ui/auth/AuthInput";
-import AnimatedError from "../../common/ui/auth/AnimatedError";
+import AnimatedError from "../../common/ui/AnimatedError";
 import { validateLogin } from "./utils/loginValidation";
 
 export default function Login() {

@@ -22,14 +22,13 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const currentStep = steps[stepIndex];
 
   const createProgram = async () => {
-    const defaultBannerUrl =
-      "/defaults/program-banner1.jpeg";
+    const defaultBannerUrl = "/defaults/program-banner1.jpeg";
 
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;
 
     const programData = {
-      title,
+      title: title.trim(),
       bannerUrl: defaultBannerUrl,
       profileId,
     };
@@ -49,7 +48,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
         ([metricTypeId, value]) => ({
           metricTypeId: Number(metricTypeId),
           value,
-        }),
+        })
       );
 
       return programExerciseService.addExerciseToProgram({
@@ -79,17 +78,18 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
     if (stepIndex < steps.length - 1) {
       setStepIndex((prev) => prev + 1);
     } else {
+      if (!title.trim()) return;
+
       // Create Program
       const program = await createProgram();
-      const programId = program.id
+      const programId = program.id;
 
       // Create Exercises with Metrics
-      createProgramExercisesAndMetrics(programId);
+      await createProgramExercisesAndMetrics(programId);
 
       // Create Schedule for the Program
-      createProgramSchedule(programId);
-      console.log(program)
-      
+      await createProgramSchedule(programId);
+
       onCreate?.(program);
       onClose();
     }
@@ -173,28 +173,30 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
               onClick={prev}
               disabled={stepIndex === 0}
               className="
-            px-4 py-2.5 rounded-xl text-sm font-medium
-            bg-gray-200 text-gray-800
-            hover:bg-gray-300 transition
-            disabled:opacity-40 disabled:cursor-not-allowed
-          "
+                px-4 py-2.5 rounded-xl text-sm font-medium
+                bg-gray-200 text-gray-800
+                hover:bg-gray-300 transition
+                disabled:opacity-40 disabled:cursor-not-allowed
+              "
             >
               Previous
             </button>
 
-            {/* Next */}
+            {/* NEXT */}
             <button
               onClick={next}
               disabled={
                 (currentStep === "category" && !selectedCategory) ||
-                (currentStep === "exercise" && selectedExercises.length === 0)
+                (currentStep === "exercise" &&
+                  selectedExercises.length === 0) ||
+                (currentStep === "schedule" && !title.trim())
               }
               className="
-            px-5 py-2.5 rounded-xl text-sm font-semibold
-            bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-            hover:opacity-90 active:scale-[0.98] transition
-            disabled:opacity-40 disabled:cursor-not-allowed
-          "
+                px-5 py-2.5 rounded-xl text-sm font-semibold
+                bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                hover:opacity-90 active:scale-[0.98] transition
+                disabled:opacity-40 disabled:cursor-not-allowed
+              "
             >
               {stepIndex === steps.length - 1 ? "Create Program" : "Next"}
             </button>

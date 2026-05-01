@@ -3,7 +3,7 @@ import { User, UserCheck, Mail, Lock, KeyRound } from "lucide-react";
 import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import AuthInput from "../../common/ui/auth/AuthInput";
-import AnimatedError from "../../common/ui/auth/AnimatedError";
+import AnimatedError from "../../common/ui/AnimatedError";
 import { validateRegister } from "./utils/registerValidation";
 
 const Signup = () => {

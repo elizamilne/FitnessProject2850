@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import AnimatedError from "../../../../../../common/ui/AnimatedError";
 
 const DAYS = [
   "Monday",
@@ -17,12 +18,25 @@ const ScheduleProgram = ({
   title = "",
   onTitleChange,
 }) => {
+  const containerRef = useRef(null);
+  const [titleTouched, setTitleTouched] = useState(false);
+
+  const titleError =
+    titleTouched && title.trim().length === 0
+      ? "Program title is required"
+      : "";
+
   const toggleDay = (day) => {
     const updated = selectedDays.includes(day)
       ? selectedDays.filter((d) => d !== day)
       : [...selectedDays, day];
 
     onChange?.(updated);
+  };
+
+  const handleTitleChange = (e) => {
+    setTitleTouched(true);
+    onTitleChange?.(e.target.value);
   };
 
   const handlePress = (el) => {
@@ -35,33 +49,73 @@ const ScheduleProgram = ({
         yoyo: true,
         repeat: 1,
         ease: "power2.out",
-      },
+      }
     );
   };
 
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.to(".schedule-block", {
+        opacity: 1,
+        y: 0,
+        duration: 0.25,
+        stagger: 0.05,
+        ease: "power2.out",
+      });
+
+      gsap.to(".day-btn", {
+        opacity: 1,
+        y: 0,
+        duration: 0.2,
+        stagger: 0.03,
+        ease: "power2.out",
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <div className="space-y-6">
-      {/* TITLE */}
-      <div className="space-y-1.5">
+    <div ref={containerRef} className="space-y-6">
+      {/* Title */}
+      <div
+        className="schedule-block space-y-1.5"
+        style={{ opacity: 0, transform: "translateY(16px)" }}
+      >
         <label className="text-sm font-medium text-gray-600">
           Program title
         </label>
 
         <input
           type="text"
+          required
           value={title}
-          onChange={(e) => onTitleChange?.(e.target.value)}
+          onBlur={() => setTitleTouched(true)}
+          onChange={handleTitleChange}
           placeholder="e.g. Push / Pull / Legs"
-          className="w-full px-4 py-3 rounded-xl
-            bg-white/70 backdrop-blur border border-gray-200
+          aria-invalid={!!titleError}
+          className={`
+            w-full px-4 py-3 rounded-xl
+            bg-white/70 backdrop-blur border
             text-gray-800 placeholder-gray-400
             focus:outline-none
-            focus:ring-2 focus:ring-indigo-400/40"
+            focus:ring-2 focus:ring-indigo-400/40
+            ${
+              titleError
+                ? "border-red-300 focus:ring-red-400/30"
+                : "border-gray-200"
+            }
+          `}
         />
+
+        <AnimatedError message={titleError} />
       </div>
 
-      {/* DAYS */}
-      <div className="space-y-2">
+      {/* Days */}
+      <div
+        className="schedule-block space-y-2"
+        style={{ opacity: 0, transform: "translateY(16px)" }}
+      >
         <p className="text-sm font-medium text-gray-600">
           Select training days
         </p>
@@ -78,6 +132,7 @@ const ScheduleProgram = ({
                   toggleDay(day);
                 }}
                 className={`
+                  day-btn
                   px-4 py-2.5 rounded-xl text-sm font-medium
                   transition-all duration-300 ease-out
                   border
@@ -100,6 +155,10 @@ const ScheduleProgram = ({
                       `
                   }
                 `}
+                style={{
+                  opacity: 0,
+                  transform: "translateY(16px)",
+                }}
               >
                 {day}
               </button>

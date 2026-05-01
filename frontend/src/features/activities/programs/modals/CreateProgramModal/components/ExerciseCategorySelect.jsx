@@ -1,42 +1,39 @@
-import { useEffect, useLayoutEffect, useState, useRef } from "react";
-import { categoryService } from "../../../../../../services/category";
+import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-const ExerciseCategorySelect = ({ onSelect, onNext }) => {
-  const [categories, setCategories] = useState([]);
+const ExerciseCategorySelect = ({
+  categories = [],
+  loading = false,
+  onSelect,
+  animate = true,
+}) => {
   const containerRef = useRef(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const response = await categoryService.getAll();
-      setCategories(response.data);
-    };
-
-    fetchCategories();
-  }, []);
-
   useLayoutEffect(() => {
-    if (!categories.length) return;
+    if (!categories.length || !animate) return;
 
     const ctx = gsap.context(() => {
-      gsap.to(".category-item", {
-        opacity: 1,
-        y: 0,
-        duration: 0.2,
-        stagger: 0.02,
-        ease: "power2.out",
-      });
+      gsap.fromTo(
+        ".category-item",
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.2,
+          stagger: 0.02,
+          ease: "power2.out",
+        }
+      );
     }, containerRef);
 
     return () => ctx.revert();
-  }, [categories]);
+  }, [categories, animate]);
 
   const handleClick = (category) => {
     onSelect?.(category);
-    onNext?.();
   };
 
-  const isEmpty = categories.length === 0;
+  const isEmpty = !loading && categories.length === 0;
 
   return (
     <div ref={containerRef} className="space-y-3">
@@ -44,9 +41,13 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
         Select Category
       </h3>
 
-      {isEmpty ? (
+      {loading ? (
         <div className="text-center py-10 text-md text-gray-500">
-            No categories found
+          Loading categories...
+        </div>
+      ) : isEmpty ? (
+        <div className="text-center py-10 text-md text-gray-500">
+          No categories found
         </div>
       ) : (
         <div className="space-y-2">
@@ -64,8 +65,8 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
                 hover:border-indigo-200/60
               "
               style={{
-                opacity: 0,
-                transform: "translateY(16px)",
+                opacity: animate ? 0 : 1,
+                transform: animate ? "translateY(16px)" : "translateY(0px)",
               }}
             >
               <img

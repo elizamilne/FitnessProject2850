@@ -1,8 +1,22 @@
-# 💪 Sila | Fitness App
+<div align="center">
 
-### Overview
+<img width="180" alt="Sila Fitness App Logo" src="https://github.com/user-attachments/assets/77b460e5-bf76-4deb-82b7-b73465e40864" />
 
-A fitness tracking application that allows users to plan workouts, record activities, and monitor their progress over time. It supports a wide range of exercise types and is suitable for both casual users and individuals training for specific events.
+### A modern fitness app for tracking workouts, progress, and personal goals.
+
+<br />
+
+![Status](https://img.shields.io/badge/status-completed-brightgreen)
+![Platform](https://img.shields.io/badge/platform-web%20%7C%20mobile-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+</div>
+
+## Overview
+
+**Sila** is a fitness tracking application that helps users plan workouts, record physical activities, and monitor their progress over time.
+
+The app supports a wide range of exercise types, making it suitable for both casual users building healthier habits and individuals training for specific fitness goals or events.
 
 ## 1. Getting started
 

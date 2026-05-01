@@ -1,10 +1,12 @@
 import { api } from "./api";
 
 export const exerciseService = {
-    getAll: () => 
-        api.get("/exercises"),
+    getAll: (categoryId) =>
+        api.get("/exercises", {
+            params: { categoryId },
+        }),
 
-    getById: (id) => 
+    getById: (id) =>
         api.get(`/exercises/${id}`),
 
     getMetrics: (id) =>

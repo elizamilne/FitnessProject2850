@@ -2,25 +2,49 @@ import { useState } from "react";
 import Modal from "../../../../common/ui/Modal";
 import { raceService } from "../../../../services/race";
 
+const defaultRaceBanners = [
+  "/defaults/race-banner1.webp",
+  "/defaults/race-banner2.webp",
+  "/defaults/race-banner3.webp",
+  "/defaults/race-banner4.webp",
+];
+
 const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isValid = title && location && date;
+  const isValid = title.trim() && location.trim() && date;
+
+  const getRandomDefaultRaceBanner = () => {
+    const randomIndex = Math.floor(Math.random() * defaultRaceBanners.length);
+    return defaultRaceBanners[randomIndex];
+  };
+
+  const resetForm = () => {
+    setTitle("");
+    setLocation("");
+    setDate("");
+    setLoading(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose?.();
+  };
 
   const handleCreate = async () => {
     if (!isValid) return;
 
-    const defaultBannerUrl =
-      "https://images.pexels.com/photos/34688570/pexels-photo-34688570.jpeg";
+    const defaultBannerUrl = getRandomDefaultRaceBanner();
     const profile = JSON.parse(sessionStorage.getItem("profile"));
-    const profileId = profile["id"];
+    const profileId = profile?.id;
+
     const payload = {
       profileId,
-      title,
-      location,
+      title: title.trim(),
+      location: location.trim(),
       date,
       bannerUrl: defaultBannerUrl,
     };
@@ -30,18 +54,12 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
 
       const response = await raceService.createRace(payload);
 
-      // optional: notify parent AFTER success
-      onCreate?.(response?.data || payload);
+      onCreate?.(response.data);
 
-      // reset
-      setTitle("");
-      setLocation("");
-      setDate("");
-
-      onClose();
+      resetForm();
+      onClose?.();
     } catch (err) {
       console.error("Create race failed:", err);
-      // you can show a toast here
     } finally {
       setLoading(false);
     }
@@ -50,7 +68,7 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       header={
         <h3 className="text-xl font-semibold text-gray-900">Create Race</h3>
       }
@@ -98,16 +116,15 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
             "
           />
 
-          {/* Action */}
           <button
             onClick={handleCreate}
             disabled={!isValid || loading}
             className="
-          w-full py-3 rounded-xl text-sm font-semibold
-          bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-          hover:opacity-90 active:scale-[0.98] transition
-          disabled:opacity-40 disabled:cursor-not-allowed
-        "
+              w-full py-3 rounded-xl text-sm font-semibold
+              bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+              hover:opacity-90 active:scale-[0.98] transition
+              disabled:opacity-40 disabled:cursor-not-allowed
+            "
           >
             {loading ? "Creating..." : "Create Race"}
           </button>

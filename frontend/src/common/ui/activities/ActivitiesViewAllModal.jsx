@@ -29,24 +29,24 @@ const ActivitiesViewAllModal = ({
                   onClose();
                 }}
                 className="
-              group flex items-center gap-4 px-4 py-3 rounded-xl
-              cursor-pointer transition-all duration-200
+                  group flex items-center gap-4 px-4 py-3 rounded-xl
+                  cursor-pointer transition-all duration-200
 
-              bg-white/60 backdrop-blur-md border border-white/50
+                  bg-white/60 backdrop-blur-md border border-white/50
 
-              hover:bg-gradient-to-r 
-              hover:from-indigo-500/5 hover:to-purple-500/5
-              hover:border-indigo-200/60
-            "
+                  hover:bg-gradient-to-r 
+                  hover:from-indigo-500/5 hover:to-purple-500/5
+                  hover:border-indigo-200/60
+                "
               >
-                {/* IMAGE */}
+                {/* Image */}
                 <img
                   src={item.bannerUrl || "https://via.placeholder.com/60"}
                   alt={item.title}
                   className="w-14 h-14 rounded-lg object-cover"
                 />
 
-                {/* TEXT */}
+                {/* Text */}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 truncate">
                     {item.title}
@@ -57,14 +57,14 @@ const ActivitiesViewAllModal = ({
                   </p>
                 </div>
 
-                {/* ARROW */}
+                {/* Arrow */}
                 <span
                   className="
-                text-gray-400 text-sm
-                transition-all duration-200
-                group-hover:text-indigo-500
-                group-hover:translate-x-1
-              "
+                    text-gray-400 text-sm
+                    transition-all duration-200
+                    group-hover:text-indigo-500
+                    group-hover:translate-x-1
+                  "
                 >
                   →
                 </span>

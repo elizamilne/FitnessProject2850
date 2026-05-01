@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import ChatWindow from "./components/ChatWindow";
 import PrimaryNavbar from "../../common/layout/PrimaryNavbar";
 import ChatSidebar from "./components/ChatSidebar";
+import { Helmet } from "react-helmet-async";
 
 export default function ChatPage() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
@@ -48,6 +49,14 @@ export default function ChatPage() {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+      <Helmet>
+        <title>SILA | Chats</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+      
       {/* Navbar */}
       <PrimaryNavbar />
 

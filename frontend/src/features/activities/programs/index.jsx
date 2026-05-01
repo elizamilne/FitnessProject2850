@@ -1,50 +1,51 @@
 import usePrograms from "./hooks/usePrograms";
 
 import ViewAllProgramModal from "./modals/ViewAllProgramModal";
-import DetailProgramModal from "./modals/DetailProgramModal";
+import DetailProgramModal from "./modals/DetailProgramModal/index";
 import CreateProgramModal from "./modals/CreateProgramModal";
 
 import ProgramsHeader from "./components/ProgramsHeader";
 import ProgramsGrid from "./components/ProgramsGrid";
 import ProgramsFooter from "./components/ProgramsFooter";
 
-const ActivitiesPrograms = () => {
+const ActivitiesPrograms = ({ profileId }) => {
   const {
-    // Data
     programs,
     visibleProgramsMap,
     activeTab,
     selectedProgram,
 
-    // Tab control
     setActiveTab,
     setSelectedProgram,
 
-    // Actions
-    handleSelectProgram,
-
-    // Modal state
     isViewModalOpen,
     isCreateModalOpen,
     isDetailModalOpen,
 
-    // Modal setters
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
-  } = usePrograms();
+
+    handleSelectProgram,
+    handleCreateProgram,
+    handleUpdateProgram,
+  } = usePrograms(profileId);
+
+  const visiblePrograms = visibleProgramsMap[activeTab] || [];
 
   return (
     <div className="space-y-6">
       <ProgramsHeader activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <ProgramsGrid
-        programs={visibleProgramsMap[activeTab]}
-        onSelect={(program) => {
-          setSelectedProgram(program);
-          setIsDetailModalOpen(true);
-        }}
-      />
+      <div>
+        <ProgramsGrid
+          programs={visiblePrograms}
+          onSelect={(program) => {
+            setSelectedProgram(program);
+            setIsDetailModalOpen(true);
+          }}
+        />
+      </div>
 
       <ProgramsFooter
         setIsCreateModalOpen={() => setIsCreateModalOpen(true)}
@@ -61,15 +62,14 @@ const ActivitiesPrograms = () => {
       <CreateProgramModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onCreate={(program) => {
-          console.log("Create program:", program);
-        }}
+        onCreate={handleCreateProgram}
       />
 
       <DetailProgramModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         program={selectedProgram}
+        onUpdate={handleUpdateProgram}
       />
     </div>
   );

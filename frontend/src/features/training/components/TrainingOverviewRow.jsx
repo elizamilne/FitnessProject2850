@@ -3,14 +3,15 @@ import { raceService } from "../../../services/race";
 import { activityService } from "../../../services/activity";
 import { CalendarDays } from "lucide-react";
 
-const TrainingOverviewRow = () => {
+const TrainingOverviewRow = ({ profileId }) => {
   const [nextRace, setNextRace] = useState(null);
   const [personalBests, setPersonalBests] = useState([]);
 
   useEffect(() => {
     const loadNextRace = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return; 
+
         const { data } = await raceService.getNextRace(profileId);
         setNextRace(data);
       } catch (error) {
@@ -21,15 +22,17 @@ const TrainingOverviewRow = () => {
     };
 
     loadNextRace();
-  }, []);
+  }, [profileId]);
 
   useEffect(() => {
     const loadPersonalBest = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
+
         const { data } = await activityService.getBestActivity(profileId);
 
         const top5 = data.slice(0, 5);
+
         setPersonalBests(top5);
       } catch (error) {
         if (error.response?.status !== 404) {
@@ -39,7 +42,7 @@ const TrainingOverviewRow = () => {
     };
 
     loadPersonalBest();
-  }, []);
+  }, [profileId]);
 
   const formatRaceDate = (dateString) => {
     const date = new Date(dateString);
@@ -123,7 +126,7 @@ const TrainingOverviewRow = () => {
             ) : (
               personalBests.map((item, index) => (
                 <li
-                  key={`${item.exerciseId}-${item.metricTypeId}`}
+                  key={`${item.programExerciseId}-${item.metricTypeId}`}
                   className={`
                     flex items-center justify-between
                     py-3 transition

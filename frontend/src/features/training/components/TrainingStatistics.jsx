@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { activityService } from "../../../services/activity";
 
-const TrainingStatistics = () => {
+const TrainingStatistics = ({ profileId }) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [barData, setBarData] = useState([]);
   const [lineData, setLineData] = useState([]);
@@ -31,7 +31,8 @@ const TrainingStatistics = () => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
+
         const { data } = await activityService.getActivitiesById(profileId);
         const activities = data.data;
 
@@ -91,7 +92,7 @@ const TrainingStatistics = () => {
     };
 
     loadStats();
-  }, []);
+  }, [profileId]);
 
   const hasEnoughData = barData.some((d) => d.value > 0) && lineData.length > 1;
 

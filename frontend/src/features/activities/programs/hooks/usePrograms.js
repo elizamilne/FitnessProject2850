@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { programService } from "../../../../services/program";
 
-const usePrograms = () => {
+const usePrograms = (profileId) => {
   const [programs, setPrograms] = useState([]);
 
   const [visibleProgramsMap, setVisibleProgramsMap] = useState({
@@ -19,7 +19,7 @@ const usePrograms = () => {
   useEffect(() => {
     const loadPrograms = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
 
         const response =
           activeTab === "active"
@@ -46,7 +46,7 @@ const usePrograms = () => {
     };
 
     loadPrograms();
-  }, [activeTab]);
+  }, [activeTab, profileId]);
 
   const handleSelectProgram = (program) => {
     setSelectedProgram(program);
@@ -64,6 +64,68 @@ const usePrograms = () => {
     });
   };
 
+  const handleCreateProgram = (newProgram) => {
+    setPrograms((prev) => [newProgram, ...prev]);
+
+    setVisibleProgramsMap((prev) => ({
+      ...prev,
+      [activeTab]: [newProgram, ...(prev[activeTab] || [])].slice(0, 3),
+    }));
+  };
+
+  const handleUpdateProgram = (updatedProgram) => {
+    if (updatedProgram.deleted) {
+      setPrograms((prev) =>
+        prev.filter((program) => program.id !== updatedProgram.id)
+      );
+
+      setVisibleProgramsMap((prev) => ({
+        active: prev.active.filter((program) => program.id !== updatedProgram.id),
+        archived: prev.archived.filter(
+          (program) => program.id !== updatedProgram.id
+        ),
+      }));
+
+      setSelectedProgram(null);
+      setIsDetailModalOpen(false);
+      return;
+    }
+
+    setPrograms((prev) => {
+      const exists = prev.some((program) => program.id === updatedProgram.id);
+
+      if (!exists) return prev;
+
+      return prev.map((program) =>
+        program.id === updatedProgram.id ? updatedProgram : program
+      );
+    });
+
+    setVisibleProgramsMap((prev) => {
+      const removeFromActive = prev.active.filter(
+        (program) => program.id !== updatedProgram.id
+      );
+
+      const removeFromArchived = prev.archived.filter(
+        (program) => program.id !== updatedProgram.id
+      );
+
+      if (updatedProgram.archived) {
+        return {
+          active: removeFromActive,
+          archived: [updatedProgram, ...removeFromArchived].slice(0, 3),
+        };
+      }
+
+      return {
+        active: [updatedProgram, ...removeFromActive].slice(0, 3),
+        archived: removeFromArchived,
+      };
+    });
+
+    setSelectedProgram(updatedProgram);
+  };
+
   return {
     // Data
     programs,
@@ -75,9 +137,6 @@ const usePrograms = () => {
     setActiveTab,
     setSelectedProgram,
 
-    // Actions
-    handleSelectProgram,
-
     // Modal state
     isViewModalOpen,
     isCreateModalOpen,
@@ -87,6 +146,11 @@ const usePrograms = () => {
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
+
+    // Actions
+    handleSelectProgram,
+    handleCreateProgram,
+    handleUpdateProgram
   };
 };
 

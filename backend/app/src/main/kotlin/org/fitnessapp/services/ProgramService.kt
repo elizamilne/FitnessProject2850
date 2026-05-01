@@ -18,6 +18,7 @@ import org.fitnessapp.models.Program
 import org.fitnessapp.models.ProgramDTO
 import org.fitnessapp.models.CreateProgramRequest
 import org.fitnessapp.models.ProgramSchedule
+import org.fitnessapp.models.UpdateProgramRequest
 
 fun ResultRow.toProgramDTO(days: List<String>) = ProgramDTO(
     id = this[Program.id],
@@ -104,6 +105,20 @@ object ProgramService {
             }
     }
 
+    fun getProgramById(programId: Long): ProgramDTO? = transaction {
+        val row = Program
+            .selectAll()
+            .where { Program.id eq programId }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val days = ProgramSchedule.selectAll()
+            .where { ProgramSchedule.programId eq programId }
+            .map { it[ProgramSchedule.day] }
+
+        row.toProgramDTO(days)
+    }
+
     fun toggleArchiveProgram(id: Long): ProgramDTO? = transaction {
         val row = Program
             .selectAll()
@@ -149,5 +164,33 @@ object ProgramService {
 
     fun deleteProgramById(id: Long): Int = transaction {
         Program.deleteWhere { Program.id eq id }
+    }
+
+    fun updateProgram(
+        id: Long,
+        request: UpdateProgramRequest
+    ): ProgramDTO? = transaction {
+        val existingProgram = Program
+            .selectAll()
+            .where { Program.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        Program.update({ Program.id eq id }) {
+            it[title] = request.title
+            it[bannerUrl] = request.bannerUrl
+        }
+
+        val updatedRow = Program
+            .selectAll()
+            .where { Program.id eq id }
+            .singleOrNull()
+            ?: return@transaction null
+
+        val days = ProgramSchedule.selectAll()
+            .where { ProgramSchedule.programId eq id }
+            .map { it[ProgramSchedule.day] }
+
+        updatedRow.toProgramDTO(days)
     }
 }

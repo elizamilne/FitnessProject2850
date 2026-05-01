@@ -7,13 +7,17 @@ import { programService } from "../../services/program";
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import PrimaryNavbar from "../../common/layout/PrimaryNavbar";
+import { Helmet } from "react-helmet-async";
 
 const TrainingPage = () => {
   const [programs, setPrograms] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
 
-  // 🔹 Root ref for GSAP scope
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile?.id;
+
+  // Root ref for GSAP scope
   const pageRef = useRef(null);
 
   // Updates selected date
@@ -34,7 +38,8 @@ const TrainingPage = () => {
 
     const loadPrograms = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
+
         const { data } = await programService.getByProfileAndDate(
           profileId,
           selectedDate
@@ -47,19 +52,26 @@ const TrainingPage = () => {
     };
 
     loadPrograms();
-  }, [selectedDate]);
+  }, [selectedDate, profileId]);
 
   // Stable GSAP animation (no glitches)
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".animate-section", {
-        y: 20,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.12,
-        ease: "power2.out",
-        clearProps: "all",
-      });
+      gsap.fromTo(
+        ".animate-section",
+        {
+          y: 12,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          stagger: 0.015,
+          overwrite: "auto",
+        }
+      );
     }, pageRef);
 
     return () => ctx.revert();
@@ -79,6 +91,14 @@ const TrainingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+      <Helmet>
+        <title>SILA | Training</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+      
       <PrimaryNavbar />
 
       <div
@@ -91,10 +111,10 @@ const TrainingPage = () => {
             <h1 className="text-base text-gray-500 font-medium">
               {selectedDate
                 ? new Date(selectedDate).toLocaleDateString("en-GB", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                  })
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })
                 : "Select a date"}
             </h1>
 
@@ -123,7 +143,7 @@ const TrainingPage = () => {
           <h3 className="text-xl font-semibold text-gray-800">Workouts</h3>
 
           <div className="relative p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-            
+
             {selectedDate && (
               <TrainingProgramSelector
                 programs={programs}
@@ -150,14 +170,18 @@ const TrainingPage = () => {
         <div className="animate-section space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Statistics</h3>
 
-          <TrainingStatistics />
+          <TrainingStatistics
+            profileId={profileId}
+          />
         </div>
 
         {/* Overview */}
         <div className="animate-section space-y-4">
           <h3 className="text-xl font-semibold text-gray-800">Overview</h3>
 
-          <TrainingOverviewRow />
+          <TrainingOverviewRow
+            profileId={profileId}
+          />
         </div>
       </div>
     </div>

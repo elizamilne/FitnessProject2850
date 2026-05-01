@@ -15,11 +15,18 @@ export const programService = {
     getArchived: (profileId) =>
         api.get(`/programs/profile/${profileId}/archived`),
 
-     toggleArchive: (id) =>
+    toggleArchive: (id) =>
         api.post(`/programs/${id}/archive`),
      
     createProgram: (programData) => 
         api.post("/programs", programData),
+
+
+    updateProgram: (id, programData) =>
+        api.put(`/programs/${id}`, {
+            title: programData.title,
+            bannerUrl: programData.bannerUrl,
+        }),
     
     deleteProgram: (id) => 
         api.delete(`/programs/${id}`)

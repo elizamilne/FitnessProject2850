@@ -1,21 +1,36 @@
 name,image
-Push Up,https://example.com/images/push-up.png
-Squat,https://example.com/images/squat.png
-Plank,https://example.com/images/plank.png
-Pull Up,https://example.com/images/pull-up.png
-Lunge,https://example.com/images/lunge.png
-Burpee,https://example.com/images/burpee.png
-Mountain Climber,https://example.com/images/mountain-climber.png
-Sit Up,https://example.com/images/sit-up.png
-Deadlift,https://example.com/images/deadlift.png
-Bench Press,https://example.com/images/bench-press.png
-Shoulder Press,https://example.com/images/shoulder-press.png
-Bicep Curl,https://example.com/images/bicep-curl.png
-Tricep Dip,https://example.com/images/tricep-dip.png
-Leg Press,https://example.com/images/leg-press.png
-Calf Raise,https://example.com/images/calf-raise.png
-Russian Twist,https://example.com/images/russian-twist.png
-Jumping Jacks,https://example.com/images/jumping-jacks.png
-High Knees,https://example.com/images/high-knees.png
-Glute Bridge,https://example.com/images/glute-bridge.png
-Side Plank,https://example.com/images/side-plank.png
+Parallel Bar Dips,/exercises/parallel-bar-dips.gif
+Leg Press,/exercises/leg-press.gif
+Barbell Bench Press,/exercises/barbell-bench-press.gif
+Cable Triceps Pushdown,/exercises/cable-triceps-pushdown.gif
+Dumbbell Front Raise,/exercises/dumbbell-front-raise.gif
+Incline Dumbbell Curl,/exercises/incline-dumbbell-curl.gif
+Concentration Curl,/exercises/concentration-curl.gif
+Barbell Curl,/exercises/barbell-curl.gif
+Kettlebell Goblet Squat,/exercises/kettlebell-goblet-squat.gif
+Overhead Squat,/exercises/overhead-squat.gif
+Smith Machine Bench Press,/exercises/smith-machine-bench-press.gif
+Barbell Standing Calf Raise,/exercises/barbell-standing-calf-raise.gif
+Incline Dumbbell Triceps Extension,/exercises/incline-dumbbell-triceps-extension.gif
+Dumbbell Side Bend,/exercises/dumbbell-side-bend.gif
+Dumbbell Upright Row,/exercises/dumbbell-upright-row.gif
+Barbell Preacher Curl,/exercises/barbell-preacher-curl.gif
+Incline Dumbbell Curl,/exercises/incline-dumbbell-curl.gif
+Reverse Crunch,/exercises/reverse-crunch.gif
+Machine Lat Pulldown,/exercises/machine-lat-pulldown.gif
+Seated Row (Machine),/exercises/seated-row.gif
+Seated Leg Press,/exercises/seated-leg-press.gif
+Dumbbell Bent Over Row (Single Arm),/exercises/dumbbell-bent-over-row-single-arm.gif
+Incline Cable Chest Press,/exercises/incline-cable-chest-press.gif
+Hack Squat (Machine),/exercises/hack-squat.gif
+Hanging Leg Raise,/exercises/hanging-leg-raise.gif
+Incline Dumbbell Press,/exercises/incline-dumbbell-press.gif
+Seated Cable Curl,/exercises/seated-cable-curl.gif
+Barbell Standing Calf Raise,/exercises/barbell-standing-calf-raise.gif
+Stability Ball Back Extension,/exercises/stability-ball-back-extension.gif
+Cable Crunch,/exercises/cable-crunch.gif
+Cycle Cross Trainer,/exercises/cycle-cross-trainer.gif
+Running,/exercises/running.gif
+Swimmer Kicks,/exercises/swimmer-kicks.gif
+Rocket Jump,/exercises/rocket-jump.gif
+Forward Jump,/exercises/forward-jump.gif

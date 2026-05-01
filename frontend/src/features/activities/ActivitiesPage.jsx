@@ -4,21 +4,31 @@ import ActivitiesPrograms from "./programs";
 import ActivitiesRaces from "./races";
 import { useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
+import { Helmet } from "react-helmet-async";
 
 const ActivitiesPage = () => {
   const pageRef = useRef(null);
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const profileId = profile?.id;
 
-  // ✅ Smooth, non-glitch animation
+  // Smooth, non-glitch animation
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(".animate-section", {
-        y: 20,
-        opacity: 0,
-        duration: 0.5,
-        stagger: 0.12,
-        ease: "power2.out",
-        clearProps: "all",
-      });
+      gsap.fromTo(
+        ".animate-section",
+        {
+          y: 12,
+          opacity: 0,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.35,
+          ease: "power2.out",
+          stagger: 0.015,
+          overwrite: "auto",
+        }
+      );
     }, pageRef);
 
     return () => ctx.revert();
@@ -26,6 +36,14 @@ const ActivitiesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+      <Helmet>
+        <title>SILA | Activities</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+
       <PrimaryNavbar />
 
       <div
@@ -56,7 +74,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesPrograms />
+            <ActivitiesPrograms
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"
@@ -73,7 +93,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesRaces />
+            <ActivitiesRaces
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"
@@ -90,7 +112,9 @@ const ActivitiesPage = () => {
               bg-white/60 backdrop-blur-xl border border-white/50
               shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
           >
-            <ActivitiesHistory />
+            <ActivitiesHistory
+              profileId={profileId}
+            />
 
             <div className="absolute inset-0 rounded-3xl pointer-events-none
               bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"

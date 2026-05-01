@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { raceService } from "../../../../services/race";
 
-const useRaces = () => {
+const useRaces = (profileId) => {
   const [races, setRaces] = useState([]);
 
   const [visisbleRacesMap, setVisibleRacesMap] = useState({
@@ -19,7 +19,7 @@ const useRaces = () => {
   useEffect(() => {
     const loadRaces = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
 
         const response =
           activeTab === "upcoming"
@@ -30,14 +30,10 @@ const useRaces = () => {
 
         setRaces(data);
 
-        setVisibleRacesMap((prev) => {
-          if (prev[activeTab].length > 0) return prev;
-
-          return {
-            ...prev,
-            [activeTab]: data.slice(0, 3),
-          };
-        });
+        setVisibleRacesMap((prev) => ({
+          ...prev,
+          [activeTab]: data.slice(0, 3),
+        }));
 
         setSelectedRace(null);
       } catch (err) {
@@ -46,7 +42,18 @@ const useRaces = () => {
     };
 
     loadRaces();
-  }, [activeTab]);
+  }, [activeTab, profileId]);
+
+  const handleCreateRace = (newRace) => {
+    setRaces((prev) => [newRace, ...prev]);
+
+    const targetTab = newRace.completed ? "completed" : "upcoming";
+
+    setVisibleRacesMap((prev) => ({
+      ...prev,
+      [targetTab]: [newRace, ...(prev[targetTab] || [])].slice(0, 3),
+    }));
+  };
 
   const handleSelectRace = (race) => {
     setSelectedRace(race);
@@ -66,29 +73,78 @@ const useRaces = () => {
     setIsViewModalOpen(false);
   };
 
+  const handleUpdateRace = (updatedRace) => {
+    if (updatedRace.deleted) {
+      setRaces((prev) =>
+        prev.filter((race) => race.id !== updatedRace.id)
+      );
+
+      setVisibleRacesMap((prev) => ({
+        upcoming: prev.upcoming.filter((race) => race.id !== updatedRace.id),
+        completed: prev.completed.filter((race) => race.id !== updatedRace.id),
+      }));
+
+      setSelectedRace(null);
+      setIsDetailModalOpen(false);
+      return;
+    }
+
+    setRaces((prev) => {
+      const exists = prev.some((race) => race.id === updatedRace.id);
+
+      if (!exists) return prev;
+
+      return prev.map((race) =>
+        race.id === updatedRace.id ? updatedRace : race
+      );
+    });
+
+    setVisibleRacesMap((prev) => {
+      const removeFromUpcoming = prev.upcoming.filter(
+        (race) => race.id !== updatedRace.id
+      );
+
+      const removeFromCompleted = prev.completed.filter(
+        (race) => race.id !== updatedRace.id
+      );
+
+      if (updatedRace.completed) {
+        return {
+          upcoming: removeFromUpcoming,
+          completed: [updatedRace, ...removeFromCompleted].slice(0, 3),
+        };
+      }
+
+      return {
+        upcoming: [updatedRace, ...removeFromUpcoming].slice(0, 3),
+        completed: removeFromCompleted,
+      };
+    });
+
+    setSelectedRace(updatedRace);
+  };
+
   return {
-    // Data
     races,
     visisbleRacesMap,
-    activeTab,
     selectedRace,
 
-    // Tab control
+    activeTab,
+
     setActiveTab,
     setSelectedRace,
 
-    // Actions 
-    handleSelectRace,
-    
-    // Modal state
     isViewModalOpen,
     isCreateModalOpen,
     isDetailModalOpen,
-    
-    // Modal setters
+
     setIsViewModalOpen,
     setIsCreateModalOpen,
     setIsDetailModalOpen,
+
+    handleSelectRace,
+    handleCreateRace,
+    handleUpdateRace,
   };
 };
 

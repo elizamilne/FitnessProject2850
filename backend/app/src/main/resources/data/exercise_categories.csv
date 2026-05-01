@@ -1,27 +1,50 @@
 exercise_name,category_name
-Push Up,Chest
-Push Up,Arms
-Squat,Legs
-Plank,Core
-Pull Up,Back
-Pull Up,Arms
-Lunge,Legs
-Burpee,Full Body
-Mountain Climber,Cardio
-Mountain Climber,Core
-Sit Up,Core
-Deadlift,Back
-Deadlift,Legs
-Bench Press,Chest
-Bench Press,Arms
-Shoulder Press,Shoulders
-Shoulder Press,Arms
-Bicep Curl,Arms
-Tricep Dip,Arms
+Parallel Bar Dips,Chest
+Parallel Bar Dips,Arms
 Leg Press,Legs
-Calf Raise,Legs
-Russian Twist,Core
-Jumping Jacks,Cardio
-High Knees,Cardio
-Glute Bridge,Legs
-Side Plank,Core
+Seated Leg Press,Legs
+Barbell Bench Press,Chest
+Barbell Bench Press,Arms
+Cable Triceps Pushdown,Arms
+Dumbbell Front Raise,Shoulders
+Incline Dumbbell Curl,Arms
+Concentration Curl,Arms
+Barbell Curl,Arms
+Kettlebell Goblet Squat,Legs
+Overhead Squat,Legs
+Overhead Squat,Shoulders
+Overhead Squat,Core
+Smith Machine Bench Press,Chest
+Smith Machine Bench Press,Arms
+Barbell Standing Calf Raise,Legs
+Incline Dumbbell Triceps Extension,Arms
+Dumbbell Side Bend,Core
+Dumbbell Upright Row,Shoulders
+Dumbbell Upright Row,Arms
+Barbell Preacher Curl,Arms
+Reverse Crunch,Core
+Machine Lat Pulldown,Back
+Machine Lat Pulldown,Arms
+Seated Row (Machine),Back
+Seated Row (Machine),Arms
+Dumbbell Bent Over Row (Single Arm),Back
+Dumbbell Bent Over Row (Single Arm),Arms
+Incline Cable Chest Press,Chest
+Incline Cable Chest Press,Arms
+Hack Squat (Machine),Legs
+Hanging Leg Raise,Core
+Incline Dumbbell Press,Chest
+Incline Dumbbell Press,Arms
+Seated Cable Curl,Arms
+Stability Ball Back Extension,Back
+Stability Ball Back Extension,Core
+Cable Crunch,Core
+Cycle Cross Trainer,Cardio
+Cycle Cross Trainer,Legs
+Running,Cardio
+Running,Legs
+Swimmer Kicks,Core
+Rocket Jump,Legs
+Rocket Jump,Full Body
+Forward Jump,Legs
+Forward Jump,Cardio

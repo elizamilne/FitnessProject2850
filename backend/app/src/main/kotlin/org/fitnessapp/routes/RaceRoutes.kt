@@ -60,18 +60,14 @@ fun Route.raceRoutes() {
 
         get("/next-race/{profileId}") {
             val profileId = call.parameters["profileId"]?.toLongOrNull()
-
-            if (profileId == null) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid profileId")
-                return@get
-            }
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid profileId")
 
             val race = RaceService.getNextIncompleteRace(profileId)
 
-            if (race != null) {
-                call.respond(race)
+            if (race == null) {
+                call.respond(HttpStatusCode.NoContent)
             } else {
-                call.respond(HttpStatusCode.NotFound, "No upcoming race found")
+                call.respond(HttpStatusCode.OK, race)
             }
         }
 

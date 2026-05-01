@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { activityService } from "../../../services/activity";
 
-const ActivitiesHistory = () => {
+const ActivitiesHistory = ({ profileId }) => {
   const [sort, setSort] = useState("asc");
   const [search, setSearch] = useState("");
   const [date, setDate] = useState("");
@@ -14,7 +14,7 @@ const ActivitiesHistory = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const profileId = 1;
+        if (!profileId) return;
 
         const params = {
           search: search || undefined,
@@ -37,7 +37,7 @@ const ActivitiesHistory = () => {
     };
 
     fetchActivities();
-  }, [search, date, sort, page]);
+  }, [search, date, sort, page, profileId]);
 
   const isEmpty = activities.length === 0;
 
@@ -84,10 +84,10 @@ const ActivitiesHistory = () => {
         </div>
       </div>
 
-      {/* Table or Empty */}
-      <div className="overflow-hidden rounded-2xl bg-white/60 backdrop-blur-xl border border-white/50">
+      {/* Table / Empty (STABILIZED) */}
+      <div className="min-h-[320px] overflow-hidden rounded-2xl bg-white/60 backdrop-blur-md border border-white/50">
         {isEmpty ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="min-h-[320px] flex items-center justify-center px-6">
             <div className="text-center text-gray-400 max-w-sm space-y-2">
               <p className="text-base font-semibold text-gray-500">
                 No activities found
@@ -122,8 +122,8 @@ const ActivitiesHistory = () => {
                   <td className="px-5 py-4 text-gray-600">
                     {activity.metrics?.length
                       ? activity.metrics
-                          .map((m) => `${m.value ?? "-"} ${m.unit ?? ""}`)
-                          .join(" · ")
+                        .map((m) => `${m.value ?? "-"} ${m.unit ?? ""}`)
+                        .join(" · ")
                       : "No metrics"}
                   </td>
                 </tr>

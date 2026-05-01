@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import PublicLayout from "../common/layout/PublicLayout";
 
 // Public pages
-import HomeScreen from "../features/home/HomeScreen";
+import HomePage from "../features/home/HomePage";
 import Login from "../features/auth/Login";
 import SignUp from "../features/auth/Signup";
 
@@ -32,7 +32,7 @@ const AppRoutes = () => {
 
         <Route path="/" element={
             <PublicOnlyRoute>
-                <HomeScreen />
+                <HomePage />
             </PublicOnlyRoute>
         } />
 

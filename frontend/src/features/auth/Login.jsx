@@ -4,8 +4,9 @@ import { userService } from "../../services/user";
 import { useNavigate } from "react-router-dom";
 import { profileService } from "../../services/profile";
 import AuthInput from "../../common/ui/auth/AuthInput";
-import AnimatedError from "../../common/ui/auth/AnimatedError";
+import AnimatedError from "../../common/ui/AnimatedError";
 import { validateLogin } from "./utils/loginValidation";
+import { Helmet } from "react-helmet-async";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function Login() {
         const profile = profileRes?.data || profileRes;
 
         sessionStorage.setItem("profile", JSON.stringify(profile));
-        navigate("/dashboard");
+        navigate("/training-page");
       } catch (profileErr) {
         console.error("No profile found:", profileErr);
 
@@ -57,6 +58,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      <Helmet>
+        <title>SILA | Login</title>
+        <meta name="description" content="Track your workouts, programs, races, and training progress." />
+      </Helmet>
+
       <div className="relative z-10 w-full max-w-md">
         <form
           onSubmit={handleSubmit}

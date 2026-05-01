@@ -3,6 +3,8 @@ package org.fitnessapp.models
 import org.jetbrains.exposed.sql.*
 import kotlinx.serialization.Serializable
 
+import org.fitnessapp.models.MetricType 
+
 object ProgramExerciseMetric : Table("program_exercise_metric") {
     val id = long("id").autoIncrement()
     val metricTypeId = reference("metric_type_id", MetricType.id)
@@ -27,7 +29,7 @@ data class ProgramExerciseMetricDTO(
 
 @Serializable
 data class ProgramExerciseMetricResponseDTO (
-    val metricTypeId: Long,
+    val metricType: MetricTypeDTO,
     val value: Double,
 )
 

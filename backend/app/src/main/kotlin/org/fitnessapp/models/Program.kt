@@ -28,3 +28,9 @@ data class CreateProgramRequest(
     val bannerUrl: String,
     val profileId: Long
 )
+
+@Serializable
+data class UpdateProgramRequest(
+    val title: String,
+    val bannerUrl: String? = null
+)

@@ -1,125 +1,118 @@
-import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
-import { programExerciseService } from "../../../services/programExercise";
-import { metricService } from "../../../services/metricType";
+import { useState } from "react";
 import { programExerciseMetricService } from "../../../services/programExerciseMetric";
 import { activityService } from "../../../services/activity";
 
+import { useExercises } from "./hooks/useExercises";
+import { useCompletedExercises } from "./hooks/useCompletedExercises";
+
 const TrainingContentList = ({ program, date }) => {
-  const progress = 66;
-  const [completed, setCompleted] = useState([]);
-  const [exercises, setExercises] = useState([]);
-  const [metricMap, setMetricMap] = useState({});
+  const { exercises = [] } = useExercises(program) || {};
 
-  useEffect(() => {
-    const loadMetrics = async () => {
-      try {
-        const { data } = await metricService.getAll();
+  const {
+    completed = [],
+    initialCompleted = [],
+    toggleExercise,
+  } = useCompletedExercises(program, date);
 
-        const map = Object.fromEntries(
-          data.map((m) => [
-            m.id,
-            {
-              name: m.name,
-              unit: m.unit,
-            },
-          ]),
-        );
+  const progress = exercises.length
+    ? Math.min(
+        100,
+        Math.round(
+          ([...new Set(completed)].filter((id) =>
+            exercises.some((ex) => ex.programExerciseId === id)
+          ).length /
+            exercises.length) *
+            100
+        )
+      )
+    : 0;
 
-        setMetricMap(map);
-      } catch (error) {
-        console.error("Failed to load metrics", error);
-      }
-    };
+  const [page, setPage] = useState(1);
+  const pageSize = 8;
 
-    loadMetrics();
-  }, []);
+  const totalPages = Math.ceil(exercises.length / pageSize);
 
-  useEffect(() => {
-    const loadExercises = async () => {
-      try {
-        const { data } = await programExerciseService.getByProgram(program.id);
-        setExercises(data);
-      } catch (error) {
-        console.error("Failed to load exercises:", error);
-      }
-    };
+  const paginatedExercises = exercises.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
 
-    if (program) loadExercises();
-  }, [program]);
+  const hasNext = page < totalPages;
+  const isEmpty = exercises.length === 0;
 
-  const toggleExercise = (exercise) => {
-    setCompleted((prev) => {
-      const exists = prev.some(
-        (item) => item.programExerciseId === exercise.programExerciseId,
-      );
-
-      return exists
-        ? prev.filter(
-            (item) =>
-              item.programExerciseId !== exercise.programExerciseId,
-          )
-        : [...prev, exercise];
-    });
-  };
-
-  const formatMetrics = (metrics) => {
-    if (!metrics) return "";
-
+  const formatMetrics = (metrics = []) => {
     return metrics
       .slice(0, 2)
       .map((m) => {
-        const metric = metricMap[m.metricTypeId];
-        if (!metric) return m.value;
+        const name = m.metricType?.name || "Metric";
+        const unit = m.metricType?.unit || "";
+        const value = m.value ?? "";
 
-        return `${m.value}${metric.unit || ""} ${metric.name.toLowerCase()}`;
+        return `${value}${unit ? ` ${unit}` : ""} ${name.toLowerCase()}`;
       })
       .join(" • ");
   };
 
   const handleSave = async () => {
+    if (!program || exercises.length === 0) return;
+
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;
 
+    if (!profileId) return;
+
     try {
-      completed.map(async (e) => {
-        const exerciseId = e.programExerciseId;
-        const res =
-          await programExerciseMetricService.getByProgramExerciseId(
-            exerciseId,
+      const toCreate = completed.filter(
+        (id) => !initialCompleted.includes(id)
+      );
+
+      const toDelete = initialCompleted.filter(
+        (id) => !completed.includes(id)
+      );
+
+      await Promise.all(
+        toCreate.map(async (programExerciseId) => {
+          const res =
+            await programExerciseMetricService.getByProgramExerciseId(
+              programExerciseId
+            );
+
+          const cleanedMetrics = res.data.map(
+            ({ metricType, metricTypeId, value }) => ({
+              metricTypeId: metricType?.id ?? metricTypeId,
+              value,
+            })
           );
 
-        const cleanedMetrics = res.data.map(
-          ({ metricTypeId, value }) => ({
-            metricTypeId,
-            value,
-          }),
-        );
+          const payload = {
+            date,
+            profileId,
+            programExerciseId,
+            metrics: cleanedMetrics,
+          };
 
-        const payload = {
-          date,
-          profileId,
-          exerciseId,
-          metrics: cleanedMetrics,
-        };
+          return activityService.createActivity(payload);
+        })
+      );
 
-        activityService.createActivity(payload);
-      });
+      await Promise.all(
+        toDelete.map((programExerciseId) =>
+          activityService.deleteByProgramExercise(
+            profileId,
+            programExerciseId,
+            date
+          )
+        )
+      );
     } catch (error) {
-      console.error("Error fetching:", error);
+      console.error("Error saving activities:", error);
     }
   };
 
-  // Empty state: no program selected
   if (!program) {
     return (
       <div className="w-full lg:w-[80%] mx-auto">
-        <div
-          className="relative p-6 rounded-3xl
-                      bg-white/70 backdrop-blur-xl border border-white/50
-                      shadow-[0_10px_40px_rgba(0,0,0,0.06)]
-                      flex items-center justify-center"
-        >
+        <div className="relative p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex items-center justify-center">
           <div className="text-center text-gray-400 max-w-sm space-y-2">
             <p className="text-base font-semibold text-gray-500">
               No program selected
@@ -137,49 +130,43 @@ const TrainingContentList = ({ program, date }) => {
 
   return (
     <div className="w-full lg:w-[100%] mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-gray-900 truncate">
-          {program.title}
-        </h2>
-
-        <div className="flex items-center gap-3">
-          <button className="w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur border border-white/60 hover:bg-white transition">
-            <Plus size={20} />
-          </button>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-semibold text-gray-900 truncate">
+            {program.title}
+          </h2>
 
           <button
             onClick={handleSave}
-            className="px-5 py-2.5 rounded-lg text-base font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90 active:scale-95 transition"
+            disabled={isEmpty}
+            className="
+              px-5 py-2.5 rounded-lg text-base font-semibold
+              bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+              hover:opacity-90 active:scale-95 transition
+              disabled:opacity-40 disabled:cursor-not-allowed
+            "
           >
             Save
           </button>
         </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-gray-500">
+            <span>In progress</span>
+            <span>{progress}%</span>
+          </div>
+
+          <div className="h-2 bg-gray-200/70 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Progress */}
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm text-gray-500">
-          <span>In progress</span>
-          <span>{progress}%</span>
-        </div>
-
-        <div className="h-2 bg-gray-200/70 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Empty state: no exercises */}
-      {exercises.length === 0 ? (
-        <div
-          className="relative p-6 rounded-3xl
-                      bg-white/70 backdrop-blur-xl border border-white/50
-                      shadow-[0_10px_40px_rgba(0,0,0,0.06)]
-                      flex items-center justify-center"
-        >
+      {isEmpty ? (
+        <div className="relative p-6 flex items-center justify-center">
           <div className="text-center text-gray-400 max-w-sm space-y-2">
             <p className="text-base font-semibold text-gray-500">
               No exercises yet
@@ -188,64 +175,84 @@ const TrainingContentList = ({ program, date }) => {
               Add exercises to start your workout
             </p>
           </div>
-
-          <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-r from-indigo-500/5 to-purple-500/5" />
         </div>
       ) : (
-        <div className="space-y-2">
-          {exercises.map((exercise) => {
-            const isCompleted = completed.some(
-              (item) =>
-                item.programExerciseId ===
-                exercise.programExerciseId,
-            );
+        <div>
+          <div className="space-y-2">
+            {paginatedExercises.map((exercise) => {
+              const isCompleted = completed.includes(
+                exercise.programExerciseId
+              );
 
-            return (
-              <div
-                key={exercise.programExerciseId}
-                onClick={() => toggleExercise(exercise)}
-                className={`
-                  flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer
-                  transition-all duration-200 relative
-                  ${
-                    isCompleted
-                      ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
-                      : "hover:bg-white/60"
-                  }
-                `}
-              >
-                <img
-                  src={exercise.image}
-                  alt={exercise.exerciseName}
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {exercise.exerciseName}
-                  </h3>
-
-                  <p className="text-base text-gray-500 truncate">
-                    {formatMetrics(exercise.metrics)}
-                  </p>
-                </div>
-
+              return (
                 <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
-                    isCompleted
-                      ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
-                      : "border border-gray-300"
-                  }`}
+                  key={exercise.programExerciseId}
+                  onClick={() => toggleExercise(exercise)}
+                  className={`
+                    flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer
+                    transition-all duration-200 relative
+                    ${
+                      isCompleted
+                        ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
+                        : "hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18"
+                    }
+                  `}
                 >
-                  {isCompleted && "✓"}
-                </div>
+                  <img
+                    src={exercise.image || "https://via.placeholder.com/60"}
+                    alt={exercise.exerciseName}
+                    className="w-12 h-12 rounded-lg object-cover"
+                  />
 
-                {isCompleted && (
-                  <div className="absolute inset-0 rounded-xl pointer-events-none bg-gradient-to-r from-indigo-500/5 to-purple-500/5" />
-                )}
-              </div>
-            );
-          })}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                      {exercise.exerciseName}
+                    </h3>
+
+                    <p className="text-base text-gray-500 truncate">
+                      {formatMetrics(exercise.metrics)}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
+                      isCompleted
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
+                        : "border border-gray-300"
+                    }`}
+                  >
+                    {isCompleted && "✓"}
+                  </div>
+
+                  {isCompleted && (
+                    <div className="absolute inset-0 rounded-xl pointer-events-none bg-gradient-to-r from-indigo-500/5 to-purple-500/5" />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-center gap-8 mt-6">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              disabled={page === 1}
+              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Prev
+            </button>
+
+            <span className="text-sm text-gray-600 font-medium">
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              disabled={!hasNext}
+              className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

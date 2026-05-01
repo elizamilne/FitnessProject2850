@@ -8,18 +8,31 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isValid = title && location && date;
+  const isValid = title.trim() && location.trim() && date;
+
+  const resetForm = () => {
+    setTitle("");
+    setLocation("");
+    setDate("");
+    setLoading(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose?.();
+  };
 
   const handleCreate = async () => {
     if (!isValid) return;
 
     const defaultBannerUrl = "/defaults/race-banner1.jpeg";
     const profile = JSON.parse(sessionStorage.getItem("profile"));
-    const profileId = profile["id"];
+    const profileId = profile?.id;
+
     const payload = {
       profileId,
-      title,
-      location,
+      title: title.trim(),
+      location: location.trim(),
       date,
       bannerUrl: defaultBannerUrl,
     };
@@ -29,18 +42,12 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
 
       const response = await raceService.createRace(payload);
 
-      // optional: notify parent AFTER success
       onCreate?.(response.data);
 
-      // reset
-      setTitle("");
-      setLocation("");
-      setDate("");
-
-      onClose();
+      resetForm();
+      onClose?.();
     } catch (err) {
       console.error("Create race failed:", err);
-      // you can show a toast here
     } finally {
       setLoading(false);
     }
@@ -49,7 +56,7 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       header={
         <h3 className="text-xl font-semibold text-gray-900">Create Race</h3>
       }
@@ -97,7 +104,6 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
             "
           />
 
-          {/* Action */}
           <button
             onClick={handleCreate}
             disabled={!isValid || loading}

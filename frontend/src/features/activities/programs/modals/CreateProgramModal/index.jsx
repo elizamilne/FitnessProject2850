@@ -21,6 +21,20 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
 
   const currentStep = steps[stepIndex];
 
+  const resetForm = () => {
+    setStepIndex(0);
+    setSelectedCategory(null);
+    setSelectedExercises([]);
+    setExerciseMetrics({});
+    setSelectedDays([]);
+    setTitle("");
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose?.();
+  };
+
   const createProgram = async () => {
     const defaultBannerUrl = "/defaults/program-banner1.jpeg";
 
@@ -80,18 +94,20 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
     } else {
       if (!title.trim()) return;
 
-      // Create Program
       const program = await createProgram();
       const programId = program.id;
 
-      // Create Exercises with Metrics
       await createProgramExercisesAndMetrics(programId);
-
-      // Create Schedule for the Program
       await createProgramSchedule(programId);
 
-      onCreate?.(program);
-      onClose();
+      onCreate?.({
+        ...program,
+        weeklyFrequency: selectedDays,
+        days: selectedDays,
+      });
+
+      resetForm();
+      onClose?.();
     }
   };
 
@@ -104,7 +120,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       header={
         <h3 className="text-xl font-semibold text-gray-900">Create Program</h3>
       }

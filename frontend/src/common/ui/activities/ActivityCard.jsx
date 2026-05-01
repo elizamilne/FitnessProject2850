@@ -21,37 +21,34 @@ const ActivityCard = ({
         alt={item.title}
         className="
           absolute inset-0 w-full h-full object-cover
+          grayscale-[0.15] contrast-[0.9]
           transition-transform duration-500 group-hover:scale-105
         "
       />
 
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
+      {/* Subtle overlay */}
+      <div
+        className="
+          absolute inset-0
+          bg-gradient-to-r from-white/55 via-indigo-100/25 to-transparent
+          backdrop-blur-[1px]
+        "
+      />
 
       {/* Content */}
       <div className="relative h-full flex items-center px-5">
         <div>
-          <h3
-            className="
-              text-white font-semibold text-lg tracking-tight
-              drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]
-            "
-          >
+          <h3 className="text-gray-900 font-semibold text-lg tracking-tight">
             {item.title}
           </h3>
 
-          <p
-            className="
-              text-sm text-white/80 mt-1
-              drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]
-            "
-          >
+          <p className="text-sm text-gray-600 mt-1">
             {renderSubtitle?.(item)}
           </p>
         </div>
       </div>
 
-      {/* Subtle glow (on hover) */}
+      {/* Hover glow */}
       <div
         className="
           absolute inset-0 rounded-2xl pointer-events-none

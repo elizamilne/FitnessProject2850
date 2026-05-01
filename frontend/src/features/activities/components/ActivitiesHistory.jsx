@@ -87,7 +87,7 @@ const ActivitiesHistory = ({ profileId }) => {
       {/* Table / Empty (STABILIZED) */}
       <div className="min-h-[320px] overflow-hidden rounded-2xl bg-white/60 backdrop-blur-md border border-white/50">
         {isEmpty ? (
-          <div className="flex items-center justify-center h-full py-16">
+          <div className="min-h-[320px] flex items-center justify-center px-6">
             <div className="text-center text-gray-400 max-w-sm space-y-2">
               <p className="text-base font-semibold text-gray-500">
                 No activities found
@@ -122,8 +122,8 @@ const ActivitiesHistory = ({ profileId }) => {
                   <td className="px-5 py-4 text-gray-600">
                     {activity.metrics?.length
                       ? activity.metrics
-                          .map((m) => `${m.value ?? "-"} ${m.unit ?? ""}`)
-                          .join(" · ")
+                        .map((m) => `${m.value ?? "-"} ${m.unit ?? ""}`)
+                        .join(" · ")
                       : "No metrics"}
                   </td>
                 </tr>

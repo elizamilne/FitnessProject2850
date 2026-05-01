@@ -1,12 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { Helmet } from "react-helmet-async";
 
-const HomeScreen = () => {
+const HomePage = () => {
   const navigate = useNavigate();
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center text-center px-6 pt-20 space-y-8 font-sans">
+      <Helmet>
+        <title>SILA | Home</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+
+
       {/* Social icons */}
       <div className="absolute bottom-6 right-6 flex gap-4 text-white z-20">
         <a className="hover:scale-110 hover:text-blue-400 transition">
@@ -63,4 +73,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default HomePage;

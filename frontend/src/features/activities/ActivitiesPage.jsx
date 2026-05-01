@@ -4,6 +4,7 @@ import ActivitiesPrograms from "./programs";
 import ActivitiesRaces from "./races";
 import { useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
+import { Helmet } from "react-helmet-async";
 
 const ActivitiesPage = () => {
   const pageRef = useRef(null);
@@ -35,6 +36,14 @@ const ActivitiesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+      <Helmet>
+        <title>SILA | Activities</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+
       <PrimaryNavbar />
 
       <div

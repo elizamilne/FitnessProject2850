@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AuthInput from "../../common/ui/auth/AuthInput";
 import AnimatedError from "../../common/ui/AnimatedError";
 import { validateRegister } from "./utils/registerValidation";
+import { Helmet } from "react-helmet-async";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -66,6 +67,14 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      <Helmet>
+        <title>SILA | Sign Up</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+
       <form
         onSubmit={handleSubmit}
         className="

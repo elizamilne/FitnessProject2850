@@ -7,6 +7,7 @@ import { programService } from "../../services/program";
 import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { gsap } from "gsap";
 import PrimaryNavbar from "../../common/layout/PrimaryNavbar";
+import { Helmet } from "react-helmet-async";
 
 const TrainingPage = () => {
   const [programs, setPrograms] = useState([]);
@@ -90,6 +91,14 @@ const TrainingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#eef2ff] to-[#fdf4ff]">
+      <Helmet>
+        <title>SILA | Training</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+      
       <PrimaryNavbar />
 
       <div

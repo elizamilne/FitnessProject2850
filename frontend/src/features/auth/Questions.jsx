@@ -3,6 +3,7 @@ import { profileService } from "../../services/profile";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import AnimatedError from "../../common/ui/AnimatedError";
+import { Helmet } from "react-helmet-async";
 
 const quiz = [
   {
@@ -259,6 +260,14 @@ const Questions = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
+      <Helmet>
+        <title>SILA | Questions</title>
+        <meta
+          name="description"
+          content="Track your workouts, programs, races, and training progress."
+        />
+      </Helmet>
+      
       <video
         ref={videoA}
         autoPlay

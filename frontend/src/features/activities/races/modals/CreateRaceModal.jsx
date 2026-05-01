@@ -2,6 +2,13 @@ import { useState } from "react";
 import Modal from "../../../../common/ui/Modal";
 import { raceService } from "../../../../services/race";
 
+const defaultRaceBanners = [
+  "/defaults/race-banner1.jpg",
+  "/defaults/race-banner2.jpg",
+  "/defaults/race-banner3.jpg",
+  "/defaults/race-banner4.jpg",
+];
+
 const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -9,6 +16,11 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const [loading, setLoading] = useState(false);
 
   const isValid = title.trim() && location.trim() && date;
+
+  const getRandomDefaultRaceBanner = () => {
+    const randomIndex = Math.floor(Math.random() * defaultRaceBanners.length);
+    return defaultRaceBanners[randomIndex];
+  };
 
   const resetForm = () => {
     setTitle("");
@@ -25,7 +37,7 @@ const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {
   const handleCreate = async () => {
     if (!isValid) return;
 
-    const defaultBannerUrl = "/defaults/race-banner1.jpeg";
+    const defaultBannerUrl = getRandomDefaultRaceBanner();
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;
 

@@ -12,6 +12,14 @@ import { exerciseService } from "../../../../../services/exercise";
 
 const steps = ["category", "exercise", "metrics", "schedule"];
 
+const defaultProgramBanners = [
+  "/defaults/program-banner1.jpeg",
+  "/defaults/program-banner2.jpg",
+  "/defaults/program-banner3.jpg",
+  "/defaults/program-banner4.jpg",
+];
+
+
 const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const [stepIndex, setStepIndex] = useState(0);
 
@@ -31,6 +39,11 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   const [loadingExercises, setLoadingExercises] = useState(false);
 
   const currentStep = steps[stepIndex];
+
+  const getRandomDefaultBanner = () => {
+    const randomIndex = Math.floor(Math.random() * defaultProgramBanners.length);
+    return defaultProgramBanners[randomIndex];
+  };
 
   const loadCategories = async () => {
     if (categories.length > 0) return;
@@ -130,7 +143,7 @@ const CreateProgramModal = ({ isOpen, onClose, onCreate }) => {
   };
 
   const createProgram = async () => {
-    const defaultBannerUrl = "/defaults/program-banner1.jpeg";
+    const defaultBannerUrl = getRandomDefaultBanner();
 
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;

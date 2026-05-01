@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.JoinType
 
 import java.math.BigDecimal
 
@@ -21,6 +22,7 @@ import org.fitnessapp.models.ProgramExerciseMetricRequest
 import org.fitnessapp.models.ProgramExerciseMetricResponseDTO
 
 import org.fitnessapp.models.MetricType
+import org.fitnessapp.models.MetricTypeDTO
 import org.fitnessapp.models.Exercise
 
 import org.fitnessapp.services.MetricTypeService
@@ -63,17 +65,32 @@ object ProgramExerciseService {
         builder[ProgramExerciseMetric.value] = BigDecimal.valueOf(metric.value)
     }
 
-    fun getMetricsForProgramExercise(programExerciseId: Long): List<ProgramExerciseMetricResponseDTO> {
+    fun getMetricsForProgramExercise(
+        programExerciseId: Long
+    ): List<ProgramExerciseMetricResponseDTO> {
         return ProgramExerciseMetric
+            .join(
+                MetricType,
+                JoinType.INNER,
+                additionalConstraint = {
+                    ProgramExerciseMetric.metricTypeId eq MetricType.id
+                }
+            )
             .selectAll()
-            .where { ProgramExerciseMetric.programExerciseId eq programExerciseId }
+            .where {
+                ProgramExerciseMetric.programExerciseId eq programExerciseId
+            }
             .map { row ->
                 ProgramExerciseMetricResponseDTO(
-                    metricTypeId = row[ProgramExerciseMetric.metricTypeId],
+                    metricType = MetricTypeDTO(
+                        id = row[MetricType.id],
+                        name = row[MetricType.name],
+                        unit = row[MetricType.unit]
+                    ),
                     value = row[ProgramExerciseMetric.value].toDouble()
                 )
             }
-    } 
+    }
     
     fun getProgramExerciseIds(programId: Long): List<Long> {
         return ProgramExercise

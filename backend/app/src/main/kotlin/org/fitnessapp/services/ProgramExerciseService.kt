@@ -133,10 +133,6 @@ object ProgramExerciseService {
     }
 
     fun deleteProgramExerciseAndMetrics(programExerciseId: Long): Int = transaction {
-        ProgramExerciseMetric.deleteWhere {
-            ProgramExerciseMetric.programExerciseId eq programExerciseId
-        }
-
         ProgramExercise.deleteWhere {
             ProgramExercise.id eq programExerciseId
         }

@@ -12,7 +12,11 @@ object Activity : Table("activity") {
 
     val profileId = reference("profile_id", Profile.id)
 
-    val programExerciseId = reference("program_exercise_id", ProgramExercise.id)
+    val programExerciseId = reference(
+        "program_exercise_id",
+        ProgramExercise.id,
+        onDelete = ReferenceOption.CASCADE
+    )
 
     override val primaryKey = PrimaryKey(id)
 }

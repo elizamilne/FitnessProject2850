@@ -38,7 +38,7 @@ export default function Login() {
         const profile = profileRes?.data || profileRes;
 
         sessionStorage.setItem("profile", JSON.stringify(profile));
-        navigate("/dashboard");
+        navigate("/training-page");
       } catch (profileErr) {
         console.error("No profile found:", profileErr);
 

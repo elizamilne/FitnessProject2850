@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { profileService } from "../../services/profile";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
+import AnimatedError from "../../common/ui/AnimatedError";
 
 const quiz = [
   {
@@ -69,7 +70,6 @@ const Questions = () => {
   const currentQuestion = quiz[currentIndex];
   const progress = ((currentIndex + 1) / quiz.length) * 100;
 
-  // Animate progress on change
   useEffect(() => {
     gsap.to(progressRef.current, {
       width: `${progress}%`,
@@ -92,6 +92,7 @@ const Questions = () => {
 
   const buildPayload = (answers) => {
     const userId = getUserId();
+
     return {
       userId,
       ...answers,
@@ -104,6 +105,23 @@ const Questions = () => {
     sessionStorage.setItem("profile", JSON.stringify(profile));
   };
 
+  const handleNumberInputChange = (value) => {
+    if (value === "") {
+      setAnswer("");
+      setError("");
+      return;
+    }
+
+    const numericValue = Number(value);
+
+    if (Number.isNaN(numericValue) || numericValue < 0) {
+      return;
+    }
+
+    setAnswer(value);
+    setError("");
+  };
+
   const handleNext = async (e) => {
     e.preventDefault();
 
@@ -114,11 +132,14 @@ const Questions = () => {
 
     if (
       currentQuestion.type === "input" &&
-      currentQuestion.inputType === "number" &&
-      isNaN(answer)
+      currentQuestion.inputType === "number"
     ) {
-      setError("Please enter a valid number");
-      return;
+      const numericAnswer = Number(answer);
+
+      if (Number.isNaN(numericAnswer) || numericAnswer <= 0) {
+        setError("Please enter a number greater than 0");
+        return;
+      }
     }
 
     setError("");
@@ -136,7 +157,6 @@ const Questions = () => {
     setAnswers(updatedAnswers);
     setAnswer("");
 
-    // GSAP forward animation
     if (currentIndex + 1 < quiz.length) {
       gsap.to(contentRef.current, {
         y: -40,
@@ -154,10 +174,11 @@ const Questions = () => {
               opacity: 1,
               duration: 0.35,
               ease: "power3.out",
-            },
+            }
           );
         },
       });
+
       return;
     }
 
@@ -197,7 +218,7 @@ const Questions = () => {
             opacity: 1,
             duration: 0.35,
             ease: "power3.out",
-          },
+          }
         );
       },
     });
@@ -209,24 +230,35 @@ const Questions = () => {
 
     if (!active || !next) return;
 
-    // load next video in hidden player
     next.src = currentQuestion.video;
 
     next.oncanplay = () => {
       next.play();
 
-      // smooth crossfade
-      gsap.to(next, { opacity: 1, duration: 0.6, ease: "power2.out" });
-      gsap.to(active, { opacity: 0, duration: 0.6, ease: "power2.out" });
+      gsap.to(next, {
+        opacity: 1,
+        duration: 0.6,
+        ease: "power2.out",
+      });
+
+      gsap.to(active, {
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out",
+      });
 
       setIsAActive((prev) => !prev);
     };
+
+    return () => {
+      next.oncanplay = null;
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestion.video]);
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
-      {/* Background Video */}
       <video
         ref={videoA}
         autoPlay
@@ -244,14 +276,12 @@ const Questions = () => {
         className="absolute w-full h-full object-cover opacity-0"
       />
 
-      {/* Overlay */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-purple-900/20 to-black/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.65)_100%)]" />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex items-center justify-center h-screen px-4 text-white">
         <form
           onSubmit={handleNext}
@@ -263,11 +293,9 @@ const Questions = () => {
             shadow-[0_10px_40px_rgba(0,0,0,0.4)]
           "
         >
-          {/* Glow */}
           <div className="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
 
           <div ref={contentRef} className="relative z-10">
-            {/* Progress */}
             <div className="mb-6 space-y-2">
               <div className="flex justify-between text-xs text-gray-400">
                 <span>
@@ -285,12 +313,10 @@ const Questions = () => {
               </div>
             </div>
 
-            {/* Question */}
             <h2 className="text-2xl sm:text-3xl font-bold mb-6">
               {currentQuestion.question}
             </h2>
 
-            {/* Choices */}
             {currentQuestion.type === "choice" && (
               <div className="flex flex-col gap-3">
                 {currentQuestion.options.map((option) => {
@@ -323,12 +349,28 @@ const Questions = () => {
               </div>
             )}
 
-            {/* Input */}
             {currentQuestion.type === "input" && (
               <input
                 type={currentQuestion.inputType || "text"}
+                min={currentQuestion.inputType === "number" ? 0 : undefined}
+                step={currentQuestion.inputType === "number" ? 1 : undefined}
                 value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
+                onChange={(e) => {
+                  if (currentQuestion.inputType === "number") {
+                    handleNumberInputChange(e.target.value);
+                    return;
+                  }
+
+                  setAnswer(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (
+                    currentQuestion.inputType === "number" &&
+                    ["-", "+", "e", "E"].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 placeholder={currentQuestion.placeholder}
                 className="
                   w-full mt-2 p-3 rounded-xl
@@ -339,11 +381,11 @@ const Questions = () => {
                 "
               />
             )}
+ 
+            <div className="mt-3">
+              <AnimatedError message={error} />
+            </div>
 
-            {/* Error */}
-            {error && <p className="text-red-400 text-sm mt-3">{error}</p>}
-
-            {/* Buttons */}
             <div className="flex gap-3 mt-6">
               <button
                 type="button"
@@ -375,7 +417,6 @@ const Questions = () => {
         </form>
       </div>
 
-      {/* Exit / Logout */}
       <div className="absolute top-6 right-6 z-20">
         <button
           onClick={() => {

@@ -22,7 +22,7 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
       gsap.to(".category-item", {
         opacity: 1,
         y: 0,
-        duration: 0.20,
+        duration: 0.2,
         stagger: 0.02,
         ease: "power2.out",
       });
@@ -36,44 +36,44 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
     onNext?.();
   };
 
+  const isEmpty = categories.length === 0;
+
   return (
     <div ref={containerRef} className="space-y-3">
-      {/* Header */}
       <h3 className="text-xl font-semibold text-gray-900">
         Select Category
       </h3>
 
-      {/* List */}
-      <div className="space-y-2">
-        {categories.map((c) => {
-          return (
+      {isEmpty ? (
+        <div className="text-center py-10 text-md text-gray-500">
+            No categories found
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {categories.map((c) => (
             <div
               key={c.id}
               onClick={() => handleClick(c)}
-              className={`
+              className="
                 category-item
                 group flex items-center gap-4 px-4 py-3 rounded-xl
                 cursor-pointer transition-all duration-200
-
                 bg-white/60 backdrop-blur-md border border-white/50
-
                 hover:bg-gradient-to-r 
                 hover:from-indigo-500/5 hover:to-purple-500/5
                 hover:border-indigo-200/60
-              `}
+              "
               style={{
-                opacity: 0,          
+                opacity: 0,
                 transform: "translateY(16px)",
               }}
             >
-              {/* Image */}
               <img
                 src={c.image || "https://via.placeholder.com/60"}
                 alt={c.name}
                 className="w-14 h-14 rounded-lg object-cover"
               />
 
-              {/* Text */}
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 truncate">
                   {c.name}
@@ -84,7 +84,6 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
                 </p>
               </div>
 
-              {/* Arrow */}
               <span
                 className="
                   text-sm transition-all duration-200
@@ -94,9 +93,9 @@ const ExerciseCategorySelect = ({ onSelect, onNext }) => {
                 →
               </span>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

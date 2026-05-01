@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
 import { programExerciseMetricService } from "../../../services/programExerciseMetric";
 import { activityService } from "../../../services/activity";
 
@@ -7,28 +6,27 @@ import { useExercises } from "./hooks/useExercises";
 import { useCompletedExercises } from "./hooks/useCompletedExercises";
 
 const TrainingContentList = ({ program, date }) => {
-  const { exercises } = useExercises(program);
+  const { exercises = [] } = useExercises(program) || {};
 
   const {
-    completed,
-    initialCompleted,
+    completed = [],
+    initialCompleted = [],
     toggleExercise,
   } = useCompletedExercises(program, date);
 
   const progress = exercises.length
     ? Math.min(
-      100,
-      Math.round(
-        ([...new Set(completed)].filter((id) =>
-          exercises.some((ex) => ex.programExerciseId === id)
-        ).length /
-          exercises.length) *
-        100
+        100,
+        Math.round(
+          ([...new Set(completed)].filter((id) =>
+            exercises.some((ex) => ex.programExerciseId === id)
+          ).length /
+            exercises.length) *
+            100
+        )
       )
-    )
     : 0;
 
-  // Pagination
   const [page, setPage] = useState(1);
   const pageSize = 8;
 
@@ -56,8 +54,12 @@ const TrainingContentList = ({ program, date }) => {
   };
 
   const handleSave = async () => {
+    if (!program || exercises.length === 0) return;
+
     const profile = JSON.parse(sessionStorage.getItem("profile"));
     const profileId = profile?.id;
+
+    if (!profileId) return;
 
     try {
       const toCreate = completed.filter(
@@ -68,7 +70,6 @@ const TrainingContentList = ({ program, date }) => {
         (id) => !completed.includes(id)
       );
 
-      // Create
       await Promise.all(
         toCreate.map(async (programExerciseId) => {
           const res =
@@ -77,8 +78,8 @@ const TrainingContentList = ({ program, date }) => {
             );
 
           const cleanedMetrics = res.data.map(
-            ({ metricTypeId, value }) => ({
-              metricTypeId,
+            ({ metricType, metricTypeId, value }) => ({
+              metricTypeId: metricType?.id ?? metricTypeId,
               value,
             })
           );
@@ -94,7 +95,6 @@ const TrainingContentList = ({ program, date }) => {
         })
       );
 
-      // Delete
       await Promise.all(
         toDelete.map((programExerciseId) =>
           activityService.deleteByProgramExercise(
@@ -109,7 +109,6 @@ const TrainingContentList = ({ program, date }) => {
     }
   };
 
-  // Empty state
   if (!program) {
     return (
       <div className="w-full lg:w-[80%] mx-auto">
@@ -131,7 +130,6 @@ const TrainingContentList = ({ program, date }) => {
 
   return (
     <div className="w-full lg:w-[100%] mx-auto space-y-6">
-      {/* Header */}
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-2xl font-semibold text-gray-900 truncate">
@@ -140,7 +138,13 @@ const TrainingContentList = ({ program, date }) => {
 
           <button
             onClick={handleSave}
-            className="px-5 py-2.5 rounded-lg text-base font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:opacity-90 active:scale-95 transition"
+            disabled={isEmpty}
+            className="
+              px-5 py-2.5 rounded-lg text-base font-semibold
+              bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+              hover:opacity-90 active:scale-95 transition
+              disabled:opacity-40 disabled:cursor-not-allowed
+            "
           >
             Save
           </button>
@@ -161,9 +165,8 @@ const TrainingContentList = ({ program, date }) => {
         </div>
       </div>
 
-      {/* Exercises */}
       {isEmpty ? (
-        <div className="relative p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/50 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex items-center justify-center">
+        <div className="relative p-6 flex items-center justify-center">
           <div className="text-center text-gray-400 max-w-sm space-y-2">
             <p className="text-base font-semibold text-gray-500">
               No exercises yet
@@ -177,30 +180,26 @@ const TrainingContentList = ({ program, date }) => {
         <div>
           <div className="space-y-2">
             {paginatedExercises.map((exercise) => {
-              const id = exercise.programExerciseId;
-              const programId = program.id;
-
-              const uniqueKey = `${programId}-${id}`;
-
               const isCompleted = completed.includes(
                 exercise.programExerciseId
               );
 
               return (
                 <div
-                  key={uniqueKey}
+                  key={exercise.programExerciseId}
                   onClick={() => toggleExercise(exercise)}
                   className={`
                     flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer
                     transition-all duration-200 relative
-                    ${isCompleted
-                      ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
-                      : "hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18"
+                    ${
+                      isCompleted
+                        ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
+                        : "hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18"
                     }
                   `}
                 >
                   <img
-                    src={exercise.image}
+                    src={exercise.image || "https://via.placeholder.com/60"}
                     alt={exercise.exerciseName}
                     className="w-12 h-12 rounded-lg object-cover"
                   />
@@ -216,10 +215,11 @@ const TrainingContentList = ({ program, date }) => {
                   </div>
 
                   <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${isCompleted
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
+                      isCompleted
                         ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
                         : "border border-gray-300"
-                      }`}
+                    }`}
                   >
                     {isCompleted && "✓"}
                   </div>
@@ -232,7 +232,6 @@ const TrainingContentList = ({ program, date }) => {
             })}
           </div>
 
-          {/* Pagination */}
           <div className="flex items-center justify-center gap-8 mt-6">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
@@ -247,9 +246,7 @@ const TrainingContentList = ({ program, date }) => {
             </span>
 
             <button
-              onClick={() =>
-                setPage((p) => Math.min(p + 1, totalPages))
-              }
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={!hasNext}
               className="px-4 py-2.5 rounded-xl text-sm font-medium bg-gray-200 text-gray-800 hover:bg-gray-300 active:scale-95 transition disabled:opacity-40 disabled:cursor-not-allowed"
             >

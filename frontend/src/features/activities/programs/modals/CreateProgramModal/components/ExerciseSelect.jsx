@@ -21,7 +21,7 @@ const ExerciseSelect = ({
     fetchExercises();
   }, [selectedCategory]);
 
-  // 🔥 SAME animation as categories
+  // Same animation as categories
   useLayoutEffect(() => {
     if (!exercises.length) return;
 

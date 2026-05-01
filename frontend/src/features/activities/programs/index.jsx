@@ -1,7 +1,7 @@
 import usePrograms from "./hooks/usePrograms";
 
 import ViewAllProgramModal from "./modals/ViewAllProgramModal";
-import DetailProgramModal from "./modals/DetailProgramModal";
+import DetailProgramModal from "./modals/DetailProgramModal/index";
 import CreateProgramModal from "./modals/CreateProgramModal";
 
 import ProgramsHeader from "./components/ProgramsHeader";

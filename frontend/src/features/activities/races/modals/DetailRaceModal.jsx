@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../../../../common/ui/Modal";
 import { raceService } from "../../../../services/race";
 
@@ -6,8 +6,31 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
   const [form, setForm] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  // initialize form when race changes
-  if (race && (!form || form.id !== race.id)) {
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [completeLoading, setCompleteLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  useEffect(() => {
+    if (race) {
+      setForm({
+        id: race.id,
+        title: race.title || "",
+        location: race.location || "",
+        date: race.date?.split("T")[0] || "",
+        bannerUrl: race.bannerUrl || "",
+      });
+
+      setIsEditing(false);
+    } else {
+      setForm(null);
+    }
+  }, [race]);
+
+  if (!race || !form) return null;
+
+  const isValid = form.title && form.location && form.date;
+
+  const resetForm = () => {
     setForm({
       id: race.id,
       title: race.title || "",
@@ -15,17 +38,16 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
       date: race.date?.split("T")[0] || "",
       bannerUrl: race.bannerUrl || "",
     });
+
     setIsEditing(false);
-  }
-
-  if (!race || !form) return null;
-
-  const isValid = form.title && form.location && form.date;
+  };
 
   const handleUpdate = async () => {
     if (!isValid) return;
 
     try {
+      setUpdateLoading(true);
+
       const response = await raceService.updateRace(race.id, {
         ...race,
         ...form,
@@ -35,16 +57,45 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
       setIsEditing(false);
     } catch (err) {
       console.error("Update failed:", err);
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
   const handleComplete = async () => {
     try {
+      setCompleteLoading(true);
+
       const response = await raceService.toggleComplete(race.id);
 
       onUpdate?.(response.data);
     } catch (err) {
       console.error("Complete failed:", err);
+    } finally {
+      setCompleteLoading(false);
+    }
+  };
+
+  const handleDeleteRace = async () => {
+    if (!race?.id) return;
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this race? This cannot be undone."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleteLoading(true);
+
+      await raceService.deleteRace(race.id);
+
+      onUpdate?.({ ...race, deleted: true });
+      onClose();
+    } catch (err) {
+      console.error("Race delete failed:", err);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -53,13 +104,12 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
       isOpen={isOpen}
       onClose={onClose}
       header={
-        <h3 classNamme="text-xl font-semibold text-gray-900">
+        <h3 className="text-xl font-semibold text-gray-900">
           {isEditing ? "Edit Race" : "Race Details"}
         </h3>
       }
       body={
         <div className="space-y-6">
-          {/* Image Header */}
           <div className="relative">
             <img
               src={form.bannerUrl || "https://via.placeholder.com/300x200"}
@@ -67,41 +117,38 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
               className="w-full h-48 object-cover rounded-2xl"
             />
 
-            {/* subtle overlay */}
             <div className="absolute inset-0 rounded-2xl bg-black/20" />
+
+            <span
+              className={`
+                absolute top-3 right-3 rounded-full px-3 py-1
+                text-xs font-semibold backdrop-blur-md text-white shadow-md
+                ${race.completed
+                  ? "bg-gradient-to-r from-green-500 to-emerald-500"
+                  : "bg-gradient-to-r from-indigo-500 to-purple-500"
+                }
+              `}
+            >
+              {race.completed ? "Completed" : "Upcoming"}
+            </span>
           </div>
 
-          {/* Content */}
-          <div className="space-y-4">
-            {/* Title */}
+          <div className={isEditing ? "space-y-4" : "space-y-2"}>
             {isEditing ? (
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl
-              bg-white/70 backdrop-blur border border-gray-200
-              text-gray-800 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
-              />
-            ) : (
-              <h4 className="text-2xl font-semibold text-gray-900">
-                {form.title}
-              </h4>
-            )}
+              <div className="grid grid-cols-1 gap-4">
+                <input
+                  type="text"
+                  value={form.title}
+                  placeholder="Race title"
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="
+                    w-full px-4 py-3 rounded-xl
+                    bg-white/70 backdrop-blur border border-gray-200
+                    text-gray-800 placeholder-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+                  "
+                />
 
-            {/* Meta */}
-            {!isEditing && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span>{new Date(form.date).toLocaleDateString()}</span>
-                <span className="text-gray-300">•</span>
-                <span>{form.location}</span>
-              </div>
-            )}
-
-            {/* Edit Fields */}
-            {isEditing && (
-              <div className="grid grid-cols-1 gap-3">
                 <input
                   type="text"
                   placeholder="Banner image URL"
@@ -109,10 +156,12 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
                   onChange={(e) =>
                     setForm({ ...form, bannerUrl: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl
-                bg-white/70 backdrop-blur border border-gray-200
-                text-gray-700 placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                  className="
+                    w-full px-4 py-3 rounded-xl
+                    bg-white/70 backdrop-blur border border-gray-200
+                    text-gray-700 placeholder-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+                  "
                 />
 
                 <input
@@ -122,45 +171,66 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
                   onChange={(e) =>
                     setForm({ ...form, location: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl
-                bg-white/70 backdrop-blur border border-gray-200
-                text-gray-700
-                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                  className="
+                    w-full px-4 py-3 rounded-xl
+                    bg-white/70 backdrop-blur border border-gray-200
+                    text-gray-700 placeholder-gray-400
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+                  "
                 />
 
                 <input
                   type="date"
                   value={form.date}
-                  onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl
-                bg-white/70 backdrop-blur border border-gray-200
-                text-gray-700
-                focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                  onChange={(e) =>
+                    setForm({ ...form, date: e.target.value })
+                  }
+                  className="
+                    w-full px-4 py-3 rounded-xl
+                    bg-white/70 backdrop-blur border border-gray-200
+                    text-gray-700
+                    focus:outline-none focus:ring-2 focus:ring-indigo-400/40
+                  "
                 />
               </div>
+            ) : (
+              <>
+                <h4 className="text-2xl font-semibold text-gray-900">
+                  {form.title}
+                </h4>
+
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span>{new Date(form.date).toLocaleDateString()}</span>
+                  <span className="text-gray-300">•</span>
+                  <span>{form.location}</span>
+                </div>
+              </>
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 pt-2">
             {isEditing ? (
               <>
                 <button
                   onClick={handleUpdate}
-                  disabled={!isValid}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-                hover:opacity-90 active:scale-[0.98] transition
-                disabled:opacity-40"
+                  disabled={!isValid || updateLoading}
+                  className="
+                    flex-1 py-3 rounded-xl text-sm font-semibold
+                    bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                    hover:opacity-90 active:scale-[0.98] transition
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                  "
                 >
-                  Save Changes
+                  {updateLoading ? "Saving..." : "Save Changes"}
                 </button>
 
                 <button
-                  onClick={() => setIsEditing(false)}
-                  className="flex-1 py-3 rounded-xl text-sm font-medium
-                bg-gray-100 text-gray-700
-                hover:bg-gray-200 transition"
+                  onClick={resetForm}
+                  className="
+                    flex-1 py-3 rounded-xl text-sm font-medium
+                    bg-gray-100 text-gray-700
+                    hover:bg-gray-200 transition
+                  "
                 >
                   Cancel
                 </button>
@@ -169,24 +239,54 @@ const DetailRaceModal = ({ isOpen, onClose, race, onUpdate }) => {
               <>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex-1 py-3 rounded-xl text-sm font-medium
-                bg-gray-100 text-gray-700
-                hover:bg-gray-200 transition"
+                  className="
+                    flex-1 py-3 rounded-xl text-sm font-medium
+                    bg-gray-100 text-gray-700
+                    hover:bg-gray-200 transition
+                  "
                 >
                   Edit
                 </button>
 
                 <button
                   onClick={handleComplete}
-                  className="flex-1 py-3 rounded-xl text-sm font-semibold
-                bg-gradient-to-r from-indigo-500 to-purple-500 text-white
-                hover:opacity-90 active:scale-[0.98] transition"
+                  disabled={completeLoading}
+                  className="
+                    flex-1 py-3 rounded-xl text-sm font-semibold
+                    bg-gradient-to-r from-indigo-500 to-purple-500 text-white
+                    hover:opacity-90 active:scale-[0.98] transition
+                    disabled:opacity-40 disabled:cursor-not-allowed
+                  "
                 >
-                  {race.completed ? "Mark as Upcoming" : "Mark as Completed"}
+                  {completeLoading
+                    ? race.completed
+                      ? "Updating..."
+                      : "Updating..."
+                    : race.completed
+                      ? "Mark as Upcoming"
+                      : "Mark as Completed"}
                 </button>
               </>
             )}
           </div>
+
+          {!isEditing && (
+            <div className="flex justify-center border-t border-gray-100 pt-4">
+              <button
+                type="button"
+                onClick={handleDeleteRace}
+                disabled={deleteLoading}
+                className="
+                  text-xs font-medium text-gray-400
+                  hover:text-red-500
+                  transition
+                  disabled:opacity-40 disabled:cursor-not-allowed
+                "
+              >
+                {deleteLoading ? "Deleting..." : "Delete race"}
+              </button>
+            </div>
+          )}
         </div>
       }
     />

@@ -20,6 +20,13 @@ export const programService = {
      
     createProgram: (programData) => 
         api.post("/programs", programData),
+
+
+    updateProgram: (id, programData) =>
+        api.put(`/programs/${id}`, {
+            title: programData.title,
+            bannerUrl: programData.bannerUrl,
+        }),
     
     deleteProgram: (id) => 
         api.delete(`/programs/${id}`)

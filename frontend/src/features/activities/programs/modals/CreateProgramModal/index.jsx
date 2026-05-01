@@ -13,10 +13,10 @@ import { exerciseService } from "../../../../../services/exercise";
 const steps = ["category", "exercise", "metrics", "schedule"];
 
 const defaultProgramBanners = [
-  "/defaults/program-banner1.jpeg",
-  "/defaults/program-banner2.jpg",
-  "/defaults/program-banner3.jpg",
-  "/defaults/program-banner4.jpg",
+  "/defaults/program-banner1.webp",
+  "/defaults/program-banner2.webp",
+  "/defaults/program-banner3.webp",
+  "/defaults/program-banner4.webp",
 ];
 
 

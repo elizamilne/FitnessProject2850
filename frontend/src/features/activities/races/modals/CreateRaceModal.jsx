@@ -3,10 +3,10 @@ import Modal from "../../../../common/ui/Modal";
 import { raceService } from "../../../../services/race";
 
 const defaultRaceBanners = [
-  "/defaults/race-banner1.jpg",
-  "/defaults/race-banner2.jpg",
-  "/defaults/race-banner3.jpg",
-  "/defaults/race-banner4.jpg",
+  "/defaults/race-banner1.webp",
+  "/defaults/race-banner2.webp",
+  "/defaults/race-banner3.webp",
+  "/defaults/race-banner4.webp",
 ];
 
 const CreateRaceModal = ({ isOpen, onClose, onCreate }) => {

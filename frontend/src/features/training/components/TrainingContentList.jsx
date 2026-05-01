@@ -4,12 +4,10 @@ import { programExerciseMetricService } from "../../../services/programExerciseM
 import { activityService } from "../../../services/activity";
 
 import { useExercises } from "./hooks/useExercises";
-import { useMetrics } from "./hooks/useMetrics";
 import { useCompletedExercises } from "./hooks/useCompletedExercises";
 
 const TrainingContentList = ({ program, date }) => {
   const { exercises } = useExercises(program);
-  const { metricMap } = useMetrics();
 
   const {
     completed,
@@ -19,15 +17,15 @@ const TrainingContentList = ({ program, date }) => {
 
   const progress = exercises.length
     ? Math.min(
-        100,
-        Math.round(
-          ([...new Set(completed)].filter((id) =>
-            exercises.some((ex) => ex.programExerciseId === id)
-          ).length /
-            exercises.length) *
-            100
-        )
+      100,
+      Math.round(
+        ([...new Set(completed)].filter((id) =>
+          exercises.some((ex) => ex.programExerciseId === id)
+        ).length /
+          exercises.length) *
+        100
       )
+    )
     : 0;
 
   // Pagination
@@ -44,16 +42,15 @@ const TrainingContentList = ({ program, date }) => {
   const hasNext = page < totalPages;
   const isEmpty = exercises.length === 0;
 
-  const formatMetrics = (metrics) => {
-    if (!metrics) return "";
-
+  const formatMetrics = (metrics = []) => {
     return metrics
       .slice(0, 2)
       .map((m) => {
-        const metric = metricMap[m.metricTypeId];
-        if (!metric) return m.value;
+        const name = m.metricType?.name || "Metric";
+        const unit = m.metricType?.unit || "";
+        const value = m.value ?? "";
 
-        return `${m.value}${metric.unit || ""} ${metric.name.toLowerCase()}`;
+        return `${value}${unit ? ` ${unit}` : ""} ${name.toLowerCase()}`;
       })
       .join(" • ");
   };
@@ -196,10 +193,9 @@ const TrainingContentList = ({ program, date }) => {
                   className={`
                     flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer
                     transition-all duration-200 relative
-                    ${
-                      isCompleted
-                        ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
-                        : "hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18"
+                    ${isCompleted
+                      ? "bg-white/70 backdrop-blur border border-indigo-100 shadow-[0_4px_20px_rgba(99,102,241,0.08)]"
+                      : "hover:bg-gradient-to-br hover:from-indigo-500/18 hover:via-purple-500/9 hover:to-indigo-500/18"
                     }
                   `}
                 >
@@ -220,11 +216,10 @@ const TrainingContentList = ({ program, date }) => {
                   </div>
 
                   <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${
-                      isCompleted
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium ${isCompleted
                         ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white"
                         : "border border-gray-300"
-                    }`}
+                      }`}
                   >
                     {isCompleted && "✓"}
                   </div>

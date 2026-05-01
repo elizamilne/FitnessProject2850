@@ -28,6 +28,7 @@ import org.fitnessapp.models.ProgramExerciseMetric
 
 import org.fitnessapp.services.ProgramService
 import org.fitnessapp.services.ProfileService
+import org.fitnessapp.models.UpdateProgramRequest
 
 fun Route.programRoutes() { 
     route("/programs") {
@@ -128,6 +129,22 @@ fun Route.programRoutes() {
             ProgramService.deleteProgramById(id)
 
             call.respond(HttpStatusCode.OK, "Program deleted")
+        }
+
+        put("/{id}") {
+            val id = call.parameters["id"]?.toLongOrNull()
+                ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+            val request = call.receive<UpdateProgramRequest>()
+
+            if (request.title.isBlank()) {
+                return@put call.respond(HttpStatusCode.BadRequest, "Title cannot be empty")
+            }
+
+            val updatedProgram = ProgramService.updateProgram(id, request)
+                ?: return@put call.respond(HttpStatusCode.NotFound, "Program not found")
+
+            call.respond(HttpStatusCode.OK, updatedProgram)
         }
     }
 }

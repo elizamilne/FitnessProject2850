@@ -173,6 +173,8 @@ cd backend
 
 After the backend starts, open the **Ports** tab in Codespaces and find port `8080`.
 
+Set the visibility of port `8080` to **Public**. If port `8080` is private, the frontend may not be able to call the backend correctly, and API requests may fail with Axios network errors or CORS preflight errors.
+
 Copy the forwarded URL for port `8080`. It will look similar to this:
 
 ```text
@@ -180,6 +182,20 @@ https://your-codespace-name-8080.app.github.dev
 ```
 
 This is the backend URL.
+
+Do not include a trailing slash at the end of the backend URL when adding it to the `.env` file.
+
+Correct:
+
+```env
+VITE_API_URL=https://your-codespace-name-8080.app.github.dev
+```
+
+Incorrect:
+
+```env
+VITE_API_URL=https://your-codespace-name-8080.app.github.dev/
+```
 
 ---
 
@@ -195,6 +211,8 @@ npm run dev
 
 After the frontend starts, open the **Ports** tab in Codespaces and find port `5173`.
 
+Set the visibility of port `5173` to **Public**.
+
 Copy the forwarded URL for port `5173`. It will look similar to this:
 
 ```text
@@ -202,6 +220,20 @@ https://your-codespace-name-5173.app.github.dev
 ```
 
 This is the frontend URL.
+
+Do not include a trailing slash at the end of the frontend URL when adding it to the `.env` file.
+
+Correct:
+
+```env
+FRONTEND_ORIGIN=https://your-codespace-name-5173.app.github.dev
+```
+
+Incorrect:
+
+```env
+FRONTEND_ORIGIN=https://your-codespace-name-5173.app.github.dev/
+```
 
 ---
 
@@ -216,15 +248,15 @@ frontend/.env
 Set the API base URL to the Codespaces backend URL from port `8080`:
 
 ```env
-VITE_API_BASE_URL=https://your-codespace-name-8080.app.github.dev
+VITE_API_URL=https://your-codespace-name-8080.app.github.dev
 ```
 
-Do not include a trailing slash at the end of the URL unless your Axios configuration specifically requires it.
+Do not include a trailing slash at the end of the URL.
 
 Example:
 
 ```env
-VITE_API_BASE_URL=https://ubiquitous-fishstick-75g94ppvg7x2pqjj-8080.app.github.dev
+VITE_API_URL=https://ubiquitous-fishstick-75g94ppvg7x2pqjj-8080.app.github.dev
 ```
 
 ---
@@ -250,6 +282,8 @@ FRONTEND_ORIGIN=https://ubiquitous-fishstick-75g94ppvg7x2pqjj-5173.app.github.de
 ```
 
 This allows the backend CORS configuration to accept requests from the Codespaces frontend.
+
+Do not include a trailing slash at the end of the URL.
 
 ---
 
@@ -282,16 +316,19 @@ If the frontend loads but API requests fail, check the following:
 - The backend is running.
 - The frontend is running.
 - Port `8080` is forwarded in Codespaces.
+- Port `8080` visibility is set to **Public**.
 - Port `5173` is forwarded in Codespaces.
+- Port `5173` visibility is set to **Public**.
 - `frontend/.env` points to the Codespaces backend URL, not `localhost`.
 - `backend/.env` points to the Codespaces frontend URL, not `localhost`.
+- Neither `.env` URL has a trailing slash at the end.
 - Both servers were restarted after changing the `.env` files.
 
 For Codespaces, the two environment files should look like this:
 
 ```env
 # frontend/.env
-VITE_API_BASE_URL=https://your-codespace-name-8080.app.github.dev
+VITE_API_URL=https://your-codespace-name-8080.app.github.dev
 ```
 
 ```env
@@ -303,7 +340,7 @@ For local development, they should look like this:
 
 ```env
 # frontend/.env
-VITE_API_BASE_URL=http://localhost:8080
+VITE_API_URL=http://localhost:8080
 ```
 
 ```env

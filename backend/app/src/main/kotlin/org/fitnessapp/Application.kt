@@ -1,6 +1,7 @@
 package org.fitnessapp
 
 import kotlinx.serialization.json.Json
+import java.io.File
 
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -37,14 +38,59 @@ import org.fitnessapp.routes.chatRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
+fun loadEnvValue(key: String): String? {
+    val envFile = File(".env")
+
+    if (!envFile.exists()) {
+        return System.getenv(key)
+    }
+
+    return envFile
+        .readLines()
+        .map { it.trim() }
+        .filter { it.isNotEmpty() && !it.startsWith("#") }
+        .mapNotNull { line ->
+            val parts = line.split("=", limit = 2)
+
+            if (parts.size == 2) {
+                parts[0].trim() to parts[1].trim()
+            } else {
+                null
+            }
+        }
+        .firstOrNull { it.first == key }
+        ?.second
+        ?: System.getenv(key)
+}
+
 fun Application.module() {
     initDatabase()
 
+    val frontendOrigin = loadEnvValue("FRONTEND_ORIGIN") ?: "http://localhost:5173"
+
     install(CORS) {
-        allowHost("localhost:5173")
-        allowHost("localhost:3000")
-        allowHost("127.0.0.1:5173")
-        allowHost("127.0.0.1:3000")
+        allowHost("localhost:5173", schemes = listOf("http"))
+        allowHost("localhost:3000", schemes = listOf("http"))
+        allowHost("127.0.0.1:5173", schemes = listOf("http"))
+        allowHost("127.0.0.1:3000", schemes = listOf("http"))
+
+        // Allows any GitHub Codespaces frontend URL.
+        allowHost("*.app.github.dev", schemes = listOf("https"))
+
+        // Also allows the exact frontend URL from backend/.env.
+        if (frontendOrigin.startsWith("http://")) {
+            allowHost(
+                frontendOrigin.removePrefix("http://"),
+                schemes = listOf("http")
+            )
+        }
+
+        if (frontendOrigin.startsWith("https://")) {
+            allowHost(
+                frontendOrigin.removePrefix("https://"),
+                schemes = listOf("https")
+            )
+        }
 
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
@@ -53,6 +99,7 @@ fun Application.module() {
         allowMethod(HttpMethod.Post)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Patch)
         allowMethod(HttpMethod.Options)
 
         allowCredentials = true
@@ -127,4 +174,5 @@ fun Application.module() {
 
     val port = environment.config.property("ktor.deployment.port").getString()
     println("🚀 Server running at \u001B[32mhttp://localhost:$port\u001B[0m")
+    println("🌐 Allowed frontend origin: \u001B[36m$frontendOrigin\u001B[0m")
 }

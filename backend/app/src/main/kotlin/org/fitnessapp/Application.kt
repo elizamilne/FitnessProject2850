@@ -39,9 +39,16 @@ import org.fitnessapp.routes.chatRoutes
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun loadEnvValue(key: String): String? {
-    val envFile = File(".env")
+    val possibleEnvFiles = listOf(
+        File(".env"),
+        File("../.env"),
+        File("../../.env"),
+        File("backend/.env")
+    )
 
-    if (!envFile.exists()) {
+    val envFile = possibleEnvFiles.firstOrNull { it.exists() }
+
+    if (envFile == null) {
         return System.getenv(key)
     }
 
@@ -60,13 +67,17 @@ fun loadEnvValue(key: String): String? {
         }
         .firstOrNull { it.first == key }
         ?.second
+        ?.trim()
+        ?.removeSuffix("/")
         ?: System.getenv(key)
 }
 
 fun Application.module() {
     initDatabase()
 
-    val frontendOrigin = loadEnvValue("FRONTEND_ORIGIN") ?: "http://localhost:5173"
+    val frontendOrigin = (loadEnvValue("FRONTEND_ORIGIN") ?: "http://localhost:5173")
+        .trim()
+        .removeSuffix("/")
 
     install(CORS) {
         allowHost("localhost:5173", schemes = listOf("http"))
@@ -74,20 +85,16 @@ fun Application.module() {
         allowHost("127.0.0.1:5173", schemes = listOf("http"))
         allowHost("127.0.0.1:3000", schemes = listOf("http"))
 
-        // Allows any GitHub Codespaces frontend URL.
-        allowHost("*.app.github.dev", schemes = listOf("https"))
-
-        // Also allows the exact frontend URL from backend/.env.
         if (frontendOrigin.startsWith("http://")) {
             allowHost(
-                frontendOrigin.removePrefix("http://"),
+                frontendOrigin.removePrefix("http://").removeSuffix("/"),
                 schemes = listOf("http")
             )
         }
 
         if (frontendOrigin.startsWith("https://")) {
             allowHost(
-                frontendOrigin.removePrefix("https://"),
+                frontendOrigin.removePrefix("https://").removeSuffix("/"),
                 schemes = listOf("https")
             )
         }
@@ -101,8 +108,6 @@ fun Application.module() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Patch)
         allowMethod(HttpMethod.Options)
-
-        allowCredentials = true
     }
 
     install(ContentNegotiation) {
@@ -173,6 +178,7 @@ fun Application.module() {
     }
 
     val port = environment.config.property("ktor.deployment.port").getString()
+
     println("🚀 Server running at \u001B[32mhttp://localhost:$port\u001B[0m")
     println("🌐 Allowed frontend origin: \u001B[36m$frontendOrigin\u001B[0m")
 }

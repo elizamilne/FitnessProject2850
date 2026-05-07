@@ -153,7 +153,14 @@ http://localhost:5173/
 
 When running the project in GitHub Codespaces, the frontend and backend are hosted on cloud URLs instead of `localhost`.
 
-The backend still runs on port `8080`, but Codespaces exposes it using a forwarded port URL. The frontend must use this Codespaces backend URL so that Axios can send requests to the backend correctly.
+The backend still runs on port `8080`, but Codespaces exposes it using a forwarded port URL. The frontend runs on port `5173` and also receives its own forwarded URL.
+
+Because the frontend and backend are on different Codespaces URLs, both environment files must be updated:
+
+- `frontend/.env` tells Axios where the backend API is.
+- `backend/.env` tells the backend which frontend URL is allowed by CORS.
+
+---
 
 #### Step 1: Start the backend
 
@@ -172,23 +179,11 @@ Copy the forwarded URL for port `8080`. It will look similar to this:
 https://your-codespace-name-8080.app.github.dev
 ```
 
-#### Step 2: Update the frontend environment variable
+This is the backend URL.
 
-Open the frontend environment file:
+---
 
-```text
-frontend/.env
-```
-
-Change the API base URL variable so it points to the Codespaces backend URL:
-
-```env
-VITE_API_BASE_URL=https://your-codespace-name-8080.app.github.dev
-```
-
-Do not include a trailing slash at the end of the URL unless your Axios configuration specifically requires it.
-
-#### Step 3: Start the frontend
+#### Step 2: Start the frontend once to get its Codespaces URL
 
 Open a new terminal from the root folder:
 
@@ -198,27 +193,122 @@ npm install
 npm run dev
 ```
 
-Then open the forwarded frontend URL from the **Ports** tab for port `5173`.
+After the frontend starts, open the **Ports** tab in Codespaces and find port `5173`.
 
-It will look similar to this:
+Copy the forwarded URL for port `5173`. It will look similar to this:
 
 ```text
 https://your-codespace-name-5173.app.github.dev
 ```
+
+This is the frontend URL.
+
+---
+
+#### Step 3: Update the frontend environment file
+
+Open the frontend environment file:
+
+```text
+frontend/.env
+```
+
+Set the API base URL to the Codespaces backend URL from port `8080`:
+
+```env
+VITE_API_BASE_URL=https://your-codespace-name-8080.app.github.dev
+```
+
+Do not include a trailing slash at the end of the URL unless your Axios configuration specifically requires it.
+
+Example:
+
+```env
+VITE_API_BASE_URL=https://ubiquitous-fishstick-75g94ppvg7x2pqjj-8080.app.github.dev
+```
+
+---
+
+#### Step 4: Update the backend environment file
+
+Open the backend environment file:
+
+```text
+backend/.env
+```
+
+Set the frontend origin to the Codespaces frontend URL from port `5173`:
+
+```env
+FRONTEND_ORIGIN=https://your-codespace-name-5173.app.github.dev
+```
+
+Example:
+
+```env
+FRONTEND_ORIGIN=https://ubiquitous-fishstick-75g94ppvg7x2pqjj-5173.app.github.dev
+```
+
+This allows the backend CORS configuration to accept requests from the Codespaces frontend.
+
+---
+
+#### Step 5: Restart both servers
+
+After changing `.env` files, restart both the backend and frontend.
+
+Restart the backend:
+
+```bash
+cd backend
+./gradlew run
+```
+
+Restart the frontend:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Then open the forwarded frontend URL from the **Ports** tab for port `5173`.
+
+---
 
 #### Important Codespaces note
 
 If the frontend loads but API requests fail, check the following:
 
 - The backend is running.
+- The frontend is running.
 - Port `8080` is forwarded in Codespaces.
-- The `frontend/.env` file points to the Codespaces backend URL, not `localhost`.
-- The frontend was restarted after changing the `.env` file.
+- Port `5173` is forwarded in Codespaces.
+- `frontend/.env` points to the Codespaces backend URL, not `localhost`.
+- `backend/.env` points to the Codespaces frontend URL, not `localhost`.
+- Both servers were restarted after changing the `.env` files.
 
-After changing `frontend/.env`, stop and restart the frontend server:
+For Codespaces, the two environment files should look like this:
 
-```bash
-npm run dev
+```env
+# frontend/.env
+VITE_API_BASE_URL=https://your-codespace-name-8080.app.github.dev
+```
+
+```env
+# backend/.env
+FRONTEND_ORIGIN=https://your-codespace-name-5173.app.github.dev
+```
+
+For local development, they should look like this:
+
+```env
+# frontend/.env
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+```env
+# backend/.env
+FRONTEND_ORIGIN=http://localhost:5173
 ```
 
 ---

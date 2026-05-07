@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.guava)
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("com.h2database:h2:2.2.224")
 
     // CSV
     implementation("org.apache.commons:commons-csv:1.10.0")
